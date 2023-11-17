@@ -1,0 +1,293 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  box-sizing: border-box;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+input {
+  outline: none;
+}
+
+::placeholder {
+  color: #adb5bd !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #e4e6f0;
+  border-radius: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+@font-face {
+  font-family: 'Pretendard Thin';
+  src: url('https://cidfonts.s3.ap-northeast-2.amazonaws.com/Pretendard/Pretendard-Thin.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Pretendard ExtraLight';
+  src: url('https://cidfonts.s3.ap-northeast-2.amazonaws.com/Pretendard/Pretendard-ExtraLight.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Pretendard Light';
+  src: url('https://cidfonts.s3.ap-northeast-2.amazonaws.com/Pretendard/Pretendard-Light.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Pretendard Regular';
+  src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pretendard Medium';
+  src: url('https://cidfonts.s3.ap-northeast-2.amazonaws.com/Pretendard/Pretendard-Medium.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Pretendard SemiBold';
+  src: url('https://cidfonts.s3.ap-northeast-2.amazonaws.com/Pretendard/Pretendard-SemiBold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Pretendard Bold';
+  src: url('https://cidfonts.s3.ap-northeast-2.amazonaws.com/Pretendard/Pretendard-Bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Pretendard ExtraBold';
+  src: url('https://cidfonts.s3.ap-northeast-2.amazonaws.com/Pretendard/Pretendard-ExtraBold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Pretendard Black';
+  src: url('https://cidfonts.s3.ap-northeast-2.amazonaws.com/Pretendard/Pretendard-Black.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'NanumSquare';
+  src: url('https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css') format('opentype');
+}
+
+/* @font-face {
+  font-family: 'SpoqaHanSansNeo-Thin';
+  src: url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Thin.woff2') format('woff2'), url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Thin.woff') format('woff'),
+    url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Thin.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'SpoqaHanSansNeo-Regular';
+  src: url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Regular.woff2') format('woff2'), url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Regular.woff') format('woff'),
+    url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'SpoqaHanSansNeo-Medium';
+  src: url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Medium.woff2') format('woff2'), url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Medium.woff') format('woff'),
+    url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Medium.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'SpoqaHanSansNeo-Light';
+  src: url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Light.woff2') format('woff2'), url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Light.woff') format('woff'),
+    url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Light.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'SpoqaHanSansNeo-Bold';
+  src: url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Bold.woff2') format('woff2'), url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Bold.woff') format('woff'),
+    url('../fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Bold.otf') format('opentype');
+} */
+
+/* @font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('../fonts/GmarketSansOTF/GmarketSansMedium.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'GmarketSansLight';
+  src: url('../fonts/GmarketSansOTF/GmarketSansLight.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'GmarketSansBold';
+  src: url('../fonts/GmarketSansOTF/GmarketSansBold.otf') format('opentype');
+} */
+
+/* @font-face {
+  font-family: 'SUIT Bold';
+  src: url('../fonts/SUIT/SUIT-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT ExtraBold';
+  src: url('../fonts/SUIT/SUIT-ExtraBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT ExtraLight';
+  src: url('../fonts/SUIT/SUIT-ExtraLight.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT Heavy';
+  src: url('../fonts/SUIT/SUIT-Heavy.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'SUIT Light';
+  src: url('../fonts/SUIT/SUIT-Light.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT Medium';
+  src: url('../fonts/SUIT/SUIT-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT Regular';
+  src: url('../fonts/SUIT/SUIT-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT SemiBold';
+  src: url('../fonts/SUIT/SUIT-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SUIT Thin';
+  src: url('../fonts/SUIT/SUIT-Thin.woff2') format('woff2');
+} */

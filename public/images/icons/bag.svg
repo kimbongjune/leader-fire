@@ -1,0 +1,10 @@
+<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="home_repair_service">
+<mask id="mask0_60_964" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+<rect id="Bounding box" width="24" height="24" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask0_60_964)">
+<path id="home_repair_service_2" d="M9 8H15V6H9V8ZM2 20V15H6V16H8V15H16V16H18V15H22V20H2ZM2 14V8H7V4H17V8H22V14H18V12H16V14H8V12H6V14H2Z" fill="currentColor"/>
+</g>
+</g>
+</svg>

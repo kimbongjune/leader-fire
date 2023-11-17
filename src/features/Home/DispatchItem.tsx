@@ -1,0 +1,224 @@
+import { Box, Flex, Stack } from '@chakra-ui/react';
+import EventStatus from './EventStatus';
+import styled from '@emotion/styled';
+import Clock from '../../../public/images/icons/clock.svg';
+import RightArrow from '../../../public/images/icons/arrow-right.svg';
+import { useRouter } from 'next/router';
+import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
+import { DeviceType } from '@/types/types';
+import theme from '@/theme/colors';
+
+export type DispatchItemType = {
+  id: string;
+  status: 'progress' | 'completion';
+  reportCount: number;
+  eventName: string;
+  type: 'fires' | 'rescue' | 'firstAid' | 'others';
+  address: string;
+  description: string;
+  created: string;
+};
+
+interface Props {
+  id: string;
+  status: 'progress' | 'completion';
+  reportCount: number;
+  eventName: string;
+  type: DispatchItemType['type'];
+  address: string;
+  description: string;
+  created: string;
+  deviceType?: DeviceType;
+  isNew?: boolean;
+}
+
+const DispatchItem = (props: Props) => {
+  const { deviceType } = props;
+  const router = useRouter();
+
+  return (
+    <Container className="dispatch-item" onClick={() => router.push(`/detail/${props.id}`)} deviceType={deviceType} type={props.type}>
+      <Flex align="center">
+        <Stack spacing={deviceType === 'mobile' ? '0px' : '16px'} w={deviceType === 'tabletHorizontal' ? 'auto' : '100%'}>
+          <Flex gap={deviceType === 'mobile' ? '12px' : '16px'} align="center">
+            <EventStatus eventType={props.type} reportCount={props.reportCount} status={props.status} />
+            <Stack spacing={deviceType === 'mobile' ? '8px' : '0px'} position="relative" flex={1} w={deviceType === 'tabletHorizontal' ? '256px' : '100%'}>
+              <Stack spacing="4px">
+                <Flex align="center" gap="4px" justify={deviceType === 'tabletHorizontal' ? 'flex-start' : 'space-between'}>
+                  <Title>{props.eventName}</Title>
+                  <Time>
+                    <Clock width={14} height={14} color="#ADB5BD" />
+                    30분 경과
+                  </Time>
+                </Flex>
+                <Address>{props.address}</Address>
+              </Stack>
+              <Flex gap="9px">
+                {deviceType === 'mobile' && (
+                  <>
+                    <Description dangerouslySetInnerHTML={{ __html: props.description }} />
+                    <Box width="16px" />
+                  </>
+                )}
+              </Flex>
+              {deviceType === 'mobile' && (
+                <Box position="absolute" right="0" top="50%" transform="translateY(-50%)">
+                  <RightArrow width="16px" height="16px" color="#909AA4" />
+                </Box>
+              )}
+            </Stack>
+          </Flex>
+          {deviceType === 'tabletVertical' && (
+            <Flex justify="space-between">
+              <Description dangerouslySetInnerHTML={{ __html: props.description }} />
+              <Flex align="center" gap="16px">
+                {props.isNew && <NewDataDisplay type={props.type}>신규</NewDataDisplay>}
+                <IconWrapper width="16px" height="16px" color="#909AA4">
+                  <RightArrow />
+                </IconWrapper>
+              </Flex>
+            </Flex>
+          )}
+        </Stack>
+        {deviceType === 'tabletHorizontal' && (
+          <>
+            <Divider />
+            <Description dangerouslySetInnerHTML={{ __html: props.description }} />
+            <Flex align="center" gap="16px">
+              {props.isNew && <NewDataDisplay type={props.type}>신규</NewDataDisplay>}
+              <IconWrapper width="16px" height="16px" color="#909AA4">
+                <RightArrow />
+              </IconWrapper>
+            </Flex>
+          </>
+        )}
+      </Flex>
+    </Container>
+  );
+};
+
+export default DispatchItem;
+
+DispatchItem.defaultProps = {
+  status: 'progress',
+  reportCount: 1,
+  eventName: '기타화재',
+  type: 'fires',
+  address: '경남 진주시 진주대로 234-13',
+  description: '신고 내용 표시합니다. 마그네슘 공장화재 /검은 연기가 엄청나다 /사람들이 대피중이다',
+  created: '2023.10.11 09:00',
+};
+
+const Container = styled.div<any>`
+  ${({ deviceType, type }: { deviceType?: DeviceType; type: string }) => {
+    if (deviceType !== 'mobile') {
+      if (type === 'fires') {
+        return `
+        &:hover {
+          border-radius: 16px;
+          border: 1px solid rgba(255, 138, 58, 0.40);
+        }
+        `;
+      }
+
+      if (type === 'rescue') {
+        return `
+        &:hover {
+          border-radius: 16px;
+          border: 1px solid rgba(121, 158, 255, 0.4);
+        }
+        `;
+      }
+
+      if (type === 'firstAid') {
+        return `
+        &:hover {
+          border-radius: 16px;
+          border: 1px solid rgba(29, 206, 0, 0.4);
+        }
+        `;
+      }
+    }
+  }}
+
+  ${({ deviceType }) => {
+    if (deviceType === 'tabletVertical' || deviceType === 'tabletHorizontal') {
+      return `
+      padding: 12px 16px;
+      `;
+    }
+  }}
+`;
+
+const Title = styled.div`
+  color: var(--10, #212529);
+  font-family: Pretendard Bold;
+  font-size: 16px;
+  line-height: 20px; /* 125% */
+  letter-spacing: -0.32px;
+`;
+
+const Address = styled.div`
+  color: var(--06, #909aa4);
+  font-family: Pretendard SemiBold;
+  font-size: 14px;
+  line-height: 20px; /* 142.857% */
+  letter-spacing: -0.28px;
+`;
+
+const Description = styled.div`
+  flex: 1;
+  color: var(--08, #495057);
+  font-family: Pretendard Medium;
+  font-size: 14px;
+  line-height: 18px; /* 128.571% */
+  letter-spacing: -0.28px;
+`;
+
+const Time = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  color: var(--05, #adb5bd);
+  font-family: Pretendard SemiBold;
+  font-size: 12px;
+  line-height: 16px; /* 133.333% */
+  letter-spacing: -0.24px;
+`;
+
+const Divider = styled.div`
+  height: 32px;
+  margin: 0 16px;
+  border-left: 1px solid ${theme.colors.gray2};
+`;
+
+const NewDataDisplay = styled.div<any>`
+  padding: 2px 4px;
+  color: ${theme.colors.white};
+  font-family: Pretendard Bold;
+  font-size: 12px;
+  line-height: 16px; /* 133.333% */
+  letter-spacing: -0.24px;
+  border-radius: 4px;
+
+  ${({ type }) => {
+    if (type === 'fires') {
+      return `
+        background: ${theme.colors.orange};
+        `;
+    }
+
+    if (type === 'rescue') {
+      return `
+        background: ${theme.colors.blue};
+        `;
+    }
+
+    if (type === 'firstAid') {
+      return `
+        background: ${theme.colors.green};
+        `;
+    }
+  }}
+`;
