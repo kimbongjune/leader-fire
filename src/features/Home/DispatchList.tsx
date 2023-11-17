@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
-import type { DispatchItemType } from './DispatchItem';
+import { DispatchItemType } from '../../types/types';
 import { Box, Flex, Stack } from '@chakra-ui/react';
 import DispatchItem from './DispatchItem';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { isEmpty } from 'lodash';
 import theme from '@/theme/colors';
 import { DeviceType } from '@/types/types';
@@ -10,18 +10,22 @@ import HomeFilter from './HomeFilter';
 import { CountByType } from './HomeFilterItem';
 import { useRouter } from 'next/router';
 import AlertModal from '@/components/common/Modal/AlertModal';
+import axios from "../../components/common/api/axios"
+import { RootState } from '../../app/store';
+import { useSelector } from 'react-redux';
 
 interface Props {
   dispatchLists: DispatchItemType[];
   deviceType?: DeviceType;
 }
 
+//TODO: 재난정보 조회(폴링)
 const DispatchList = (props: Props) => {
   const { deviceType } = props;
   // 보여줄 리스트
   const router = useRouter();
   const type = router.query.type;
-  const [isAlert, setIsAlert] = useState(true);
+  const [hasRead, setHasRead] = useState(false);
 
   // 리스트 필터링
   const filteredList = useMemo(() => {
@@ -50,75 +54,9 @@ const DispatchList = (props: Props) => {
           </Stack>
         )}
       </Wrapper>
-      {isAlert && <AlertModal isAlert={isAlert} setIsAlert={setIsAlert} />}
+      {!hasRead && <AlertModal hasRead={hasRead} setHasRead={setHasRead} disasterNumber={["sssssss", "???"]} />}
     </>
   );
-};
-
-DispatchList.defaultProps = {
-  dispatchLists: [
-    {
-      id: '1',
-      status: 'progress',
-      reportCount: 5,
-      eventName: '기타화재',
-      type: 'fires',
-      address: '경남 진주시 진주대로 234-13',
-      description: '신고 내용 표시합니다. 마그네슘 공장화재 / 검은 연기가 엄청나다 / 사람들이 대피중이다',
-      isNew: true,
-      created: '2023.10.11 09:00',
-    },
-    {
-      id: '2',
-      status: 'progress',
-      reportCount: 1,
-      eventName: '기타화재',
-      type: 'fires',
-      address: '경남 진주시 진주대로 234-13',
-      description: '신고 내용 표시합니다. 마그네슘 공장화재 / 검은 연기가 엄청나다 / 사람들이 대피중이다',
-      created: '2023.10.11 08:00',
-    },
-    {
-      id: '3',
-      status: 'completion',
-      reportCount: 1,
-      eventName: '기타화재',
-      type: 'fires',
-      address: '경남 진주시 진주대로 234-13',
-      description: '신고 내용 표시합니다. 마그네슘 공장화재 / 검은 연기가 엄청나다 / 사람들이 대피중이다',
-      created: '2023.10.11 08:00',
-    },
-    {
-      id: '4',
-      status: 'progress',
-      reportCount: 3,
-      eventName: '기타구조',
-      type: 'rescue',
-      address: '경남 진주시 진주대로 234-13',
-      description: '신고 내용 표시합니다. 마그네슘 공장화재 / 검은 연기가 엄청나다 / 사람들이 대피중이다',
-      created: '2023.10.11 08:00',
-    },
-    {
-      id: '5',
-      status: 'progress',
-      reportCount: 10,
-      eventName: '기타구급',
-      type: 'firstAid',
-      address: '경남 진주시 진주대로 234-13',
-      description: '신고 내용 표시합니다. 마그네슘 공장화재 / 검은 연기가 엄청나다 / 사람들이 대피중이다',
-      created: '2023.10.11 08:00',
-    },
-    {
-      id: '6',
-      status: 'completion',
-      reportCount: 10,
-      eventName: '기타구급',
-      type: 'firstAid',
-      address: '경남 진주시 진주대로 234-13',
-      description: '신고 내용 표시합니다. 마그네슘 공장화재 / 검은 연기가 엄청나다 / 사람들이 대피중이다',
-      created: '2023.10.11 08:00',
-    },
-  ],
 };
 
 export default DispatchList;

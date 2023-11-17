@@ -24,6 +24,7 @@ interface Props {
   onCloseButton?: () => void;
 }
 
+//TODO 상부 재난종별, 발생시간, 경과 표시 탭
 const Menu = (props: Props) => {
   return (
     <Wrapper className="menu-container">

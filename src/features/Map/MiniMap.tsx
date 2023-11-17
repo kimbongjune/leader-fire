@@ -12,6 +12,11 @@ import MyLocationIcon from '../../../public/images/icons/myLocation.svg';
 import FullScreenIcon from '../../../public/images/icons/fullscreen.svg';
 import { useRouter } from 'next/router';
 import { v4 as uuidv4 } from 'uuid';
+
+import { RootState } from '../../app/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { setIsDangerMarkerActive, setIsExtinguisherMarkerActive, setIsTargetMarkerActive, setIsWaterMarkerActive } from '../../features/slice/disasterSlice';
+
 const KakaoMap = dynamic(() => import('./KakaoMap'), { ssr: false });
 
 interface Props {
@@ -21,7 +26,9 @@ interface Props {
   alpha: number; // z축 회전 각도
 }
 
+//TODO 지도(태블릿 미니맵), 소화전, 비상소화장치, 대상물, 위험물 표시, 롱클릭 시 오버레이와 마커 표시(마커는 한건만)
 const MiniMap = (props: Props) => {
+  const dispatch = useDispatch()
   const apiKey = process.env.NEXT_PUBLIC_KAKAOMAP_API_KEY;
   const router = useRouter();
   const distance = Number(router.query.distance); // 거리
@@ -29,19 +36,16 @@ const MiniMap = (props: Props) => {
   const extinguisher = router.query.extinguisher; // 비상소화장치
   const target = router.query.target; // 대상물
   const danger = router.query.danger; // 위협물
-  const vulnerble = router.query.vulnerble; // 피난약자
-  const history = router.query.history; // 과거이력
   const kakaoRef = useRef<any>();
+
+  const isWaterActive = useSelector((state: RootState) => state.disaster.isWaterMarkerActive);
+  const isExtinguisherActive = useSelector((state: RootState) => state.disaster.isExtinguisherMarkerActive);
+  const isTargetActive = useSelector((state: RootState) => state.disaster.isTargetMarkerActive);
+  const isDangerActive = useSelector((state: RootState) => state.disaster.isDangerMarkerActive);
 
   const [isClickRescuePosition, setIsClickRescuePosition] = useState(false); // 긴급구조위치
   const [isClickVehicle, setIsClickVehicle] = useState(false); //출동 차량
   const [isClickVideo, setIsClickVideo] = useState(false); //영상공유
-  const [isClickWater, setIsClickWater] = useState(false); // 소화전
-  const [isClickExtinguisher, setIsClickExtinguisher] = useState(false); // 비상소화장치
-  const [isClickTarget, setIsClickTarget] = useState(false); // 대상물
-  const [isClickDanger, setIsClickDanger] = useState(false); // 위협물
-  const [isClickVulnerble, setIsClickVulnerble] = useState(false); // 피난약자
-  const [isClickHistory, setIsClickHistory] = useState(false); // 과거이력
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClickCompassButton, setIsClickCompassButton] = useState(false); // 나침반 버튼 클릭 유무
 
@@ -52,13 +56,11 @@ const MiniMap = (props: Props) => {
   };
 
   useEffect(() => {
-    setIsClickWater(water === 'true');
-    setIsClickExtinguisher(extinguisher === 'true');
-    setIsClickTarget(target === 'true');
-    setIsClickDanger(danger === 'true');
-    setIsClickVulnerble(vulnerble === 'true');
-    setIsClickHistory(history === 'true');
-  }, [water, extinguisher, target, danger, vulnerble, history]);
+    dispatch(setIsWaterMarkerActive(isWaterActive === true));
+    dispatch(setIsExtinguisherMarkerActive(isExtinguisherActive === true));
+    dispatch(setIsTargetMarkerActive(isTargetActive === true));
+    dispatch(setIsDangerMarkerActive(isDangerActive === true));
+  }, [isWaterActive, isExtinguisherActive, isTargetActive, isDangerActive]);
 
   useEffect(() => {
     const kakaoMapScript = document.createElement('script');
@@ -238,11 +240,10 @@ const MiniMap = (props: Props) => {
         kakaoRef.current.onClickMarkerButton({ isClick: isClickRescuePosition, markers: rescueMarkers });
         kakaoRef.current.onClickMarkerButton({ isClick: isClickVehicle, markers: vehicleMarkers });
         kakaoRef.current.onClickMarkerButton({ isClick: isClickVideo, markers: videoMarkers });
-        kakaoRef.current.onClickMarkerButton({ isClick: isClickWater, markers: waterMarkers });
-        kakaoRef.current.onClickMarkerButton({ isClick: isClickTarget, markers: targetMarkers });
-        kakaoRef.current.onClickMarkerButton({ isClick: isClickDanger, markers: dangerMarkers });
-        kakaoRef.current.onClickMarkerButton({ isClick: isClickExtinguisher, markers: fireExtinguisherMarkers });
-        kakaoRef.current.onClickMarkerButton({ isClick: isClickVulnerble, markers: vulnerbleMarkers });
+        kakaoRef.current.onClickMarkerButton({ isClick: isWaterActive, markers: waterMarkers });
+        kakaoRef.current.onClickMarkerButton({ isClick: isTargetActive, markers: targetMarkers });
+        kakaoRef.current.onClickMarkerButton({ isClick: isDangerActive, markers: dangerMarkers });
+        kakaoRef.current.onClickMarkerButton({ isClick: isExtinguisherActive, markers: fireExtinguisherMarkers });
 
         targetMarkers.map((marker: any) => {
           return window.kakao.maps.event.addListener(marker, 'click', function () {
@@ -263,7 +264,7 @@ const MiniMap = (props: Props) => {
     };
 
     kakaoMapScript.addEventListener('load', onLoadKakaoAPI);
-  }, [isClickVehicle, isClickVulnerble, isClickWater, isClickExtinguisher, isClickRescuePosition, isClickVideo, isClickTarget, isClickDanger, isClickHistory, props.latitude, props.longitude, distance, props.alpha, isClickCompassButton]);
+  }, [isClickVehicle, isWaterActive, isExtinguisherActive, isClickRescuePosition, isClickVideo, isTargetActive, isDangerActive, props.latitude, props.longitude, distance, props.alpha, isClickCompassButton]);
 
   return (
     <MapWrapper>

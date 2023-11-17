@@ -9,6 +9,7 @@ interface Props {
   deviceType: DeviceType;
 }
 
+//TODO 관제내용 탭
 const ControlItem = (props: Props) => {
   const { deviceType } = props;
   const router = useRouter();

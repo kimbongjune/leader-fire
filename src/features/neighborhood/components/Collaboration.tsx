@@ -14,6 +14,7 @@ interface Props {
 }
 
 //  전화번호, 사용자 동태, 직급(소속), 성명, 위치와의거리,
+//TODO 협업대응 하위 페이지
 const Collaboration = (props: Props) => {
   const deviceType = useDeviceType();
 

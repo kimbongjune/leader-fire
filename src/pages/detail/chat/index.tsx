@@ -10,12 +10,15 @@ import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import TabletPage from './tablet';
 import useDeviceType from '@/hooks/useDeviceType';
+import { RootState } from '../../../app/store';
+import { useSelector } from 'react-redux';
 
-interface Props {}
-
-const ChatPage = (props: Props) => {
+//TODO 모바일 채팅 페이지
+const ChatPage = () => {
   const router = useRouter();
   const deviceType = useDeviceType();
+
+  const data = useSelector((state: RootState) => state.disaster.subDisasterInformation);
 
   if (!deviceType) return null;
 
@@ -24,8 +27,8 @@ const ChatPage = (props: Props) => {
   return (
     <Layout>
       <Flex direction="column" height="100%">
-        <Menu title="공장화재" timestamp={'2023 09 10 23:09'} contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />
-        <AddressTab address="경남 진주시 진주대로 345-13, 203호" />
+        <Menu title={data?.eventName} timestamp={data?.created} contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />
+        <AddressTab address={data?.lawAddr} />
         <Children>
           <Stack spacing="16px">
             <FilterWrapper>

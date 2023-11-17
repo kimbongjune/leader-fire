@@ -18,14 +18,16 @@ interface Props {
 }
 
 const Filter = (props: Props) => {
-  const [filterName, setFilterName] = useQueryParam(props.queryKey);
+  const [filterName, setFilterName] = useQueryParam(props.queryKey, StringParam);
 
-  const handleClickButton = async (name: string) => {
-    if (props.onClick) {
-      props.onClick(name);
-      return;
+  const handleClickButton = (name: string) => {
+    // 현재 선택된 필터와 클릭된 필터가 같은 경우, URL에서 해당 type 제거
+    if (filterName === name) {
+      setFilterName(undefined);
+    } else {
+      // 다른 필터가 클릭된 경우, URL에 해당 type 추가
+      setFilterName(name);
     }
-    setFilterName(name);
   };
 
   return (

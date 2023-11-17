@@ -23,6 +23,7 @@ interface Props {
   }[];
 }
 
+//TODO 인근 피난약자 하위페이지, 가려야함
 const VulnerablePerson = (props: Props) => {
   const deviceType = useDeviceType();
 

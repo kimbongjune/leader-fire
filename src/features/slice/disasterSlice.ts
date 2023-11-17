@@ -1,72 +1,73 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { DispatchItemType } from '../../types/types';
 
 interface DisasterState {
-  disasterNumber: string;
-  disasterCoordinateX:number;
-  disasterCoordinateY:number;
-  disasterAcceptFlag:boolean;
-  disasterInfoReadFlag:boolean;
-  disasterModalReadFlag:boolean;
-  disasterAddress:string;
-  disasterWaterMarkerShowFlag:boolean;
-  disasterVehicleMarkerShowFlag:boolean;
+  disasterInformation: DispatchItemType[]
+  subDisasterInformation: DispatchItemType
+  isWaterMarkerActive: boolean;
+  isExtinguisherMarkerActive: boolean;
+  isTargetMarkerActive: boolean;
+  isDangerMarkerActive: boolean;
 }
 
 const initialState: DisasterState = {
-  disasterNumber: '',
-  disasterCoordinateX: 0.0,
-  disasterCoordinateY: 0.0,
-  disasterAcceptFlag:false,
-  disasterInfoReadFlag:false,
-  disasterModalReadFlag: false,
-  disasterAddress:"",
-  disasterWaterMarkerShowFlag:false,
-  disasterVehicleMarkerShowFlag:false
+  disasterInformation: [],
+  subDisasterInformation: {
+    jurisWardId: '',
+    dsrKndCd: '',
+    dsrClsCd: '',
+    dsrSeq: '',
+    status: 'progress',
+    reportCount: 0,
+    eventName: '',
+    type: 'fires',
+    lawAddr: '',
+    roadAddr: '',
+    procCd: '',
+    gisX: '',
+    gisY: '',
+    dFstRegSeq: '',
+    callTell: '',
+    description: '',
+    created: ''
+  },
+  isWaterMarkerActive: false,
+  isExtinguisherMarkerActive: false,
+  isTargetMarkerActive: false,
+  isDangerMarkerActive: false
 };
 
 export const disasterSlice = createSlice({
   name: 'disaster',
   initialState,
   reducers: {
-    setDisasterNumber: (state, action: PayloadAction<string>) => {
-      state.disasterNumber = action.payload;
+    setDisasterInformation: (state, action: PayloadAction<DispatchItemType[]>) => {
+      state.disasterInformation = action.payload;
     },
-    setDisasterCoordinateX: (state, action: PayloadAction<number>) => {
-      state.disasterCoordinateX = action.payload;
+    setIsWaterMarkerActive: (state, action: PayloadAction<boolean>) => {
+      state.isWaterMarkerActive = action.payload;
     },
-    setDisasterCoordinateY: (state, action: PayloadAction<number>) => {
-      state.disasterCoordinateY = action.payload;
+    setIsExtinguisherMarkerActive: (state, action: PayloadAction<boolean>) => {
+      state.isExtinguisherMarkerActive = action.payload;
     },
-    setDisasterAccptFlag: (state, action: PayloadAction<boolean>) => {
-      state.disasterAcceptFlag = action.payload;
+    setIsTargetMarkerActive: (state, action: PayloadAction<boolean>) => {
+      state.isTargetMarkerActive = action.payload;
     },
-    setDisasterInfoReadFlag: (state, action: PayloadAction<boolean>) => {
-      state.disasterInfoReadFlag = action.payload;
+    setIsDangerMarkerActive: (state, action: PayloadAction<boolean>) => {
+      state.isDangerMarkerActive = action.payload;
     },
-    setDisasterModalReadFlag: (state, action: PayloadAction<boolean>) => {
-      state.disasterModalReadFlag = action.payload;
-    },
-    setDisasterAddress: (state, action: PayloadAction<string>) => {
-      state.disasterAddress = action.payload;
-    },
-    setDisasterWaterMakrerShowFlag: (state, action: PayloadAction<boolean>) => {
-      state.disasterWaterMarkerShowFlag = action.payload;
-    },
-    setDisasterVehicleMarkerShowFlag: (state, action: PayloadAction<boolean>) => {
-      state.disasterVehicleMarkerShowFlag = action.payload;
+    setSubDisasterInformation: (state, action: PayloadAction<DispatchItemType>) => {
+      state.subDisasterInformation = action.payload;
     }
   },
 });
 
 export const { 
-  setDisasterNumber,
-  setDisasterCoordinateX, 
-  setDisasterCoordinateY, 
-  setDisasterAccptFlag, 
-  setDisasterInfoReadFlag, 
-  setDisasterModalReadFlag, 
-  setDisasterAddress ,
-  setDisasterWaterMakrerShowFlag,
-  setDisasterVehicleMarkerShowFlag
+  setDisasterInformation,
+  setIsDangerMarkerActive,
+  setIsExtinguisherMarkerActive,
+  setIsTargetMarkerActive,
+  setIsWaterMarkerActive,
+  setSubDisasterInformation
 } = disasterSlice.actions;
 export default disasterSlice.reducer;

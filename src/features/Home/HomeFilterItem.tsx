@@ -24,6 +24,7 @@ interface Props extends FilterItemProps {
   deviceType?: DeviceType;
 }
 
+//TODO 홈 화면 왼쪽 종별 버튼
 const HomeFilterItem = (props: Props) => {
   const router = useRouter();
   const selectedType = router.query.type;
@@ -37,8 +38,26 @@ const HomeFilterItem = (props: Props) => {
     return '';
   };
 
+  const handleClick = () => {
+    // 현재 선택된 타입과 클릭된 타입이 같은 경우, URL에서 타입 제거
+    if (selectedType === props.filterName) {
+      const newQuery = { ...router.query };
+      delete newQuery.type; // 타입 제거
+      router.push({
+        pathname: router.pathname,
+        query: newQuery
+      });
+    } else {
+      // 다른 타입이 선택된 경우, URL에 타입 추가
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, type: props.filterName }
+      });
+    }
+  };
+
   return (
-    <Wrapper onClick={props.onClick} isSelected={selectedType === props.filterName} type={props.filterName} deviceType={deviceType}>
+    <Wrapper onClick={handleClick} isSelected={selectedType === props.filterName} type={props.filterName} deviceType={deviceType}>
       {/* {(deviceType === 'mobile' || deviceType === 'tabletVertical') && ( */}
       <Stack align="center" justify="center" spacing={deviceType === 'mobile' ? '8px' : '16px'} direction={deviceType === 'mobile' ? 'column' : 'row'}>
         <Stack align="center" spacing="4px" direction={deviceType === 'mobile' ? 'column' : 'row'}>
@@ -97,6 +116,13 @@ const Wrapper = styled.div<any>`
         return `
         border: 1px solid #77D134;
         background: rgba(29, 206, 0, 0.15);
+      `;
+      }
+
+      if (type === 'others') {
+        return `
+        border: 1px solid ${theme.colors.purple};
+        background: rgba(164, 101, 227, 0.15);
       `;
       }
     }

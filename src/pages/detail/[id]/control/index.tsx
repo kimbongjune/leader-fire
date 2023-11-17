@@ -21,6 +21,7 @@ interface Props {
   }[];
 }
 
+//TODO 관제내용 상세보기 탭
 const ControlDetail = (props: Props) => {
   const router = useRouter();
   const deviceType = useDeviceType();

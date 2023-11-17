@@ -7,6 +7,7 @@ import { DeviceType } from '@/types/types';
 import SOPContainer from '@/features/SOP/SOPContainer';
 import { NextPageContext } from 'next';
 
+//TODO SOP 페이지 pdf 로직 작성
 const SOPPage = () => {
   const deviceType = useDeviceType();
 

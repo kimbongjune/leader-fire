@@ -15,6 +15,7 @@ import UserSettingModal from '@/components/common/Modal/UserSettingModal';
 import TokenRefreshModal from '@/components/common/Modal/TokenRefreshModal';
 import SearchDispatch from './SearchDispatch';
 import { DeviceType } from '@/types/types';
+import { useRouter } from 'next/router';
 
 interface Props {
   profileUrl?: string;
@@ -29,6 +30,7 @@ const HomeMenu = (props: Props) => {
   const { deviceType } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [query, setQuery] = useQueryParam('option');
+  const router = useRouter();
 
   // 홈 메뉴 선택 시 호출
   const handleClickMenu = (query: string) => {
@@ -55,6 +57,7 @@ const HomeMenu = (props: Props) => {
   // 로그아웃 버튼 클릭 시 호출
   const handleLogoutButton = () => {
     onClose();
+    router.replace('/logIn');
   };
 
   return (

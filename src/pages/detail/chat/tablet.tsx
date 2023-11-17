@@ -8,6 +8,8 @@ import { Box, Flex, Stack } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import Div100vh from 'react-div-100vh';
+import { RootState } from '../../../app/store';
+import { useSelector } from 'react-redux';
 
 interface Props {
   deviceType: DeviceType;
@@ -17,14 +19,16 @@ const TabletPage = (props: Props) => {
   const { deviceType } = props;
   const router = useRouter();
 
+  const data = useSelector((state: RootState) => state.disaster.subDisasterInformation);
+
   return (
     <Layout>
       <Flex direction="column" height="100%">
         <MenuWrapper deviceType={deviceType}>
-          <Menu title="공장화재" status="progress" timestamp="2023 09 10 23:09" contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />
+          <Menu title={data?.eventName} status="progress" timestamp={data?.created} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />
         </MenuWrapper>
         <AddressTabWrapper deviceType={deviceType}>
-          <AddressTab />
+          <AddressTab address={data?.lawAddr} />
         </AddressTabWrapper>
         <Children>
           <ChatContainer deviceType={deviceType} />

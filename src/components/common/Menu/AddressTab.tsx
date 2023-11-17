@@ -16,6 +16,7 @@ interface Props {
   marginLeft?: string;
 }
 
+//TODO 상부 주소 관련 탭, 안드로이드 복사
 const AddressTab = (props: Props) => {
   const router = useRouter();
   const id = router.query.id;

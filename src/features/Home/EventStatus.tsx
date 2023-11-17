@@ -2,7 +2,7 @@ import { Stack } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import PhoneInTalk from '../../../public/images/icons/phoneInTalk.svg';
 import PhoneForwarded from '../../../public/images/icons/phoneForwarded.svg';
-import { DispatchItemType } from './DispatchItem';
+import { DispatchItemType } from '../../types/types';
 
 interface Props {
   eventType: DispatchItemType['type'];

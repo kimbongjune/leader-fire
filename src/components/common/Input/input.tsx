@@ -1,5 +1,5 @@
 import { Input as ChakraInput } from '@chakra-ui/react';
-import React from 'react';
+import React, {forwardRef} from 'react';
 
 interface Props {
   fontSize: string;
@@ -10,11 +10,13 @@ interface Props {
   placeholder?: string;
   value?: string;
   disabled?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; //onChange 함수를 정의
 }
 
-const Input = (props: Props) => {
+const Input = forwardRef<HTMLInputElement, Props>((props, ref) => {
   return (
     <ChakraInput
+      ref={ref}
       w="100%"
       h="100%"
       border="1px solid #E9ECEF"
@@ -29,8 +31,9 @@ const Input = (props: Props) => {
       backgroundColor="#fff"
       value={props.value}
       disabled={props.disabled}
+      onChange={props.onChange}
     />
   );
-};
+});
 
 export default Input;

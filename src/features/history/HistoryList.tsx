@@ -20,6 +20,7 @@ interface Props {
   reportNumber: number;
 }
 
+//TODO 과거이력 아이템 클릭시 표출 페이지
 const HistoryList = (props: Props) => {
   const deviceType = useDeviceType();
   const router = useRouter();

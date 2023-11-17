@@ -21,6 +21,9 @@ import FloatingButtons from '@/features/Map/FloatingButtons';
 import ObjectPosition from '@/features/Map/ObjectPosition';
 import MiniMap from '@/features/Map/MiniMap';
 import { NextPageContext } from 'next';
+import { RootState } from '../../app/store';
+import { useSelector } from 'react-redux';
+import axios from "../../components/common/api/axios"
 
 interface Props {
   eventName: string;
@@ -32,29 +35,56 @@ interface Props {
   title: string;
 }
 
+//TODO 상세 페이지, 상세정보 조회(폴링)
 const DetailPage = (props: Props) => {
   const router = useRouter();
   const deviceType = useDeviceType();
+
+  useEffect(() =>{
+    //TODO 재난번호 파라미터로 상세 정보 조회
+    //관제내용은 ControlItem 컴포넌트에
+    //출동대 편성 데이터는 OrganizationItem 컴포넌트에
+  })
+
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
+    const test = () =>{
+      console.log("상세 데이터 조회!!!!!!!!!!")
+    }
+    test()
+    // setInterval을 사용하여 주기적으로 API를 호출
+    const intervalId = setInterval(() => test(), 10000);
+
+    // 컴포넌트가 언마운트될 때 인터벌을 정리
+    return () => {
+      clearInterval(intervalId) 
+      console.log("상세데이터 조회 취소!!!!!!!!!!")
+    };
+  }, []);
+
+  const data = useSelector((state: RootState) => state.disaster.subDisasterInformation);
+
+  console.log("data!!!",data);
 
   if (!deviceType) return null;
 
   return (
     <Layout>
       <Flex direction="column" height="100%" background={deviceType === 'tabletHorizontal' ? theme.colors.white : theme.colors.gray1}>
-        {deviceType === 'mobile' && <Menu title="공장화재" timestamp={'2023.09.10 23:09'} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />}
+        {deviceType === 'mobile' && <Menu title={data?.eventName} timestamp={data?.created} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />}
         {deviceType !== 'mobile' && (
           <MenuWrapper deviceType={deviceType}>
-            <Menu title="공장화재" status="progress" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} onCloseButton={() => router.push('/')} timestamp={'2023 10 20 23:09'} contentAlign="space-between" />
+            <Menu title={data?.eventName} status="progress" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} onCloseButton={() => router.push('/')} timestamp={data.created} contentAlign="space-between" />
           </MenuWrapper>
         )}
         <AddressTabWrapper deviceType={deviceType}>
-          <AddressTab />
+          <AddressTab address={data?.lawAddr} />
         </AddressTabWrapper>
         <Children>
           <Flex direction={deviceType === 'tabletHorizontal' ? 'row' : 'column'} w="100%">
             <Stack spacing="24px" p="24px 16px 16px" flex={1} borderRight={deviceType === 'tabletHorizontal' ? `1px solid ${theme.colors.gray2}` : ''}>
               {/* 신고내용 */}
-              <ReportItem deviceType={deviceType} description={props.description} />
+              <ReportItem callTell={data?.callTell} deviceType={deviceType} description={data?.description} />
               {/* 관제내용 */}
               <ControlItem deviceType={deviceType} />
               {/* 모바일 지도보기 버튼 추가 */}

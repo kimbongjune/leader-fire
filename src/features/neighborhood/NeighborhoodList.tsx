@@ -31,6 +31,7 @@ export type NeighborhoodType = {
   created: string;
 };
 
+//TODO 연관인근 아이템 리스트
 const NeighborhoodList = (props: Props) => {
   const deviceType = useDeviceType();
   const { query } = useRouter();

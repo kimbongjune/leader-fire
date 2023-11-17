@@ -11,6 +11,7 @@ interface Props {
   deviceType?: DeviceType;
 }
 
+//TODO 과거이력 클릭 아이템
 const HistoryFilter = (props: Props) => {
   const { deviceType } = props;
   return (

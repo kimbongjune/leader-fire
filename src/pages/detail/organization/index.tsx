@@ -16,6 +16,7 @@ import SwiperIcon from '../../../../public/images/icons/swipe.svg';
 import theme from '@/theme/colors';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
+//TODO 출동대 편성 상세보기 페이지
 const OrganizationPage = () => {
   const router = useRouter();
   const deviceType = useDeviceType();

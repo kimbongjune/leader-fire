@@ -13,6 +13,7 @@ interface Props {
   chatList: ChatTargetType[];
 }
 
+//TODO 태블릿 채팅 페이지
 const ChatContainer = (props: Props) => {
   const { deviceType } = props;
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);

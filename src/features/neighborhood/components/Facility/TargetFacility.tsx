@@ -52,6 +52,7 @@ export const PhoneBox = ({ title, number, deviceType }: { title: string; number:
   );
 };
 
+//TODO 인근 대상물 페이지
 const TargetFacility = (props: Props) => {
   const { query } = useRouter();
   const queryId = Number(query.id);

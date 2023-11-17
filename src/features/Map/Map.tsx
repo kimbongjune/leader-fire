@@ -21,6 +21,9 @@ import { useRouter } from 'next/router';
 import { v4 as uuidv4 } from 'uuid';
 const KakaoMap = dynamic(() => import('./KakaoMap'), { ssr: false });
 
+import { RootState } from '../../app/store';
+import { useDispatch, useSelector } from 'react-redux';
+
 interface Props {
   latitude: number; // 위도
   longitude: number; // 경도
@@ -28,11 +31,18 @@ interface Props {
   vehicleData: DispatchVehicleDataType[]; // 출동차량 데이터
 }
 
+//TODO 지도(핸드폰 or 태블릿 크게보기), 소화전, 비상소화장치, 대상물, 위험물 표시/ 미터, 피난약자, 과거이력 제거, 롱클릭 시 오버레이와 마커 표시(마커는 한건만)
+//TODO 지도 화면의 버튼이 미니맵의 버튼과 다름 개수, 이름 뭐로 맞춰야하는지
 const Map = (props: Props) => {
   const router = useRouter();
   const deviceType = useDeviceType();
   const apiKey = process.env.NEXT_PUBLIC_KAKAOMAP_API_KEY;
   const kakaoRef = useRef<any>();
+
+  const isWaterActive = useSelector((state: RootState) => state.disaster.isWaterMarkerActive);
+  const isExtinguisherActive = useSelector((state: RootState) => state.disaster.isExtinguisherMarkerActive);
+  const isTargetActive = useSelector((state: RootState) => state.disaster.isTargetMarkerActive);
+  const isDangerActive = useSelector((state: RootState) => state.disaster.isDangerMarkerActive);
 
   const [isClickRescuePosition, setIsClickRescuePosition] = useState(false); // 긴급구조위치
   const [isClickVehicle, setIsClickVehicle] = useState(false); //출동 차량

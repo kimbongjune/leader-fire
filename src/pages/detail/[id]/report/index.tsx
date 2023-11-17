@@ -8,6 +8,9 @@ import { Flex, Grid, Stack } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import { RootState } from '../../../../app/store';
+import { useSelector } from 'react-redux';
+import { DispatchItemType } from '../../../../types/types';
 
 interface Props {
   records: {
@@ -17,12 +20,19 @@ interface Props {
   description: string;
 }
 
+//TODO 신고내용 상세보기 탭 녹취는 안보이게
 const ReportDetailPage = (props: Props) => {
-  const MyAudioPlayer = dynamic(() => import('@/components/common/Player/MyAudioPlayer'), {
-    loading: () => <p>loading...</p>,
-  });
+  // const MyAudioPlayer = dynamic(() => import('@/components/common/Player/MyAudioPlayer'), {
+  //   loading: () => <p>loading...</p>,
+  // });
   const router = useRouter();
   const deviceType = useDeviceType();
+
+  const id = router.query.id as string;
+
+  const selectedData = useSelector((state: RootState) => 
+    state.disaster.disasterInformation.find(item => item.dsrSeq === id)
+  );
 
   return (
     <Layout>
@@ -32,7 +42,7 @@ const ReportDetailPage = (props: Props) => {
         </MenuWrapper>
         <Children>
           <Stack spacing="24px">
-            <DetailItem title="녹취파일">
+            {/* <DetailItem title="녹취파일">
               {deviceType === 'mobile' && (
                 <Stack spacing="4px">
                   {props.records?.map((record, index) => {
@@ -47,9 +57,9 @@ const ReportDetailPage = (props: Props) => {
                   })}
                 </Grid>
               )}
-            </DetailItem>
+            </DetailItem> */}
             <DetailItem title="신고내용">
-              <Content dangerouslySetInnerHTML={{ __html: props.description }} />
+              <Content dangerouslySetInnerHTML={{ __html: selectedData?.description as string }} />
             </DetailItem>
           </Stack>
         </Children>

@@ -7,37 +7,46 @@ import { useRouter } from 'next/router';
 import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
 import { DeviceType } from '@/types/types';
 import theme from '@/theme/colors';
+import { useDispatch } from 'react-redux';
+import { setSubDisasterInformation } from '../../features/slice/disasterSlice';
+import { useEffect } from 'react';
 
-export type DispatchItemType = {
-  id: string;
+interface Props {
+  jurisWardId:string;
+  dsrKndCd:string;
+  dsrClsCd:string;
+  dsrSeq: string;
   status: 'progress' | 'completion';
   reportCount: number;
   eventName: string;
   type: 'fires' | 'rescue' | 'firstAid' | 'others';
-  address: string;
+  lawAddr: string;
+  roadAddr:string;
+  procCd:string;
+  gisX:string;
+  gisY:string;
+  dFstRegSeq:string;
+  callTell:string
   description: string;
   created: string;
-};
-
-interface Props {
-  id: string;
-  status: 'progress' | 'completion';
-  reportCount: number;
-  eventName: string;
-  type: DispatchItemType['type'];
-  address: string;
-  description: string;
-  created: string;
-  deviceType?: DeviceType;
   isNew?: boolean;
+  deviceType?: DeviceType;
 }
 
 const DispatchItem = (props: Props) => {
+  const dispatch = useDispatch()
   const { deviceType } = props;
   const router = useRouter();
 
+  const moveDetailPage = () => {
+    console.log("move page")
+    
+    dispatch(setSubDisasterInformation(props))
+    router.push(`/detail/${props.dsrSeq}`)
+  }
+
   return (
-    <Container className="dispatch-item" onClick={() => router.push(`/detail/${props.id}`)} deviceType={deviceType} type={props.type}>
+    <Container className="dispatch-item" onClick={moveDetailPage} deviceType={deviceType} type={props.type}>
       <Flex align="center">
         <Stack spacing={deviceType === 'mobile' ? '0px' : '16px'} w={deviceType === 'tabletHorizontal' ? 'auto' : '100%'}>
           <Flex gap={deviceType === 'mobile' ? '12px' : '16px'} align="center">
@@ -51,7 +60,7 @@ const DispatchItem = (props: Props) => {
                     30분 경과
                   </Time>
                 </Flex>
-                <Address>{props.address}</Address>
+                <Address>{props.lawAddr}</Address>
               </Stack>
               <Flex gap="9px">
                 {deviceType === 'mobile' && (
@@ -138,6 +147,15 @@ const Container = styled.div<any>`
         }
         `;
       }
+
+      if (type === 'others') {
+        return `
+        &:hover {
+          border-radius: 16px;
+          border: 1px solid rgba(164, 101, 227, 0.4);
+        }
+        `;
+      }
     }
   }}
 
@@ -218,6 +236,12 @@ const NewDataDisplay = styled.div<any>`
     if (type === 'firstAid') {
       return `
         background: ${theme.colors.green};
+        `;
+    }
+
+    if (type === 'others') {
+      return `
+        background: ${theme.colors.purple};
         `;
     }
   }}

@@ -6,6 +6,7 @@ import { DeviceType } from '@/types/types';
 import useDeviceType from '@/hooks/useDeviceType';
 import ResidentsMobileItem from './ResidentsMobileItem';
 
+//TODO 모바일 인근주민 하위페이지
 const MobileResidents = () => {
   const deviceType = useDeviceType();
 

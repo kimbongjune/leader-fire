@@ -23,6 +23,7 @@ const Distance = (props: any) => {
   return <DistanceWrapper>{props.children}</DistanceWrapper>;
 };
 
+//TODO 태블릿 인근주민 하위페이지
 const TabletResidents = () => {
   const deviceType = useDeviceType();
 

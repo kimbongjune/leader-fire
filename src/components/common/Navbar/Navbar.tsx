@@ -22,13 +22,17 @@ type DataType = {
   active: string;
 };
 
+//TODO 하단 네비게이션 바
 const Navbar = () => {
   const router = useRouter();
   const detailId = router.query.id;
   const isDetailPage = router.route.includes('detail');
 
+  // console.log("isDetailPage",isDetailPage)
+  // console.log("detailId",detailId)
+
   const datas: DataType[] = [
-    { icon: <Home />, text: '홈', route: '/home', active: '/home' },
+    { icon: <Home />, text: '홈', route: isDetailPage? `/detail/${detailId}` : '/home', active: '/home' },
     { icon: <History />, text: '과거이력', route: `/detail/history?id=${detailId}`, disabled: !isDetailPage, active: '/history' },
     { icon: <Rader />, text: '연관인근', route: `/detail/neighborhood?id=${detailId}`, disabled: !isDetailPage, active: '/neighborhood' },
     { icon: <Group />, text: '채팅', route: `/detail/chat?filter=채팅 대상?id=${detailId}`, disabled: !isDetailPage, active: '/chat' },

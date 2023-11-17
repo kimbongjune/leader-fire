@@ -14,6 +14,7 @@ interface Props {
   status: IncidentType;
 }
 
+//TODO 영상공유페이지
 const VideoPage = (props: Props) => {
   const deviceType = useDeviceType();
   const router = useRouter();

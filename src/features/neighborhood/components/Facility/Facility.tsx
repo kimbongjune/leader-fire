@@ -47,6 +47,7 @@ const BuildNumber = ({ number, floor }: { number: string; floor: number }) => {
   );
 };
 
+//TODO 인근 업소 리스트
 const Facility = (props: Props) => {
   const { query } = useRouter();
   const queryId = Number(query.id);

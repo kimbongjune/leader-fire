@@ -10,7 +10,7 @@ import { Box } from '@chakra-ui/react';
 interface Props {
   deviceType: DeviceType;
 }
-
+//TODO 인근시설 하위페이지
 const TabletFacility = (props: Props) => {
   const { deviceType } = props;
   return (

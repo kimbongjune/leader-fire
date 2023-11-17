@@ -5,14 +5,26 @@ import { Button, Flex, Grid, Stack } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { BooleanParam, NumberParam, StringParam, useQueryParam, useQueryParams, withDefault } from 'use-query-params';
+import { useDispatch, useSelector } from 'react-redux';
+import { setIsDangerMarkerActive, setIsExtinguisherMarkerActive, setIsTargetMarkerActive, setIsWaterMarkerActive } from '../../features/slice/disasterSlice';
+import { RootState } from '../../app/store';
 
 interface Props {
   distances: number[];
   items: { label: string; value: string; count: number; hasRefreshButton?: boolean }[];
 }
 
+//TODO 지도 하단 소화전, 비상소화장치, 대상물, 위험물 등, 미터, 피난약자, 과거이력 제거
 const ObjectPosition = (props: Props) => {
-  const [position, setPosition] = useState(props.distances?.[0]);
+  //const [position, setPosition] = useState(props.distances?.[0]);
+  const dispatch = useDispatch()
+
+  const isWaterActive = useSelector((state: RootState) => state.disaster.isWaterMarkerActive);
+  const isExtinguisherActive = useSelector((state: RootState) => state.disaster.isExtinguisherMarkerActive);
+  const isTargetActive = useSelector((state: RootState) => state.disaster.isTargetMarkerActive);
+  const isDangerActive = useSelector((state: RootState) => state.disaster.isDangerMarkerActive);
+
+  const [activeItems, setActiveItems] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useQueryParams({
     distance: NumberParam,
     water: withDefault(StringParam, 'false'),
@@ -23,10 +35,17 @@ const ObjectPosition = (props: Props) => {
     history: withDefault(StringParam, 'false'),
   });
 
+  const toggleMarker = (type: string) => {
+    if (type === 'water') dispatch(setIsWaterMarkerActive(!isWaterActive));
+    if (type === 'extinguisher') dispatch(setIsExtinguisherMarkerActive(!isExtinguisherActive));
+    if (type === 'target') dispatch(setIsTargetMarkerActive(!isTargetActive));
+    if (type === 'danger') dispatch(setIsDangerMarkerActive(!isDangerActive));
+  };
+
   return (
     <Wrapper>
       <Stack spacing="16px">
-        <ButtonWrapper>
+        {/* <ButtonWrapper>
           {props.distances?.map((distance, index) => {
             return (
               <StyledButton onClick={() => setQuery({ distance })} isActive={query.distance === distance} key={index}>
@@ -34,19 +53,19 @@ const ObjectPosition = (props: Props) => {
               </StyledButton>
             );
           })}
-        </ButtonWrapper>
+        </ButtonWrapper> */}
         <Grid templateColumns="repeat(2, 1fr)" columnGap="12px" rowGap="8px">
           {props.items?.map((item, index) => {
+            let isActive;
+            if (item.value === 'water') isActive = isWaterActive;
+            if (item.value === 'extinguisher') isActive = isExtinguisherActive;
+            if (item.value === 'target') isActive = isTargetActive;
+            if (item.value === 'danger') isActive = isDangerActive;
             return (
               <ObjectItem
                 key={index}
-                onClick={() => {
-                  const currentValue = query[item.value as keyof typeof query];
-                  if (currentValue) {
-                    setQuery({ [item.value]: 'false' });
-                  }
-                  setQuery({ [item.value]: 'true' });
-                }}
+                onClick={() => toggleMarker(item.value)}
+                isActive={isActive}
               >
                 <Text>{item.label}</Text>
                 <Flex align="center" gap="4px">
@@ -94,17 +113,17 @@ ObjectPosition.defaultProps = {
       value: 'danger',
       count: 3,
     },
-    {
-      label: '피난약자',
-      value: 'vulnerble',
-      count: 3,
-    },
-    {
-      label: '과거이력',
-      value: 'history',
-      count: 3,
-      hasRefreshButton: true,
-    },
+    // {
+    //   label: '피난약자',
+    //   value: 'vulnerble',
+    //   count: 3,
+    // },
+    // {
+    //   label: '과거이력',
+    //   value: 'history',
+    //   count: 3,
+    //   hasRefreshButton: true,
+    // },
   ],
 };
 
@@ -140,13 +159,19 @@ const StyledButton = styled.button<{ isActive?: boolean }>`
   `}
 `;
 
-const ObjectItem = styled.div`
+const ObjectItem = styled.div<{ isActive?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
   border-radius: 4px;
   background: #f8f9fa;
+
+  ${({ isActive }) =>
+    isActive &&
+    `
+    background: ${theme.colors.orange}; // 활성화 상태일 때의 배경색
+  `}
 `;
 
 const Text = styled.div`

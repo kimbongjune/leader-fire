@@ -45,7 +45,7 @@ const DrawerButtons = (props: Props) => {
               </Button>
             )}
 
-            {deviceType !== 'mobile' && <Distance>30미터 이내</Distance>}
+            {deviceType !== 'mobile' && <Distance>인근</Distance>}
 
             <VStack marginTop="12px" gap="8px" w="100%">
               <ButtonItem status={props.isClickWater} onClick={() => props.changeStatus('water')}>

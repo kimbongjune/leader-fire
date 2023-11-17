@@ -7,29 +7,40 @@ import AddressTab from '@/components/common/Menu/AddressTab';
 import useDeviceType from '@/hooks/useDeviceType';
 import { useRouter } from 'next/router';
 import { DeviceType } from '@/types/types';
+import { RootState } from '../../../app/store';
+import { useSelector } from 'react-redux';
+import React, { useMemo } from 'react';
+
 
 interface Props {
-  title: string;
-  timestamp: string;
-  address: string;
+  lawAddr: string;
 }
 
-const History = (props: Props) => {
+//TODO 과거이력 페이지
+const HistoryComponent = ({ lawAddr }:Props) => {
   const deviceType = useDeviceType();
   const router = useRouter();
   const id = router.query.id;
 
+  //const data = useSelector((state: RootState) => state.disaster.subDisasterInformation);
+
+  // Redux 상태에서 전체 데이터를 가져옵니다.
+  const testData = useSelector((state: RootState) => state.disaster.disasterInformation);
+  const { eventName, created, lawAddr: selectedLawAddr } = testData.find(item => item.dsrSeq === id) || {};
+
   if (!deviceType) return null;
+
+  console.log("history call")
 
   return (
     <Layout>
       <Container deviceType={deviceType}>
         <div>
           <MenuWrapper deviceType={deviceType}>
-            <Menu title={props.title} timestamp={props.timestamp} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
+            <Menu title={eventName} timestamp={created} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
           </MenuWrapper>
           <AddressTabWrapper deviceType={deviceType}>
-            <AddressTab />
+            <AddressTab address={lawAddr}/>
           </AddressTabWrapper>
         </div>
         <Wrapper>
@@ -39,12 +50,11 @@ const History = (props: Props) => {
     </Layout>
   );
 };
+const History = React.memo(HistoryComponent, (prevProps, nextProps) => {
+  // lawAddr 값만 비교합니다.
+  return prevProps.lawAddr === nextProps.lawAddr;
+});
 
-History.defaultProps = {
-  title: '공장화재',
-  timestamp: '2023.09.10 23:09',
-  address: '경남 진주시 진주대로 345-13, 203호',
-};
 export default History;
 
 const Container = styled.div<{ deviceType: string | null }>`

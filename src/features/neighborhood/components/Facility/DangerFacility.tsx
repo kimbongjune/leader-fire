@@ -66,6 +66,7 @@ const BuildingBox = ({ number, floor }: { number: string; floor: number }) => {
   );
 };
 
+//TODO 인근 위험물제조소 리스트
 const DangerFacility = (props: Props) => {
   const { query } = useRouter();
   const queryId = Number(query.id);

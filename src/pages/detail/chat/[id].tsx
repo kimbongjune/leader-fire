@@ -8,15 +8,17 @@ import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Div100vh from 'react-div-100vh';
+import { RootState } from '../../../app/store';
+import { useSelector } from 'react-redux';
 
 interface Props {
   messages: MessageType[];
 }
 
-const ChatRoomPage = (props: Props) => {
+const ChatRoomPage = () => {
   const router = useRouter();
   const id = router.query.id as string;
-  const [messages, setMessages] = useState<MessageType[]>(props.messages);
+
   return (
     <Div100vh>
       <Flex direction="column" height="100%" position="relative">

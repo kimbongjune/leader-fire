@@ -15,6 +15,7 @@ interface Props {
   type: string;
 }
 
+//TODO 과거이력 상세 정보 모달
 const HistoryModal = (props: Props) => {
   const deviceType = useDeviceType();
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -11,7 +11,7 @@ interface Props {
   deviceType: DeviceType;
   videos: string[];
 }
-
+//TODO 영상공유 리스트
 const VideoList = (props: Props) => {
   const { deviceType } = props;
   const [isFullScreen, setIsFullScreen] = useState(false);

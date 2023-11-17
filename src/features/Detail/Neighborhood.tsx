@@ -10,9 +10,10 @@ interface Props {
   }[];
 }
 
+//TODO 핸드폰 모드일 떄 표시되는 주변 정보/ 미터 제거
 const Neighborhood = (props: Props) => {
   return (
-    <DetailItem title="재난위치 20M 인근">
+    <DetailItem title="재난위치 인근">
       <ContentWrapper>
         <Stack spacing="0" divider={<Divider />}>
           {props.positions?.map((position, index) => {
@@ -34,29 +35,29 @@ export default Neighborhood;
 Neighborhood.defaultProps = {
   positions: [
     {
-      name: '100M 이내 소화전',
+      name: '소화전',
       disasterCount: 3,
     },
     {
-      name: '100M 이내 대상물',
+      name: '대상물',
       disasterCount: 13,
     },
     {
-      name: '100M 이내 소방용수',
+      name: '소방용수',
       disasterCount: 3,
     },
     {
-      name: '100M 이내 비상소화장치',
+      name: '비상소화장치',
       disasterCount: 3,
     },
-    {
-      name: '100M 이내 위험물',
-      disasterCount: 3,
-    },
-    {
-      name: '100M 이내 피난약자',
-      disasterCount: 3,
-    },
+    // {
+    //   name: '위험물',
+    //   disasterCount: 3,
+    // },
+    // {
+    //   name: '피난약자',
+    //   disasterCount: 3,
+    // },
   ],
 };
 

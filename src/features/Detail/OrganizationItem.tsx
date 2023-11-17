@@ -23,6 +23,7 @@ interface Props {
   deviceType: DeviceType;
 }
 
+//TODO 출동대 편성 패널(간략 정보)
 const OrganizationItem = (props: Props) => {
   const router = useRouter();
   const id = router.query.id;

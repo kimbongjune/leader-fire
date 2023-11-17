@@ -8,7 +8,7 @@ import useDeviceType from '@/hooks/useDeviceType';
 import { DeviceType } from '@/types/types';
 import { NextPageContext } from 'next';
 
-//TODO 재난정보 조회
+//TODO 메인페이지
 const HomePage = () => {
   const deviceType = useDeviceType();
   if (!deviceType) return null;

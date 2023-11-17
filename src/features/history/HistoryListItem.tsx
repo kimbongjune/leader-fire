@@ -23,6 +23,7 @@ interface Props extends HistoryType {
   isChecked: boolean;
 }
 
+//TODO 과거이력 요약 페이지
 const HistoryListItem = (props: Props) => {
   const deviceType = useDeviceType();
 

@@ -39,6 +39,7 @@ const BuildingInfo = ({ title, text }: { title: string; text: string }) => {
   );
 };
 
+//TODO 인근 유독물시설 리스트
 const ToxicFacility = (props: Props) => {
   const { query } = useRouter();
   const queryId = Number(query.id);
