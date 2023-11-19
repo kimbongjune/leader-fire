@@ -35,7 +35,7 @@ const Navbar = () => {
     { icon: <Home />, text: '홈', route: isDetailPage? `/detail/${detailId}` : '/home', active: '/home' },
     { icon: <History />, text: '과거이력', route: `/detail/history?id=${detailId}`, disabled: !isDetailPage, active: '/history' },
     { icon: <Rader />, text: '연관인근', route: `/detail/neighborhood?id=${detailId}`, disabled: !isDetailPage, active: '/neighborhood' },
-    { icon: <Group />, text: '채팅', route: `/detail/chat?filter=채팅 대상?id=${detailId}`, disabled: !isDetailPage, active: '/chat' },
+    { icon: <Group />, text: '채팅', route: `/detail/chat?filter=채팅 대상&id=${detailId}`, disabled: !isDetailPage, active: '/chat' },
     { icon: <Video />, text: '영상', route: `/detail/video?id=${detailId}`, disabled: !isDetailPage, active: '/video' },
     { icon: <SOP />, text: 'SOP', route: `/detail/sop?menu=SOP&id=${detailId}`, disabled: !isDetailPage, active: '/sop' },
   ];
