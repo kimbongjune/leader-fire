@@ -22,23 +22,16 @@ import ObjectPosition from '@/features/Map/ObjectPosition';
 import MiniMap from '@/features/Map/MiniMap';
 import { NextPageContext } from 'next';
 import { RootState } from '../../app/store';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 import axios from "../../components/common/api/axios"
-
-interface Props {
-  eventName: string;
-  created: string;
-  address: string;
-  description: string;
-  latitude: number; // 위도
-  longitude: number; // 경도
-  title: string;
-}
+import { selectDisasterById } from '@/features/slice/test';
+import { setPollingInterval, isPollingActive, fetchDisasterDetail } from '../../features/global/GlobalApiCallHandler';
 
 //TODO 상세 페이지, 상세정보 조회(폴링)
-const DetailPage = (props: Props) => {
+const DetailPage = () => {
   const router = useRouter();
   const deviceType = useDeviceType();
+  const id = router.query.id as string;
 
   useEffect(() =>{
     //TODO 재난번호 파라미터로 상세 정보 조회
@@ -47,34 +40,24 @@ const DetailPage = (props: Props) => {
   })
 
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
-    const test = () =>{
-      console.log("상세 데이터 조회!!!!!!!!!!")
+    if (id && !isPollingActive()) {
+      fetchDisasterDetail(id);
+      const interval =  setInterval(() => fetchDisasterDetail(id), 10000);
+      setPollingInterval(interval);
     }
-    test()
-    // setInterval을 사용하여 주기적으로 API를 호출
-    const intervalId = setInterval(() => test(), 10000);
+  }, [id]);
 
-    // 컴포넌트가 언마운트될 때 인터벌을 정리
-    return () => {
-      clearInterval(intervalId) 
-      console.log("상세데이터 조회 취소!!!!!!!!!!")
-    };
-  }, []);
-
-  const data = useSelector((state: RootState) => state.disaster.subDisasterInformation);
-
-  console.log("data!!!",data);
+  const data = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
   if (!deviceType) return null;
 
   return (
     <Layout>
       <Flex direction="column" height="100%" background={deviceType === 'tabletHorizontal' ? theme.colors.white : theme.colors.gray1}>
-        {deviceType === 'mobile' && <Menu title={data?.eventName} timestamp={data?.created} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />}
+        {deviceType === 'mobile' && <Menu status={"progress"} title={data?.eventName} timestamp={data?.created} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />}
         {deviceType !== 'mobile' && (
           <MenuWrapper deviceType={deviceType}>
-            <Menu title={data?.eventName} status="progress" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} onCloseButton={() => router.push('/')} timestamp={data.created} contentAlign="space-between" />
+            <Menu title={data?.eventName} status="progress" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push("/home")} onCloseButton={() => router.push('/')} timestamp={data?.created} contentAlign="space-between" />
           </MenuWrapper>
         )}
         <AddressTabWrapper deviceType={deviceType}>
@@ -84,7 +67,7 @@ const DetailPage = (props: Props) => {
           <Flex direction={deviceType === 'tabletHorizontal' ? 'row' : 'column'} w="100%">
             <Stack spacing="24px" p="24px 16px 16px" flex={1} borderRight={deviceType === 'tabletHorizontal' ? `1px solid ${theme.colors.gray2}` : ''}>
               {/* 신고내용 */}
-              <ReportItem callTell={data?.callTell} deviceType={deviceType} description={data?.description} />
+              <ReportItem callTell={data?.callTell!!} deviceType={deviceType} description={data?.description!!} />
               {/* 관제내용 */}
               <ControlItem deviceType={deviceType} />
               {/* 모바일 지도보기 버튼 추가 */}
@@ -125,13 +108,6 @@ const DetailPage = (props: Props) => {
 };
 
 export default DetailPage;
-
-DetailPage.defaultProps = {
-  eventName: '공장화재',
-  created: '2023.09.10 23:09',
-  address: '경남 진주시 진주대로 345-13, 203호',
-  description: '주차된 차량에 불이 붙었다 / 옆 차로 옮겨간다 연기가 자욱하다 / 사람들 많다 / 진입 어렵다 주차된 차량에 불이 붙었다 / 옆 차로 옮겨간다',
-};
 
 export const getServerSideProps = async (context: NextPageContext) => {
   const { query } = context;
