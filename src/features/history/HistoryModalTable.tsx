@@ -19,7 +19,7 @@ const HistoryModalTable = (props: Props) => {
         <THead>
           <THeadTr type={props.type}>
             <THeadTd>항목</THeadTd>
-            <THeadTd>내용 예시</THeadTd>
+            <THeadTd>내용</THeadTd>
           </THeadTr>
         </THead>
 

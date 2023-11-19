@@ -8,6 +8,7 @@ import HistoryModal from './HistoryModal';
 import useDeviceType from '@/hooks/useDeviceType';
 import Time from '../../../public/images/icons/time.svg';
 import Check from '../../../public/images/icons/check.svg';
+import { DispatchList } from '@/types/types';
 
 export type HistoryType = {
   reportCount?: number;
@@ -19,7 +20,7 @@ export type HistoryType = {
   created: string;
 };
 
-interface Props extends HistoryType {
+interface Props extends DispatchList {
   isChecked: boolean;
 }
 
@@ -27,22 +28,110 @@ interface Props extends HistoryType {
 const HistoryListItem = (props: Props) => {
   const deviceType = useDeviceType();
 
+  const headerTag = () =>{
+    switch (props.type) {
+      case 'report':
+        return props.dsr_knd_cd_nm;
+      case 'rescue':
+        return props.acc_place_cd_nm;
+      case 'patient':
+        return props.pat_stat_cd_nm;
+      case 'mobilize':
+        return props.dsr_knd_cd_nm;
+      default:
+        return ''; // 기본값 혹은 적절한 대체 텍스트
+    }
+  }
+
+  const headerTitle = () =>{
+    switch (props.type) {
+      case 'report':
+        return "";
+      case 'rescue':
+        return props.acc_rsn_cd_nm;
+      case 'patient':
+        return props.pat_stat_cd_nm;
+      case 'mobilize':
+        return props.dsr_cls_cd_nm;
+      default:
+        return ''; // 기본값 혹은 적절한 대체 텍스트
+    }
+  }
+
+  const discription = () :string=>{
+    switch (props.type) {
+      case 'report':
+        return props.call_content as string;
+      case 'rescue':
+        return props.act_desc as string;
+      case 'patient':
+        return props.emger_opinion as string;
+      case 'mobilize':
+        return props.call_content as string;
+      default:
+        return ''; // 기본값 혹은 적절한 대체 텍스트
+    }
+  }
+
+  const parseDateString = (dateStr: string): Date => {
+    const year = parseInt(dateStr.substring(0, 4), 10);
+    const month = parseInt(dateStr.substring(4, 6), 10) - 1; // JavaScript의 월은 0에서 시작합니다.
+    const day = parseInt(dateStr.substring(6, 8), 10);
+    const hour = parseInt(dateStr.substring(8, 10), 10);
+    const minute = parseInt(dateStr.substring(10, 12), 10);
+    const second = parseInt(dateStr.substring(12, 14), 10);
+  
+    return new Date(year, month, day, hour, minute, second);
+  };
+
+  const timeSince = (date: Date): string => {
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+    let interval = seconds / 31536000; // 연도 단위
+  
+    if (interval > 1) {
+      return Math.floor(interval) + "년 전";
+    }
+    interval = seconds / 2592000; // 월 단위
+    if (interval > 1) {
+      return Math.floor(interval) + "달 전";
+    }
+    interval = seconds / 604800; // 주 단위
+    if (interval > 1) {
+      return Math.floor(interval) + "주 전";
+    }
+    interval = seconds / 86400; // 일 단위
+    if (interval > 1) {
+      return Math.floor(interval) + "일 전";
+    }
+    interval = seconds / 3600; // 시간 단위
+    if (interval > 1) {
+      return Math.floor(interval) + "시간 전";
+    }
+    interval = seconds / 60; // 분 단위
+    if (interval > 1) {
+      return Math.floor(interval) + "분 전";
+    }
+    return Math.floor(seconds) + "초 전";
+  };
+
   return (
     <Container deviceType={deviceType}>
       <Flex justifyContent="space-between" alignItems="center">
         <Header>
-          <HeaderTag type={props.type}>{props.eventName}</HeaderTag>
-          {props.status && <HeaderTitle>{props.status}</HeaderTitle>}
-          {props.age && <HeaderInfo>{props.age}세</HeaderInfo>}
+          <HeaderTag type={props.type}>{headerTag()}</HeaderTag>
+          {<HeaderTitle>{headerTitle()}</HeaderTitle>}
+          {props.pat_age && <HeaderInfo>{props.pat_age}세</HeaderInfo>}
         </Header>
         <TimeWrapper>
           <IconWrapper width="14px" height="14px" color={theme.colors.gray5}>
             <Time />
           </IconWrapper>
-          {props.created}
+          {timeSince(parseDateString(props.reg_dtime))}
         </TimeWrapper>
       </Flex>
-      <Discription isChecked={props.isChecked} deviceType={deviceType} dangerouslySetInnerHTML={{ __html: props.description }}></Discription>
+      <Discription isChecked={props.isChecked} deviceType={deviceType} dangerouslySetInnerHTML={{ __html: discription() }}></Discription>
       <HistoryModal {...props} />
     </Container>
   );
