@@ -15,7 +15,7 @@ const Sidebar = (props: Props) => {
   const [isOpen, setIsOpen] = useState(true);
   const sidebarRef = useRef(null);
   return (
-    <SidebarWrapper width={props.width}>
+    <SidebarWrapper width={props.width} isOpen={isOpen}>
       <SidebarBody isOpen={isOpen} >
         <SidebarButton isOpen={isOpen} onClick={() => setIsOpen(prev => !prev)}>
           <Stack spacing="0" align="center" flexWrap="nowrap">
@@ -38,6 +38,7 @@ const SidebarWrapper = styled.div<any>`
   height: 100%;
   z-index: 100;
   position: relative;
+  pointer-events: ${({ isOpen }) => (isOpen ? 'auto' : 'none')};
 `;
 
 const SidebarBody = styled.div<any>`
@@ -50,13 +51,14 @@ const SidebarBody = styled.div<any>`
   z-index: 1;
   background-color: ${theme.colors.white};
   border-right: 1px solid var(--02, #e9ecef);
+  pointer-events: ${({ isOpen }) => (isOpen ? 'auto' : 'none')};
 `;
 
 const SidebarButton = styled.div<any>`
   position: absolute;
   top: 16px;
   left: 100%;
-
+  pointer-events: auto;
   padding: 8px 10px;
   border-radius: 0 8px 8px 0;
   border-top: 1px solid var(--02, #e9ecef);

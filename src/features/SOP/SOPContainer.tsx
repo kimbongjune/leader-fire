@@ -8,11 +8,21 @@ import Sidebar from '@/components/common/Sidebar/Sidebar';
 import SOPFilter from './SOPFilter';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 import SearchTab from './SearchTab';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
 import RightArrow from '../../../public/images/icons/arrow-right2.svg';
-import PDFIcon from '../../../public/images/icons/pdf.svg';
 import theme from '@/theme/colors';
+import { shallowEqual, useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { selectDisasterById } from '../slice/test';
+import {Document, Page, pdfjs} from 'react-pdf';
+
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+import { PDFDocumentProxy } from 'pdfjs-dist/types/src/display/api';
+
+pdfjs.GlobalWorkerOptions.workerSrc = "/js/pdf.worker.js";
 
 type ContentDataType = {
   title: string;
@@ -26,19 +36,188 @@ interface Props {
   status?: IncidentType;
 }
 
+type OutlineData = {
+  title: string;
+  subtitles: { subtitle: string; url: string; active: boolean, page:number }[];
+};
+
 const SOPContainer = (props: Props) => {
   const { deviceType } = props;
   const router = useRouter();
-  const [query, setQuery] = useQueryParams({ index: NumberParam, menu: StringParam, search: StringParam });
-  const [tableContents, setTableContents] = useState<ContentDataType[]>([]);
+  const [query, setQuery] = useQueryParams({ index: NumberParam, menu: StringParam, search: StringParam, page:NumberParam});
+  const [tableContents, setTableContents] = useState<OutlineData[]>([]);
+  const [numPages, setNumPages] = useState(0); // 총 페이지수
+  const [pageScale, setPageScale] = useState(1);
+  const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy | null>(null);
+  const [pdfFile, setPdfFile] = useState("/pdf/SOP_bookmark.pdf")
+
+  const [searchOccurrences, setSearchOccurrences] = useState<{ page: number; index: number }[]>([]);
+  const [currentSearchIndex, setCurrentSearchIndex] = useState<number>(0);
+
+  function highlightPattern(text:string, pattern:string) {
+    return text.replace(pattern, (value) => `<mark>${value}</mark>`);
+  }
+
+  const textRenderer = useCallback(
+    (textItem: any) => highlightPattern(textItem.str, query?.search!!),
+    [query.search]
+  );
+
+  const onDocumentLoadSuccess = async (document: PDFDocumentProxy) =>{
+    setNumPages(document.numPages);
+    setPdfDocument(document);
+    setQuery({...query, page:1})
+    const outlineData = await getOutlineEntries(await pdfjs.getDocument(pdfFile).promise)
+    setTableContents(outlineData)
+  }
+
+  async function getOutlineEntries(pdf: PDFDocumentProxy): Promise<OutlineData[]> {
+    const outline = await pdf.getOutline();
+    const data: OutlineData[] = [];
+  
+    if (outline) {
+      for (const item of outline) {
+        const entry: OutlineData = {
+          title: item.title,
+          subtitles: []
+        };
+        for (const subItem of item.items) {
+          if (subItem.dest && typeof subItem.dest[0] !== 'string') {
+            const subPageIndex = await pdf.getPageIndex(subItem.dest[0]);
+            entry.subtitles.push({
+              subtitle: subItem.title,
+              url: 'example', // 실제 URL을 여기에 넣으세요.
+              active: false,
+              page: subPageIndex + 1
+            });
+          }
+        }
+
+        data.push(entry);
+      }
+    }
+  
+    return data;
+  }
+
+  const goToSearchResultPage = (pageNum: number) => {
+    setQuery({page:pageNum});
+  };
+
+  const searchInPdfDocument = async (search: string) => {
+    if (!pdfDocument) {
+      console.log('PDF 문서가 로드되지 않았습니다.');
+      return;
+    }
+    let newOccurrences: { page: number; index: number }[] = [];
+
+    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+      const page = await pdfDocument.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const texts = textContent.items.map((item: any) => item.str || '').join(' ');
+
+      let index = 0;
+      while ((index = texts.indexOf(search, index)) !== -1) {
+        newOccurrences.push({ page: pageNum, index });
+        index += search.length;
+      }
+    }
+
+    setSearchOccurrences(newOccurrences);
+    setCurrentSearchIndex(0);
+
+    if (newOccurrences.length > 0) {
+      setQuery({page:newOccurrences[0].page});
+    }
+  };
+
+  useEffect(() => {
+    const debounceTimeout = setTimeout(() => {
+      console.log(query.search)
+      if (query.search && pdfDocument) {
+        console.log("Search: ", query.search);
+        searchInPdfDocument(query.search);
+      }else{
+        setSearchOccurrences([]);
+      }
+    }, 500); // 500ms 후에 실행
+  
+    return () => clearTimeout(debounceTimeout); // 클린업 함수
+  }, [query.search, pdfDocument]);
+
+
+  const goToNextPage = () => {
+    if (query.page !== null && query.page !== undefined) {
+      const newPageNumber = query.page < numPages ? query.page + 1 : query;
+      setQuery({page : newPageNumber as number});
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (query.page !== null && query.page !== undefined) {
+      const newPageNumber = query.page > 1 ? query.page - 1 : query.page;
+      setQuery({ page: newPageNumber as number });
+    }
+  };
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const clickLocation = e.clientX;
+    const threshold = window.innerWidth / 2;
+
+    if (clickLocation > threshold && query.page as number < numPages) {
+      goToNextPage();
+    } else if (clickLocation < threshold && query.page as number > 1) {
+      goToPreviousPage();
+    }
+  };
+
+  const pdfContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function updateSize() {
+      if (pdfContainerRef.current) {
+        setContainerSize({
+          width: pdfContainerRef.current.offsetWidth,
+          height: pdfContainerRef.current.offsetHeight
+        });
+      }
+    }
+  
+    window.addEventListener('resize', updateSize);
+    updateSize();
+  
+    return () => window.removeEventListener('resize', updateSize);
+  }, [pdfContainerRef.current]);
+
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
   const selectedIndex = Number(router.query.index as string);
   const search = query.search || null;
   let totalIndex = 0; // 목차 항목 인덱스
 
+  const id = router.query.id as string;
+  const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
   // 데이터 패칭 임시 코드
   useEffect(() => {
-    if (query.menu === 'SOP') setTableContents(props.SOP ?? []);
-    if (query.menu === '화학대응메뉴얼') setTableContents(props.화학대응메뉴얼 ?? []);
+    if (query.menu === 'SOP') {
+      setPdfFile("/pdf/SOP_bookmark.pdf")
+      setQuery({
+        menu: query.menu, // 현재 menu 값을 유지
+        index: undefined, // index를 초기화
+        search: undefined, // search를 초기화
+        page: 1 // page를 1로 설정
+      });
+    };
+    if (query.menu === '화학대응메뉴얼') {
+      setPdfFile("/pdf/Chemical.pdf")
+      setQuery({
+        menu: query.menu, // 현재 menu 값을 유지
+        index: undefined, // index를 초기화
+        search: undefined, // search를 초기화
+        page: 1 // page를 1로 설정
+      });
+    };
   }, [query.menu]);
 
   // 검색어 포함하는 인덱스 모음
@@ -61,25 +240,25 @@ const SOPContainer = (props: Props) => {
     ).indexes;
   }, [search, tableContents]);
 
-  const handleClickTitleItem = (index: number, url: string) => {
-    setQuery({ index });
+  const handleClickTitleItem = (index: number, url: string, page:number) => {
+    setQuery({ index, page :page });
   };
 
   return (
     <>
-      {deviceType === 'mobile' && <Menu title="공장화재" timestamp="2023 10 21 23:09" contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />}
+      {deviceType === 'mobile' && <Menu title={selectedDisaster?.eventName} timestamp={selectedDisaster?.created} contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />}
       {deviceType !== 'mobile' && (
         <MenuWrapper deviceType={deviceType}>
-          <Menu title="공장화재" status={props.status} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} onCloseButton={() => router.push('/')} timestamp={'2023 10 20 23:09'} contentAlign="space-between" />
+          <Menu title={selectedDisaster?.eventName} status={props.status} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} onCloseButton={() => router.push('/')} timestamp={'2023 10 20 23:09'} contentAlign="space-between" />
         </MenuWrapper>
       )}
       <AddressTabWrapper deviceType={deviceType}>
-        <AddressTab />
+        <AddressTab address={selectedDisaster?.lawAddr} />
       </AddressTabWrapper>
       <Box w="100%" h="100%" position="relative">
         {deviceType !== 'mobile' && (
           <Box w="367px" position="absolute" top="16px" right="16px" zIndex={10}>
-            <SearchTab search={query.search} indexes={searchResultIndexes} setQuery={setQuery} totalCount={searchResultIndexes.length || 0} handleTableContentQuery={() => {}} deviceType={deviceType} />
+            <SearchTab goToSearchResultPage={goToSearchResultPage} totalPage={numPages} searchOccurrences={searchOccurrences} search={query.search} indexes={currentSearchIndex} setQuery={setQuery} totalCount={searchOccurrences.length || 0} handleTableContentQuery={() => {}} deviceType={deviceType} />
           </Box>
         )}
         <Sidebar width={deviceType === 'mobile' ? '240px' : deviceType === 'tabletVertical' ? '327px' : '382px'}>
@@ -92,7 +271,7 @@ const SOPContainer = (props: Props) => {
                     setQuery({ menu: name, index: null });
                   }}
                 />
-                {deviceType === 'mobile' && <SearchTab search={query.search} indexes={searchResultIndexes} setQuery={setQuery} totalCount={searchResultIndexes.length || 0} handleTableContentQuery={() => {}} deviceType={deviceType} />}
+                {deviceType === 'mobile' && <SearchTab goToSearchResultPage={goToSearchResultPage} totalPage={numPages} searchOccurrences={searchOccurrences} search={query.search} indexes={currentSearchIndex} setQuery={setQuery} totalCount={searchOccurrences.length || 0} handleTableContentQuery={() => {}} deviceType={deviceType} />}
               </Stack>
               {tableContents?.map((tableContent, index) => {
                 return (
@@ -102,7 +281,7 @@ const SOPContainer = (props: Props) => {
                       {tableContent.subtitles?.map((subtitleObj, index) => {
                         const currentIndex = totalIndex++;
                         return (
-                          <TableContentItem id={currentIndex} onClick={() => handleClickTitleItem(currentIndex, subtitleObj.url)} key={currentIndex} isSelected={currentIndex === selectedIndex} isActive={searchResultIndexes.includes(currentIndex)}>
+                          <TableContentItem id={currentIndex} onClick={() => handleClickTitleItem(currentIndex, subtitleObj.url, subtitleObj.page)} key={currentIndex} isSelected={currentIndex === selectedIndex} isActive={searchResultIndexes.includes(currentIndex)}>
                             {currentIndex === selectedIndex && (
                               <Box position="absolute" left="0">
                                 <IconWrapper width="16px" height="16px" color={theme.colors.orange}>
@@ -121,12 +300,12 @@ const SOPContainer = (props: Props) => {
             </Stack>
           </SidebarContent>
         </Sidebar>
-        <PDFWrapper>
-          <Stack spacing="16px" top={deviceType === 'mobile' ? '180px' : '204px'} position="absolute" left="50%" transform="translateX(-50%)">
-            <IconWrapper width={deviceType === 'mobile' ? '114px' : '148px'} height={deviceType === 'mobile' ? '114px' : '148px'} color="#DEE2E6">
-              <PDFIcon />
-            </IconWrapper>
-            <Text deviceType={deviceType}>PDF 이미지 삽입</Text>
+        <PDFWrapper ref={pdfContainerRef} onClick={handleClick} >
+          <Stack spacing="16px" position="absolute" left="50%" transform="translateX(-50%)" height={containerSize.height}>
+          <Document file={pdfFile} onLoadSuccess={onDocumentLoadSuccess}>
+              <Page scale={pageScale} pageNumber={query.page as number} height={containerSize.height} renderTextLayer={true} renderAnnotationLayer={true} customTextRenderer={textRenderer}/>
+          </Document>
+          <PdfPage>{query.page as number} / {numPages}</PdfPage>
           </Stack>
         </PDFWrapper>
       </Box>
@@ -322,23 +501,19 @@ const PDFWrapper = styled.div`
   height: 100%;
   width: 100%;
   top: 0;
+  overflow-y: hidden;
 `;
 
-const Text = styled.div<{ deviceType: DeviceType }>`
-  color: ${theme.colors.gray4};
-  font-family: Pretendard Bold;
-  font-size: 20px;
-  line-height: 24px; /* 120% */
-  letter-spacing: -0.4px;
-
-  ${({ deviceType }) => {
-    if (deviceType === 'tabletVertical' || deviceType === 'tabletHorizontal') {
-      return `
-        font-family: Pretendard Bold;
-        font-size: 24px;
-        line-height: 24px; /* 100% */
-        letter-spacing: -0.48px;
-      `;
-    }
-  }}
+const PdfPage = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  color: black;
+  padding: 5px 12px 5px 12px;
+  font-size: 15px;
+  background-color:${theme.colors.gray5};
+  border-radius: 5px;
+  margin-bottom: 3px;
+  color: white;
 `;
