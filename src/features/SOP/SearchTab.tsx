@@ -16,40 +16,61 @@ import { useRouter } from 'next/router';
 interface Props {
   search?: string | null;
   setQuery: (query: { index?: number; menu?: string; search?: string }) => void;
-  indexes: number[];
+  indexes: number;
   totalCount: number;
+  searchOccurrences : { page: number; index: number }[];
   handleTableContentQuery: (index?: number | null, url?: string) => void;
   deviceType?: DeviceType;
+  totalPage: number;
+  goToSearchResultPage :(page:number) => void;
 }
 
 const SearchTab = (props: Props) => {
-  const { deviceType } = props;
+  const route = useRouter();
+  const { searchOccurrences, deviceType } = props;
   const [index, setIndex] = useQueryParam('index', withDefault(NumberParam, -1));
 
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  const [inputValue, setInputValue] = useState(props.search || '');
+
+  useEffect(() => {
+    setInputValue(props.search || '');
+  }, [props.search]);
+
   // 화살표 인덱스
-  const currentIndex = useMemo(() => props.indexes.indexOf(index), [index, props.indexes]);
-
-  const handleSearch = (e : React.ChangeEvent<HTMLInputElement>) => {
-    props.setQuery({search : e.target.value || undefined, index: undefined});
-    props.handleTableContentQuery(null);
-  }
-
-  const handleDescreaseIndex = () => {
-    setIndex(props.indexes[currentIndex - 1]);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    props.setQuery({ search: newValue || undefined, index: undefined });
   };
 
   const handleIncreaseIndex = () => {
-    if (currentIndex < props.totalCount - 1) {
-      setIndex(props.indexes[currentIndex + 1]);
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < props.totalCount) {
+      setCurrentIndex(nextIndex);
+      const nextPage = searchOccurrences[nextIndex].page;
+      props.goToSearchResultPage(nextPage);
     }
   };
+
+  const handleDescreaseIndex = () => {
+    const prevIndex = currentIndex - 1;
+    if (prevIndex >= 0) {
+      setCurrentIndex(prevIndex);
+      const prevPage = searchOccurrences[prevIndex].page;
+      props.goToSearchResultPage(prevPage);
+    }
+  };
+
+  console.log(props.totalCount)
 
   return (
     <Wrapper deviceType={deviceType}>
       <Stack spacing="8px">
         <TextInputWrapper deviceType={deviceType}>
           <Flex align="center" overflow="hidden">
-            <TextInput type="text" value={props.search || ''} onChange={handleSearch} deviceType={deviceType} />
+            <TextInput value={inputValue} type="text" onChange={handleSearchChange} deviceType={deviceType}  />
             <Flex align="center" gap="4px">
               <Box onClick={() => props.setQuery({search : undefined, index: undefined})}>
                 <IconWrapper width={deviceType === 'mobile' ? '20px' : '24px'} height={deviceType === 'mobile' ? '20px' : '24px'} color={theme.colors.gray5}>
@@ -69,16 +90,16 @@ const SearchTab = (props: Props) => {
             <Flex justify="space-between" flex={1} height="fit-content">
               <Text>검색 결과</Text>
               <Text>
-                {currentIndex + 1}/{props.totalCount}
+                {props.totalCount <= 0 ? currentIndex : currentIndex + 1 }/{props.totalCount}
               </Text>
             </Flex>
             <Flex gap="8px">
-              <Button to={`${index - 1}`} spy={true} smooth={true} onClick={handleDescreaseIndex} containerId="scroll-container" offset={-200}>
+              <Button to={`${index - 1}`} spy={true} smooth={true} onClick={handleIncreaseIndex} containerId="scroll-container" offset={-200}>
                 <IconWrapper width={deviceType === 'mobile' ? '20px' : '24px'} height={deviceType === 'mobile' ? '20px' : '24px'} color={currentIndex >= 0 ? theme.colors.gray7 : theme.colors.gray5}>
                   <ArrowDownIcon />
                 </IconWrapper>
               </Button>
-              <Button to={`${index + 1}`} spy={true} smooth={true} onClick={handleIncreaseIndex} containerId="scroll-container" offset={-200}>
+              <Button to={`${index + 1}`} spy={true} smooth={true} onClick={handleDescreaseIndex} containerId="scroll-container" offset={-200}>
                 <IconWrapper width={deviceType === 'mobile' ? '20px' : '24px'} height={deviceType === 'mobile' ? '20px' : '24px'} color={currentIndex < props.totalCount - 1 ? theme.colors.gray7 : theme.colors.gray5}>
                   <ArrowUpIcon />
                 </IconWrapper>
