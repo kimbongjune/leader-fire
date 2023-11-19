@@ -11,7 +11,7 @@ import useDeviceType from '@/hooks/useDeviceType';
 import { useRouter } from 'next/router';
 import axios from "../../components/common/api/axios"
 
-//TODO 로그인 페이지, 로그인 처리
+//TODO 로그인 페이지, 로그인 처리, 로그인 성공시 redux에 내정보 넣기
 const LoginPage = () => {
   const router = useRouter();
 

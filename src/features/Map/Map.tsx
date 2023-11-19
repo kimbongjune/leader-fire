@@ -279,7 +279,7 @@ const Map = (props: Props) => {
           <AddressTab contentJustify={'flex-start'} marginLeft="8px" />
         </>
       )}
-      {deviceType === 'tabletHorizontal' && <Menu title={props.title} subTitle="경남 진주시 진주대로 345-13, 203호" contentGap="12px" onClickBackButton={onClickClose} onCloseButton={onClickClose} />}
+      {deviceType === 'tabletHorizontal' && <Menu status={"progress"} title={props.title} subTitle="경남 진주시 진주대로 345-13, 203호" contentGap="12px" onClickBackButton={onClickClose} onCloseButton={onClickClose} />}
       <Container deviceType={deviceType}>
         <VehicleStatus />
         <Wrapper deviceType={deviceType}>
