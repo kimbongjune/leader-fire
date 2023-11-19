@@ -14,8 +14,9 @@ import { useQueryParam } from 'use-query-params';
 import UserSettingModal from '@/components/common/Modal/UserSettingModal';
 import TokenRefreshModal from '@/components/common/Modal/TokenRefreshModal';
 import SearchDispatch from './SearchDispatch';
-import { DeviceType } from '@/types/types';
+import { DeviceType, DispatchItemType } from '@/types/types';
 import { useRouter } from 'next/router';
+import { CountByType } from './HomeFilterItem';
 
 interface Props {
   profileUrl?: string;
@@ -24,6 +25,7 @@ interface Props {
   phoneNumber: string;
   menus: { icon: ReactNode; name: string; query: string }[];
   deviceType?: DeviceType;
+  testData:DispatchItemType[]
 }
 
 const HomeMenu = (props: Props) => {
@@ -31,6 +33,15 @@ const HomeMenu = (props: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [query, setQuery] = useQueryParam('option');
   const router = useRouter();
+
+  const countByType: CountByType = props.testData.reduce(
+    (res, dispatch) => {
+      res[dispatch.type] = (res[dispatch.type] || 0) + 1;
+      return res;
+    },
+    { fires: 0, rescue: 0, firstAid: 0, others: 0 },
+  );
+
 
   // 홈 메뉴 선택 시 호출
   const handleClickMenu = (query: string) => {
@@ -120,7 +131,7 @@ const HomeMenu = (props: Props) => {
             </DrawerBody>
           </DrawerContent>
         </Drawer>
-        <SearchDispatch deviceType={deviceType} />
+        <SearchDispatch deviceType={deviceType} countByType={countByType} NumberOfEmergencyDispatches={props.testData.length} />
       </Container>
       {query === 'setting' && <UserSettingModal isOpen={query === 'setting'} onClose={() => handleCloseModal()} onClick={() => handleClickOkButton()} />}
       {query === 'token' && <TokenRefreshModal isOpen={query === 'token'} onClose={() => handleCloseModal()} onClick={() => handleClickOkButton()} />}

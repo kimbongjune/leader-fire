@@ -4,18 +4,31 @@ import Image from 'next/image';
 import SelectBox from '@/components/common/SelectBox/SelectBox';
 import { useEffect, useState } from 'react';
 import { isEmpty } from 'lodash';
-import { DeviceType } from '@/types/types';
+import { DeviceType, DispatchItemType } from '@/types/types';
 import theme from '@/theme/colors';
 import Calendar from '@/components/common/Calendar/Calendar';
+import { CountByType } from './HomeFilterItem';
 
 interface Props {
   NumberOfEmergencyDispatches: number;
   deviceType?: DeviceType;
+  countByType: CountByType;
 }
+
+const typeMapping: { [K in keyof CountByType]: string } = {
+  fires: "화재",
+  rescue: "구조",
+  firstAid: "구급",
+  others: "기타"
+};
 
 const SearchDispatch = (props: Props) => {
   const { deviceType } = props;
   const [dates, setDates] = useState<{ value: string; label: string }[]>([]);
+
+  const count = (Object.entries(props.countByType) as [keyof CountByType, number][])
+  .map(([key, value]) => `${typeMapping[key]} ${value}`)
+  .join(', ');
 
   const generateDateOptions = () => {
     const options = [];
@@ -83,7 +96,7 @@ const SearchDispatch = (props: Props) => {
                   <span>{props.NumberOfEmergencyDispatches}</span> 건
                 </NumberOfEmergencyDispatches>
               </Flex>
-              <Status>화재 4, 구조 1, 구급 1, 기타 0</Status>
+              <Status>{count}</Status>
             </Stack>
           </EmergencyDispatch>
         </Flex>
