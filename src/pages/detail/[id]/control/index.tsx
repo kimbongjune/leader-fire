@@ -10,6 +10,9 @@ import HistoryTable from '@/features/Detail/HistoryTable';
 import useDeviceType from '@/hooks/useDeviceType';
 import { DeviceType } from '@/types/types';
 import SwiperView from '@/components/common/SwiperView/SwiperView';
+import { shallowEqual, useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { selectDisasterById } from '@/features/slice/test';
 
 interface Props {
   histories: {
@@ -26,11 +29,15 @@ const ControlDetail = (props: Props) => {
   const router = useRouter();
   const deviceType = useDeviceType();
 
+  const id = router.query.id as string;
+
+  const selectedData = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
   return (
     <Layout>
       <Flex direction="column" height="100%">
         <MenuWrapper deviceType={deviceType}>
-          <Menu title="관제 내용" contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
+          <Menu status={"progress"} title="관제 내용" contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
         </MenuWrapper>
         <Children deviceType={deviceType}>
           {props.histories?.map((history, index) => {

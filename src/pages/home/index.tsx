@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import styled from '@emotion/styled';
 import Layout from '@/components/common/Layout/Layout';
 import { Flex } from '@chakra-ui/react';
@@ -7,18 +7,29 @@ import HomeMenu from '@/features/Home/HomeMenu';
 import useDeviceType from '@/hooks/useDeviceType';
 import { DeviceType } from '@/types/types';
 import { NextPageContext } from 'next';
+import { clearPollingInterval } from '@/features/global/GlobalApiCallHandler';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
 
 //TODO 메인페이지
 const HomePage = () => {
   const deviceType = useDeviceType();
+  
+  useEffect(() => {
+    clearPollingInterval();
+  }, []);
+
+  
+  const testData = useSelector((state: RootState) => state.disaster.disasterInformation);
+
   if (!deviceType) return null;
 
   return (
     <Layout>
       <Flex direction="column" height="100%">
-        <HomeMenu deviceType={deviceType} />
+        <HomeMenu deviceType={deviceType} testData={testData}/>
         <Children deviceType={deviceType}>
-          <Home deviceType={deviceType} />
+          <Home deviceType={deviceType} testDate={testData} />
         </Children>
       </Flex>
     </Layout>

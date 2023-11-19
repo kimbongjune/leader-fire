@@ -7,27 +7,23 @@ import AddressTab from '@/components/common/Menu/AddressTab';
 import useDeviceType from '@/hooks/useDeviceType';
 import { useRouter } from 'next/router';
 import { DeviceType } from '@/types/types';
-import { RootState } from '../../../app/store';
-import { useSelector } from 'react-redux';
-import React, { useMemo } from 'react';
+import { selectDisasterById } from '../../../features/slice/test';
+import { useSelector, shallowEqual  } from 'react-redux';
+import React from 'react';
+import { RootState } from '@/app/store';
 
-
-interface Props {
-  lawAddr: string;
-}
 
 //TODO 과거이력 페이지
-const HistoryComponent = ({ lawAddr }:Props) => {
+const HistoryComponent = () => {
   const deviceType = useDeviceType();
   const router = useRouter();
-  const id = router.query.id;
+  const id = router.query.id as string;
 
-  //const data = useSelector((state: RootState) => state.disaster.subDisasterInformation);
+  const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
-  // Redux 상태에서 전체 데이터를 가져옵니다.
-  const testData = useSelector((state: RootState) => state.disaster.disasterInformation);
-  const { eventName, created, lawAddr: selectedLawAddr } = testData.find(item => item.dsrSeq === id) || {};
-
+  //const selectedDisaster = useSelector((state: RootState) => state.disaster.subDisasterInformation);
+  
+  if (!selectedDisaster) return null
   if (!deviceType) return null;
 
   console.log("history call")
@@ -37,10 +33,10 @@ const HistoryComponent = ({ lawAddr }:Props) => {
       <Container deviceType={deviceType}>
         <div>
           <MenuWrapper deviceType={deviceType}>
-            <Menu title={eventName} timestamp={created} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
+            <Menu status={"progress"} title={selectedDisaster?.eventName} timestamp={selectedDisaster?.created} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
           </MenuWrapper>
           <AddressTabWrapper deviceType={deviceType}>
-            <AddressTab address={lawAddr}/>
+            <AddressTab address={selectedDisaster?.lawAddr}/>
           </AddressTabWrapper>
         </div>
         <Wrapper>
@@ -50,12 +46,8 @@ const HistoryComponent = ({ lawAddr }:Props) => {
     </Layout>
   );
 };
-const History = React.memo(HistoryComponent, (prevProps, nextProps) => {
-  // lawAddr 값만 비교합니다.
-  return prevProps.lawAddr === nextProps.lawAddr;
-});
 
-export default History;
+export default HistoryComponent;
 
 const Container = styled.div<{ deviceType: string | null }>`
   height: 100%;

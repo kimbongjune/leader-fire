@@ -9,8 +9,9 @@ import styled from '@emotion/styled';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { RootState } from '../../../../app/store';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 import { DispatchItemType } from '../../../../types/types';
+import { selectDisasterById } from '@/features/slice/test';
 
 interface Props {
   records: {
@@ -30,15 +31,13 @@ const ReportDetailPage = (props: Props) => {
 
   const id = router.query.id as string;
 
-  const selectedData = useSelector((state: RootState) => 
-    state.disaster.disasterInformation.find(item => item.dsrSeq === id)
-  );
+  const selectedData = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
   return (
     <Layout>
       <Flex direction="column" height="100%" background="#F8F9FA">
         <MenuWrapper deviceType={deviceType}>
-          <Menu title="신고 내용" contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
+          <Menu status={"progress"} title="신고 내용" contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
         </MenuWrapper>
         <Children>
           <Stack spacing="24px">
