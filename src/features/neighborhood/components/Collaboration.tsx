@@ -7,10 +7,19 @@ import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
 import useDeviceType from '@/hooks/useDeviceType';
 import Call from '../../../../public/images/icons/call.svg';
 import Calling from '../../../../public/images/icons/phone_in_talk.svg';
-import { DeviceType } from '@/types/types';
+import { DeviceType, ModCollaborativeResponseList } from '@/types/types';
 
+type GroupData = {
+  title: string;
+  count: number;
+  itemList: { phone: string; name: string; distance: string }[];
+};
+
+type GroupedData = {
+  [key: string]: GroupData;
+};
 interface Props {
-  datas: { title: string; count: number; itemList: { phone: string; name: string; distance: string }[] }[];
+  data:ModCollaborativeResponseList[]
 }
 
 //  전화번호, 사용자 동태, 직급(소속), 성명, 위치와의거리,
@@ -18,9 +27,31 @@ interface Props {
 const Collaboration = (props: Props) => {
   const deviceType = useDeviceType();
 
+  const transformData = (data:ModCollaborativeResponseList[]) => {
+    const groupedData: GroupedData = {
+      '1': { title: '인근 의용소방대', count: 0, itemList: [] },
+      '2': { title: '인근 의소일반대', count: 0, itemList: [] },
+      '3': { title: '인근 생명지킴이', count: 0, itemList: [] }
+    };
+  
+    data?.forEach(item => {
+      const { appUserType, tel, nmPerson } = item;
+      const group = groupedData[appUserType];
+  
+      if (group) {
+        group.itemList.push({ phone: tel, name: nmPerson, distance: '' });
+        group.count += 1;
+      }
+    });
+  
+    return Object.values(groupedData).filter(group => group.count > 0);
+  };
+
+  const collaborationData = transformData(props.data)
+
   return (
     <>
-      {props.datas?.map((data, index) => {
+      {collaborationData.map((data, index) => {
         return (
           <Container deviceType={deviceType} key={index}>
             <>
@@ -31,7 +62,7 @@ const Collaboration = (props: Props) => {
               <ItemContainer deviceType={deviceType}>
                 {data.itemList?.map((item, index) => {
                   return (
-                    <ItemWrapper deviceType={deviceType} key={index}>
+                    <a href={`tel:${item.phone}`}><ItemWrapper deviceType={deviceType} key={index}>
                       <Flex alignItems="center">
                         {deviceType === 'mobile' && (
                           <PhoneWrapper deviceType={deviceType}>
@@ -46,7 +77,7 @@ const Collaboration = (props: Props) => {
                         {deviceType !== 'mobile' && (
                           <PhoneWrapper deviceType={deviceType}>
                             <IconWrapper width="32px" height="32px" color={theme.colors.orange}>
-                              <Calling />
+                              <Calling/>
                             </IconWrapper>
                           </PhoneWrapper>
                         )}
@@ -56,7 +87,7 @@ const Collaboration = (props: Props) => {
                         </NameWrapper>
                         <Distance deviceType={deviceType}>{item.distance}</Distance>
                       </Flex>
-                    </ItemWrapper>
+                    </ItemWrapper></a>
                   );
                 })}
               </ItemContainer>
@@ -66,27 +97,6 @@ const Collaboration = (props: Props) => {
       })}
     </>
   );
-};
-
-Collaboration.defaultProps = {
-  datas: [
-    {
-      title: '인근 의용소방대',
-      count: 4,
-      itemList: [
-        { phone: '010-1111-2222', name: '홍길동', distance: '10m 인근' },
-        { phone: '010-1111-3333', name: '홍길동', distance: '10m 인근' },
-      ],
-    },
-    {
-      title: '인근 생명지킴이',
-      count: 4,
-      itemList: [
-        { phone: '010-1111-4444', name: '홍길동', distance: '10m 인근' },
-        { phone: '010-1111-5555', name: '홍길동', distance: '10m 인근' },
-      ],
-    },
-  ],
 };
 export default Collaboration;
 

@@ -29,7 +29,8 @@ const VulnerablePerson = (props: Props) => {
 
   return (
     <Container deviceType={deviceType}>
-      <TitleWrapper deviceType={deviceType}>
+      준비중
+      {/* <TitleWrapper deviceType={deviceType}>
         <Title deviceType={deviceType}>인근피난약자</Title>
         {deviceType !== 'mobile' && <Count>{props.count}명</Count>}
       </TitleWrapper>
@@ -97,7 +98,7 @@ const VulnerablePerson = (props: Props) => {
             </ItemWrapper>
           );
         })}
-      </Content>
+      </Content> */}
     </Container>
   );
 };

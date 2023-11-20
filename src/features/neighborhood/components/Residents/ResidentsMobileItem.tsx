@@ -18,6 +18,7 @@ const ResidentsMobileItem = (props: Props) => {
     <React.Fragment>
       <div>
         <Flex alignItems="center" marginBottom="8px">
+        <a href={props.phone && `tel:${props.phone}`}>
           <PhoneWrapper>
             <Flex gap="4px">
               <IconWrapper width="16px" height="16px" color={theme.colors.blue}>
@@ -26,6 +27,7 @@ const ResidentsMobileItem = (props: Props) => {
               <PhoneNumber>{props.phone}</PhoneNumber>
             </Flex>
           </PhoneWrapper>
+          </a>
           <MobileNameWrapper>
             <NameText>{props.name}</NameText>
           </MobileNameWrapper>

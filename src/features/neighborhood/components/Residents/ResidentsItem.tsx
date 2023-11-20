@@ -12,13 +12,16 @@ interface Props {
   contentTop: ReactNode;
   contentBottom: ReactNode;
   address?: ReactNode;
+  call?:string;
 }
 
 const ResidentsItem = (props: Props) => {
   const deviceType = useDeviceType();
 
   return (
+  
     <Container>
+      <a href={props.call && `tel:${props.call}`}>
       <Flex gap="12px" alignItems="center" width="100%">
         <PhoneWrapper deviceType={deviceType}>
           <IconWrapper width="32px" height="32px" color={theme.colors.blue}>
@@ -31,6 +34,7 @@ const ResidentsItem = (props: Props) => {
         </ContentArea>
       </Flex>
       {props.address && <Address>{props.address}</Address>}
+    </a>
     </Container>
   );
 };
@@ -64,6 +68,7 @@ const PhoneWrapper = styled.div<{ deviceType: DeviceType }>`
 
 const ContentArea = styled.div`
   flex: 1;
+  overflow: hidden;
 `;
 
 const ContentTop = styled.div`

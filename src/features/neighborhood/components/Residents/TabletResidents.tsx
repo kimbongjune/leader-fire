@@ -4,7 +4,7 @@ import { css } from '@emotion/react';
 import theme from '@/theme/colors';
 import { Flex } from '@chakra-ui/react';
 import useDeviceType from '@/hooks/useDeviceType';
-import { DeviceType } from '@/types/types';
+import { DeviceType, ModNearbyFacilityPersonnelList, ModNearbyOfficialsList, ModNearbyResidentsList } from '@/types/types';
 import ResidentsItem from './ResidentsItem';
 
 const Tag = (props: any) => {
@@ -15,16 +15,14 @@ const Name = (props: any) => {
   return <NameWrapper>{props.children}</NameWrapper>;
 };
 
-const Age = (props: any) => {
-  return <AgeWrapper>{props.children}</AgeWrapper>;
-};
-
-const Distance = (props: any) => {
-  return <DistanceWrapper>{props.children}</DistanceWrapper>;
-};
+type Props = {
+  nearbyFacilityPersonnelList:ModNearbyFacilityPersonnelList[]
+  nearbyOfficialsList:ModNearbyOfficialsList[]
+  nearbyResidentsList:ModNearbyResidentsList[]
+}
 
 //TODO 태블릿 인근주민 하위페이지
-const TabletResidents = () => {
+const TabletResidents = (props:Props) => {
   const deviceType = useDeviceType();
 
   return (
@@ -32,17 +30,18 @@ const TabletResidents = () => {
       <ResidentsContainer>
         <TitleWrapper>
           <Title deviceType={deviceType}>보호자</Title>
-          <Count deviceType={deviceType}>4명</Count>
+          <Count deviceType={deviceType}>{props.nearbyResidentsList?.length}명</Count>
         </TitleWrapper>
         <ResidentsItemContainer deviceType={deviceType}>
-          <ResidentsItem contentTop={<Tag>신고자의 보호자</Tag>} contentBottom={<Name>홍길동</Name>} />
-          <ResidentsItem contentTop={<Tag>신고자의 보호자</Tag>} contentBottom={<Name>홍길동</Name>} />
-          <ResidentsItem contentTop={<Tag>신고자의 보호자</Tag>} contentBottom={<Name>홍길동</Name>} />
-          <ResidentsItem contentTop={<Tag>신고자의 보호자</Tag>} contentBottom={<Name>홍길동</Name>} />
+        {props.nearbyResidentsList?.map((item, index) => {
+          return(
+            <ResidentsItem call={item?.care_tel} key={index} contentTop={<Tag>{item.care_rel}</Tag>} contentBottom={<Name>{item.care_name}</Name>} />
+          )
+        })}
         </ResidentsItemContainer>
       </ResidentsContainer>
 
-      <ResidentsContainer>
+      {/* <ResidentsContainer>
         <TitleWrapper>
           <Title deviceType={deviceType}>U119등록자</Title>
           <Count deviceType={deviceType}>4명</Count>
@@ -53,97 +52,37 @@ const TabletResidents = () => {
           <ResidentsItem contentTop={<Age>여, 56세</Age>} contentBottom={<Name>홍길동</Name>} />
           <ResidentsItem contentTop={<Age>여, 56세</Age>} contentBottom={<Name>홍길동</Name>} />
         </ResidentsItemContainer>
-      </ResidentsContainer>
+      </ResidentsContainer> */}
 
       <ResidentsContainer>
         <TitleWrapper>
           <Title deviceType={deviceType}>소방등록정보</Title>
-          <Count deviceType={deviceType}>4명</Count>
+          <Count deviceType={deviceType}>{props.nearbyOfficialsList?.length}명</Count>
         </TitleWrapper>
         <ResidentsItemContainer deviceType={deviceType}>
-          <ResidentsItem
-            contentTop={
-              <Flex gap="4px" alignItems="center">
-                <Tag>점유자</Tag>
-                홍길동
-              </Flex>
-            }
-            contentBottom={<Name>건물명</Name>}
-            address="경남 진주시 진주대로 345-13, 203호"
-          />
-          <ResidentsItem
-            contentTop={
-              <Flex gap="4px" alignItems="center">
-                <Tag>점유자</Tag>
-                홍길동
-              </Flex>
-            }
-            contentBottom={<Name>건물명</Name>}
-            address="경남 진주시 진주대로 345-13, 203호"
-          />
-          <ResidentsItem
-            contentTop={
-              <Flex gap="4px" alignItems="center">
-                <Tag>점유자</Tag>
-                홍길동
-              </Flex>
-            }
-            contentBottom={<Name>건물명</Name>}
-            address="경남 진주시 진주대로 345-13, 203호"
-          />
-          <ResidentsItem
-            contentTop={
-              <Flex gap="4px" alignItems="center">
-                <Tag>점유자</Tag>
-                홍길동
-              </Flex>
-            }
-            contentBottom={<Name>건물명</Name>}
-            address="경남 진주시 진주대로 345-13, 203호"
-          />
+        {props.nearbyOfficialsList?.map((item, index) => {
+          return(
+            <ResidentsItem key={index} call={item.tlphon_no}
+              contentTop={<Flex gap="4px" alignItems="center"><Tag>{item.partcpnt_cd_nm}</Tag>{item.partcpnt}</Flex>}contentBottom={<Name>{item.obj_nm}</Name>}
+              address={item.bunji_adress || item.doro_adress} />
+          )
+        })}
         </ResidentsItemContainer>
       </ResidentsContainer>
 
       <ResidentsContainer>
         <TitleWrapper>
           <Title deviceType={deviceType}>인근 주민</Title>
-          <Count deviceType={deviceType}>시설관계자, 4명</Count>
+          <Count deviceType={deviceType}>시설관계자, {props.nearbyFacilityPersonnelList?.length}명</Count>
         </TitleWrapper>
         <ResidentsItemContainer deviceType={deviceType}>
-          <ResidentsItem
-            contentTop={
-              <Flex justifyContent="space-between">
-                <Flex gap="4px" alignItems="center">
-                  <Tag>점유자</Tag>
-                  <Name>홍길동</Name>
-                </Flex>
-                <Distance>10m</Distance>
-              </Flex>
-            }
-            contentBottom={
-              <Flex gap="8px" alignItems="center">
-                <Name>건물명</Name>
-                <div>경남 진주시 진주대로 345-13, 203호</div>
-              </Flex>
-            }
-          />
-          <ResidentsItem
-            contentTop={
-              <Flex justifyContent="space-between">
-                <Flex gap="4px" alignItems="center">
-                  <Tag>점유자</Tag>
-                  <Name>홍길동</Name>
-                </Flex>
-                <Distance>10m</Distance>
-              </Flex>
-            }
-            contentBottom={
-              <Flex gap="8px" alignItems="center">
-                <Name>건물명</Name>
-                <div>경남 진주시 진주대로 345-13, 203호</div>
-              </Flex>
-            }
-          />
+        {props.nearbyFacilityPersonnelList?.map((item, index) => {
+          return(
+            <ResidentsItem key={index} call={item.tlphon_no}
+              contentTop={<Flex gap="4px" alignItems="center"><Tag>{item.partcpnt_cd_nm}</Tag>{item.partcpnt}</Flex>}contentBottom={<Name>{item.obj_nm}</Name>}
+              address={item.bunji_adress || item.doro_adress} />
+          )
+        })}
         </ResidentsItemContainer>
       </ResidentsContainer>
     </>
@@ -266,4 +205,6 @@ const NameWrapper = styled.div`
   line-height: 24px;
   letter-spacing: -0.36px;
   white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 `;
