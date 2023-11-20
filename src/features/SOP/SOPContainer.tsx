@@ -210,7 +210,7 @@ const SOPContainer = (props: Props) => {
       });
     };
     if (query.menu === '화학대응메뉴얼') {
-      setPdfFile("/pdf/Chemical.pdf")
+      setPdfFile("/pdf/Chemical_bookmark.pdf")
       setQuery({
         menu: query.menu, // 현재 menu 값을 유지
         index: undefined, // index를 초기화
