@@ -198,3 +198,335 @@ export type DispatchList = {
   gis_y_4326?: string
   dist?: string
 }
+
+export type NeightBorHoodData = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  totalCount: number
+  result: NeightBorHoodDataResult
+}
+
+export type NeightBorHoodDataResult = {
+  nearbyFacilityPersonnelList: NearbyFacilityPersonnelList
+  nearbyOfficialsList: NearbyOfficialsList
+  collaborativeResponseList: CollaborativeResponseList
+  fightingPropertyList: FightingPropertyList
+  hazardousSubstancList: HazardousSubstancList
+  toxicFacilityList: ToxicFacilityList
+  nearbyResidentsList: NearbyResidentsList
+}
+type NearbyFacilityPersonnelList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: NearbyFacilityPersonnelListResult
+}
+
+type NearbyFacilityPersonnelListResult = {
+  dataList: NearbyFacilityPersonnelListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type NearbyFacilityPersonnelListResultList = {
+  obj_nm: string
+  partcpnt_cd_nm: string
+  partcpnt: string
+  tlphon_no: string
+  bunji_adress: string
+  doro_adress: string
+  gis_x_5181: string
+  gis_y_5181: string
+  gis_x_4326: string
+  gis_y_4326: string
+  dist: string
+  keyword_yn: string
+}
+
+type NearbyOfficialsList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: NearbyOfficialsListResult
+}
+
+type NearbyOfficialsListResult = {
+  dataList: NearbyOfficialsListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type NearbyOfficialsListResultList = {
+  partcpnt_cd_nm: string
+  partcpnt: string
+  obj_nm: string
+  bunji_adress: string
+  doro_adress: string
+  tlphon_no: string
+}
+
+type CollaborativeResponseList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: CollaborativeResponseListResult[]
+}
+
+type CollaborativeResponseListResult = {
+  appUserId: string
+  appUserType: string
+  nmPerson: string
+  tel: string
+  type?:string
+  volunPosition: any
+  userLocX: number
+  userLocY: number
+}
+
+type FightingPropertyList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: FightingPropertyListResult
+}
+
+type FightingPropertyListResult = {
+  dataList: FightingPropertyListResultData[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type FightingPropertyListResultData = {
+  bild_sn: string
+  obj_nm: string
+  main_prpos_cd_nm: string
+  bunji_adress: string
+  doro_adress: string
+  dsprvn_tlphon: string
+  dytm_tlphon: string
+  night_tlphon: string
+  gis_x_5181: string
+  gis_y_5181: string
+  gis_x_4326: string
+  gis_y_4326: string
+  dist: string
+  keyword_yn: string
+}
+
+type HazardousSubstancList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: HazardousSubstancListResult
+}
+
+type HazardousSubstancListResult = {
+  dataList: HazardousSubstancListResultData[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type HazardousSubstancListResultData = {
+  bild_sn: string
+  obj_nm: string
+  itlpc_buld_nm: string
+  itlpc_bunji_adress: string
+  itlpc_doro_adress: string
+  mnfctretc_sn: string
+  mnfctretc_se_no: string
+  mnfctretc_detail_se_cd_nm: string
+  bulddong_sn: string
+  floor_sn: string
+  dsprvn_tlphon: string
+  dytm_tlphon: string
+  night_tlphon: string
+  gis_x_5181: number
+  gis_y_5181: number
+  gis_x_4326: number
+  gis_y_4326: number
+  dist: number
+  keyword_yn: string
+}
+
+type ToxicFacilityList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: ToxicFacilityListResult
+}
+
+type ToxicFacilityListResult = {
+  dataList: ToxicFacilityListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type ToxicFacilityListResultList = {
+  regist_de_14: string
+  buld_nm: string
+  entrps_nm: string
+  hold_cout_cstdy: string
+  hold_ffgq: string
+  hold_cout: string
+  bunji_adress: string
+  doro_adress: string
+  rprsntv_tel1: string
+  rprsntv_tel2: string
+  txsb_safer_tel1: string
+  txsb_safer_tel2: string
+  gis_x_5181: string
+  gis_y_5181: string
+  gis_x_4326: string
+  gis_y_4326: string
+  dist: string
+  keyword_yn: string
+}
+
+type NearbyResidentsList =  {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: NearbyResidentsListResult
+}
+
+type NearbyResidentsListResult = {
+  dataList: NearbyResidentsListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type NearbyResidentsListResultList = {
+  pat_name: string
+  care_name: string
+  care_rel: string
+  care_tel: string
+}
+
+export type ModCollaborativeResponseList = {
+  appUserId: string
+  appUserType: string
+  nmPerson: string
+  tel: string
+  volunPosition: any
+  userLocX: number
+  userLocY: number
+  type: 'collaboration'
+}
+
+export type ModNearbyFacilityPersonnelList = {
+  obj_nm: string
+  partcpnt_cd_nm: string
+  partcpnt: string
+  tlphon_no: string
+  bunji_adress: string
+  doro_adress: string
+  gis_x_5181: string
+  gis_y_5181: string
+  gis_x_4326: string
+  gis_y_4326: string
+  dist: string
+  keyword_yn: string
+  type: 'residents';
+}
+
+export type ModNearbyOfficialsList = {
+  partcpnt_cd_nm: string
+  partcpnt: string
+  obj_nm: string
+  bunji_adress: string
+  doro_adress: string
+  tlphon_no: string
+  type: 'residents';
+}
+
+export type ModNearbyResidentsList = {
+  pat_name: string
+  care_name: string
+  care_rel: string
+  care_tel: string
+  type: 'residents';
+}
+
+export type ModFightingPropertyList = {
+  bild_sn: string
+  obj_nm: string
+  main_prpos_cd_nm: string
+  bunji_adress: string
+  doro_adress: string
+  dsprvn_tlphon: string
+  dytm_tlphon: string
+  night_tlphon: string
+  gis_x_5181: string
+  gis_y_5181: string
+  gis_x_4326: string
+  gis_y_4326: string
+  dist: string
+  keyword_yn: string
+  type: 'facilities';
+}
+
+export type ModHazardousSubstancList = {
+  bild_sn: string
+  obj_nm: string
+  itlpc_buld_nm: string
+  itlpc_bunji_adress: string
+  itlpc_doro_adress: string
+  mnfctretc_sn: string
+  mnfctretc_se_no: string
+  mnfctretc_detail_se_cd_nm: string
+  bulddong_sn: string
+  floor_sn: string
+  dsprvn_tlphon: string
+  dytm_tlphon: string
+  night_tlphon: string
+  gis_x_5181: number
+  gis_y_5181: number
+  gis_x_4326: number
+  gis_y_4326: number
+  dist: number
+  keyword_yn: string
+  type: 'facilities';
+}
+
+export type ModToxicFacilityList = {
+  regist_de_14: string
+  buld_nm: string
+  entrps_nm: string
+  hold_cout_cstdy: string
+  hold_ffgq: string
+  hold_cout: string
+  bunji_adress: string
+  doro_adress: string
+  rprsntv_tel1: string
+  rprsntv_tel2: string
+  txsb_safer_tel1: string
+  txsb_safer_tel2: string
+  gis_x_5181: string
+  gis_y_5181: string
+  gis_x_4326: string
+  gis_y_4326: string
+  dist: string
+  keyword_yn: string
+  type: 'facilities';
+}
+
+export type DispatchLists = {
+  collaborativeResponseList: ModCollaborativeResponseList[]
+  nearbyFacilityPersonnelList: ModNearbyFacilityPersonnelList[]
+  nearbyOfficialsList: ModNearbyOfficialsList[]
+  nearbyResidentsList: ModNearbyResidentsList[]
+  fightingPropertyList: ModFightingPropertyList[]
+  hazardousSubstancList: ModHazardousSubstancList[]
+  toxicFacilityList: ModToxicFacilityList[]
+}
+
+export type ModDispatchLists = {
+  dispatchLists: DispatchLists
+}
