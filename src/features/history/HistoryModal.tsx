@@ -80,6 +80,36 @@ const HistoryModal = (props: Props) => {
     if (key === 'reg_dtime') {
       formattedValue = formatDate(value as string);
     }
+
+    if (key === 'aware_yn') {
+      if(formattedValue.trim().length <= 0){
+        formattedValue = "N"
+      }
+    }
+
+    if (key === 'breath_yn') {
+      if(formattedValue.trim().length <= 0){
+        formattedValue = "N"
+      }
+    }
+
+    if (key === 'cpr_yn') {
+      if(formattedValue.trim().length <= 0){
+        formattedValue = "N"
+      }
+    }
+
+    if (key === 'noemer_yn') {
+      if(formattedValue.trim().length <= 0){
+        formattedValue = "N"
+      }
+    }
+
+    if (key === 'copertn_cntrmsr_yn') {
+      if(formattedValue.trim().length <= 0){
+        formattedValue = "N"
+      }
+    }
   
     if (key !== 'type' && key !== 'isChecked') {
       acc.push({

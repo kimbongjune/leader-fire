@@ -39,7 +39,7 @@ const HistoryListItem = (props: Props) => {
       case 'mobilize':
         return props.dsr_knd_cd_nm;
       default:
-        return ''; // 기본값 혹은 적절한 대체 텍스트
+        return '';
     }
   }
 
@@ -54,7 +54,7 @@ const HistoryListItem = (props: Props) => {
       case 'mobilize':
         return props.dsr_cls_cd_nm;
       default:
-        return ''; // 기본값 혹은 적절한 대체 텍스트
+        return '';
     }
   }
 
@@ -69,7 +69,7 @@ const HistoryListItem = (props: Props) => {
       case 'mobilize':
         return props.call_content as string;
       default:
-        return ''; // 기본값 혹은 적절한 대체 텍스트
+        return '';
     }
   }
 
