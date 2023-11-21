@@ -20,6 +20,7 @@ import { KakaoUtil, Position } from '@/features/Map/kakaoUtil';
 import FloatingButtons from '@/features/Map/FloatingButtons';
 import ObjectPosition from '@/features/Map/ObjectPosition';
 import MiniMap from '@/features/Map/MiniMap';
+import TestMap from '@/features/Map/TestMap';
 import { NextPageContext } from 'next';
 import { RootState } from '../../app/store';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -91,7 +92,8 @@ const DetailPage = () => {
             {deviceType === 'tabletHorizontal' && (
               <Flex gap="24px" direction="column" h="100%" flex={1} p="24px 16px" bg={theme.colors.gray1}>
                 <Box flex={2}>
-                  <MiniMap deviceType={deviceType} />
+                  {/* <MiniMap deviceType={deviceType} /> */}
+                  <TestMap deviceType={deviceType} />
                 </Box>
                 <Box flex={1}>
                   <ObjectPosition />
