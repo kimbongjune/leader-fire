@@ -31,11 +31,6 @@ const MiniMap = (props: Props) => {
   const dispatch = useDispatch()
   const apiKey = process.env.NEXT_PUBLIC_KAKAOMAP_API_KEY;
   const router = useRouter();
-  const distance = Number(router.query.distance); // 거리
-  const water = router.query.water; // 소화전
-  const extinguisher = router.query.extinguisher; // 비상소화장치
-  const target = router.query.target; // 대상물
-  const danger = router.query.danger; // 위협물
   const kakaoRef = useRef<any>();
 
   const isWaterActive = useSelector((state: RootState) => state.disaster.isWaterMarkerActive);
@@ -229,7 +224,7 @@ const MiniMap = (props: Props) => {
 
         kakaoRef.current.createMarkers(vehiclePositions, vehicleMarkers, 48, 48); // 출동차량 마커를 생성하고 주차장 마커 배열에 추가합니다
         kakaoRef.current.createMarkers(waterPositions, waterMarkers, 48, 48); // 소방용수 마커를 생성하고 주차장 마커 배열에 추가합니다
-        kakaoRef.current.createMarkers(rescuePositions, rescueMarkers, distance, distance); // 긴급구조위치 마커를 생성하고 주차장 마커 배열에 추가합니다
+        kakaoRef.current.createMarkers(rescuePositions, rescueMarkers, 48, 48); // 긴급구조위치 마커를 생성하고 주차장 마커 배열에 추가합니다
         kakaoRef.current.createMarkers(videoPositions, videoMarkers, 48, 48); // 영상공유 마커를 생성하고 주차장 마커 배열에 추가합니다
         kakaoRef.current.createMarkers(targetPositions, targetMarkers, 48, 48); // 대상물 마커를 생성하고 주차장 마커 배열에 추가합니다
         kakaoRef.current.createMarkers(dangerPositions, dangerMarkers, 48, 48); // 위험물 마커를 생성하고 주차장 마커 배열에 추가합니다
@@ -264,7 +259,8 @@ const MiniMap = (props: Props) => {
     };
 
     kakaoMapScript.addEventListener('load', onLoadKakaoAPI);
-  }, [isClickVehicle, isWaterActive, isExtinguisherActive, isClickRescuePosition, isClickVideo, isTargetActive, isDangerActive, props.latitude, props.longitude, distance, props.alpha, isClickCompassButton]);
+    
+  }, [isClickVehicle, isWaterActive, isExtinguisherActive, isClickRescuePosition, isClickVideo, isTargetActive, isDangerActive, props.latitude, props.longitude, props.alpha, isClickCompassButton]);
 
   return (
     <MapWrapper>
