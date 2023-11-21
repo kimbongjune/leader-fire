@@ -17,7 +17,7 @@ export const isPollingActive = (): boolean => {
 
 export const fetchDisasterDetail = async (id: string): Promise<void> => {
     console.log(`api call!!!!!!!!! disaster ID: ${id}`);
-    // TODO 재난정보 상세조회 실제 API 호출 코드
+    // TODO 재난정보 상세조회 실제 API 호출 코드, redux store에 저장
     // return await fetch(`/api/disaster/${id}`);
     {
         [
