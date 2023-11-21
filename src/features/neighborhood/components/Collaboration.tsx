@@ -62,7 +62,7 @@ const Collaboration = (props: Props) => {
               <ItemContainer deviceType={deviceType}>
                 {data.itemList?.map((item, index) => {
                   return (
-                    <a href={`tel:${item.phone}`}><ItemWrapper deviceType={deviceType} key={index}>
+                    <a href={`tel:${item.phone}`} key={index}><ItemWrapper deviceType={deviceType}>
                       <Flex alignItems="center">
                         {deviceType === 'mobile' && (
                           <PhoneWrapper deviceType={deviceType}>

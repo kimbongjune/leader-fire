@@ -13,6 +13,7 @@ import { dangerData, evacuationFacilityData, fireFacilityData, fireHistoryData, 
 import useDeviceType from '@/hooks/useDeviceType';
 import { DeviceType } from '@/types/types';
 import { Box } from '@chakra-ui/react';
+import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 interface Props {
   data: {
@@ -28,10 +29,17 @@ interface Props {
   dangerData: any;
   isDangerCategory: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  build_sn?:string;
 }
 
 const FacilityModal = (props: Props) => {
   const deviceType = useDeviceType();
+
+  console.log(props.build_sn)
+
+  const [query, setQuery] = useQueryParams({build_sn: StringParam});
+
+  setQuery({build_sn:props?.build_sn})
 
   return (
     <ModalLayout isOpen={true} onClose={() => props.setIsModalOpen(false)} padding="24px" borderRadius="12px">

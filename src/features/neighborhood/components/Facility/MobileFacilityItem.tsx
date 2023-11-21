@@ -17,8 +17,9 @@ interface Props {
   distance?: string;
   name?: string;
   storeName?: string;
+  phoneNumber?:string;
   storeAddress?: string;
-  buildingFloor?: number;
+  buildingFloor?: string;
   buildingNumber?: string;
   buildingInfo?: ReactNode;
   containerBottom?: ReactNode;
@@ -28,6 +29,7 @@ interface Props {
   isSelected?: boolean;
   hasModal?: boolean;
   deviceType?: DeviceType;
+  build_sn:string;
 }
 
 const MobileFacilityItem = (props: Props) => {
@@ -39,6 +41,7 @@ const MobileFacilityItem = (props: Props) => {
   const onClickItem = (title: string) => {
     setIsModalOpen(true);
     if (title.includes('위험물제조소')) {
+      console.log("위험물")
       setIsDangerFacilities(true);
     } else {
       setIsDangerFacilities(false);
@@ -57,7 +60,7 @@ const MobileFacilityItem = (props: Props) => {
         <Stack spacing="0">
           <Flex gap="8px" pb="8px" borderBottom="1px solid #E9ECEF">
             <PhoneWrapper>
-              <PhoneIconWrapper onClick={() => console.log('방제실 전화번호 클릭')}>
+              <PhoneIconWrapper onClick={() => window.location.href = `tel:${props?.phoneNumber}`}>
                 <IconWrapper width="24px" height="24px" color={theme.colors.green}>
                   <Calling />
                 </IconWrapper>
@@ -90,7 +93,7 @@ const MobileFacilityItem = (props: Props) => {
         {props.containerBottom && <ContainerBottom>{props.containerBottom}</ContainerBottom>}
       </Container>
 
-      {isModalOpen && <FacilityModal setIsModalOpen={setIsModalOpen} isDangerCategory={isDangerFacilities} />}
+      {isModalOpen && <FacilityModal build_sn={props?.build_sn} setIsModalOpen={setIsModalOpen} isDangerCategory={isDangerFacilities} />}
       {isMapModalOpen && <MapModal setIsMapModalOpen={setIsMapModalOpen} />}
     </>
   );

@@ -14,6 +14,7 @@ import { DeviceType } from '@/types/types';
 interface Props {
   phoneName?: string;
   distance?: string;
+  phoneNumber?:string;
   name?: string;
   storeName?: string;
   storeAddress?: string;
@@ -25,6 +26,7 @@ interface Props {
   isSelected?: boolean;
   hasModal?: boolean;
   deviceType?: DeviceType;
+  build_sn:string;
 }
 
 const TabletFacilityItem = (props: Props) => {
@@ -53,7 +55,7 @@ const TabletFacilityItem = (props: Props) => {
         <ContainerSelected isSelected={props.isSelected} />
         <Flex gap={props.deviceType === 'tabletHorizontal' ? '16px' : '8px'} alignItems="center">
           <PhoneWrapper>
-            <PhoneIconWrapper onClick={() => console.log('방제실 전화번호 클릭')}>
+            <PhoneIconWrapper onClick={() => window.location.href = `tel:${props?.phoneNumber}`}>
               <IconWrapper width="32px" height="32px" color={theme.colors.green}>
                 <Calling />
               </IconWrapper>
@@ -91,7 +93,7 @@ const TabletFacilityItem = (props: Props) => {
         {props.containerBottom && <ContainerBottom>{props.containerBottom}</ContainerBottom>}
       </Container>
 
-      {isModalOpen && <FacilityModal setIsModalOpen={setIsModalOpen} isDangerCategory={isDangerFacilities} />}
+      {isModalOpen && <FacilityModal build_sn={props?.build_sn} setIsModalOpen={setIsModalOpen} isDangerCategory={isDangerFacilities} />}
       {isMapModalOpen && <MapModal setIsMapModalOpen={setIsMapModalOpen} />}
     </>
   );

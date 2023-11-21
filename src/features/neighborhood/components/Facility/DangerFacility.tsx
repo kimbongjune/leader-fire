@@ -9,7 +9,7 @@ import ArrowDown from '../../../../../public/images/icons/arrow-drop-down.svg';
 import FacilityModal from './FacilityModal';
 import { PhoneBox } from './TargetFacility';
 import useDeviceType from '@/hooks/useDeviceType';
-import { DeviceType } from '@/types/types';
+import { DeviceType, ModHazardousSubstancList } from '@/types/types';
 import { css } from '@emotion/react';
 import usePaging from './hooks/usePaging';
 import { DangerFacilityData } from './FacilityData';
@@ -17,26 +17,11 @@ import { useRouter } from 'next/router';
 import MobileFacilityItem from './MobileFacilityItem';
 
 interface Props {
-  title: string;
-  count: number;
-  data: {
-    id: number;
-    phoneName: string;
-    distance: string;
-    name: string;
-    storeName: string;
-    storeAddress: string;
-    categoryNumber: number;
-    buildingInfoTitle: string;
-    buildingNumber: string;
-    serialNumber: string;
-    buildingFloor: number;
-    phones: { phoneTitle: string; phoneNumber: string }[];
-  }[];
   deviceType?: DeviceType;
+  hazardousSubstancList:ModHazardousSubstancList[]
 }
 
-const BuildingInfo = ({ title, number, serialNumber }: { title: string; number: number; serialNumber: string }) => {
+const BuildingInfo = ({ title, number, serialNumber }: { title: string; number: string; serialNumber: string }) => {
   const deviceType = useDeviceType();
 
   return (
@@ -57,7 +42,7 @@ const BuildingInfo = ({ title, number, serialNumber }: { title: string; number: 
   );
 };
 
-const BuildingBox = ({ number, floor }: { number: string; floor: number }) => {
+const BuildingBox = ({ number, floor }: { number: string; floor: string }) => {
   return (
     <VStack minW="48px" padding="8px 6px" gap="0">
       <Building>{number}</Building>
@@ -69,23 +54,23 @@ const BuildingBox = ({ number, floor }: { number: string; floor: number }) => {
 //TODO 인근 위험물제조소 리스트
 const DangerFacility = (props: Props) => {
   const { query } = useRouter();
-  const queryId = Number(query.id);
+  const queryId = query.build_sn;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const dataLength = props.data.length;
+  const dataLength = props?.hazardousSubstancList?.length;
   const [isOpen, setIsOpen] = useState(true);
   const { visibleIndex, handleNext, handlePrev, setVisibleIndex } = usePaging({ dataLength: dataLength });
   const { deviceType } = props;
 
   useEffect(() => {
-    const index = props.data.findIndex(item => item.id === queryId);
+    const index = props?.hazardousSubstancList?.findIndex(item => item.bild_sn === queryId);
 
     if (index !== -1) {
       const newIndex = Math.floor(index / 2) * 2;
       setVisibleIndex(newIndex);
     }
-  }, [queryId, props.data]);
+  }, [queryId, props?.hazardousSubstancList]);
 
   const handleClickUpButton = () => {
     setIsOpen(false);
@@ -100,9 +85,9 @@ const DangerFacility = (props: Props) => {
       <Container deviceType={deviceType}>
         <TitleWrapper deviceType={deviceType}>
           <Flex align="center" gap="4px">
-            <Title deviceType={deviceType}>{props.title}</Title>
-            {deviceType !== 'mobile' && <Count>({props.count}건)</Count>}
-            {deviceType === 'mobile' && <Count deviceType={deviceType}>{props.count}건</Count>}
+            <Title deviceType={deviceType}>{'인근 위험물제조소 등'}</Title>
+            {deviceType !== 'mobile' && <Count>({dataLength}건)</Count>}
+            {deviceType === 'mobile' && <Count deviceType={deviceType}>{dataLength}건</Count>}
           </Flex>
           {deviceType !== 'mobile' && (
             <Flex>
@@ -131,39 +116,39 @@ const DangerFacility = (props: Props) => {
         </TitleWrapper>
         {isOpen && (
           <Grid templateColumns={'repeat(2, 1fr)'} columnGap={deviceType === 'mobile' ? '4px' : '8px'} rowGap={deviceType === 'mobile' ? '4px' : '8px'} marginTop={deviceType ? '4px' : '8px'}>
-            {props.data?.map((item, index) => {
-              const isSelected = queryId === item.id;
+            {props.hazardousSubstancList?.map((item, index) => {
+              const isSelected = queryId === item.bild_sn;
               if (deviceType === 'mobile')
                 return (
                   <MobileFacilityItem
                     isSelected={isSelected}
-                    key={`${props.title} - ${index}`}
-                    title={props.title}
-                    phoneName={item.phoneName}
-                    distance={item.distance}
-                    name={item.name}
-                    storeName={item.storeName}
-                    storeAddress={item.storeAddress}
-                    buildingFloor={item.buildingFloor}
-                    buildingNumber={item.buildingNumber}
+                    key={item.bild_sn}
+                    title={"인근 위험물제조소 등"}
+                    phoneName={"방재실"}
+                    build_sn={item.bild_sn}
+                    distance={item.dist.toString()}
+                    name={item.mnfctretc_detail_se_cd_nm}
+                    storeName={item.obj_nm}
+                    storeAddress={item.itlpc_bunji_adress || item.itlpc_doro_adress}
+                    buildingFloor={item.floor_sn}
+                    buildingNumber={item.bild_sn}
                     containerBottom={
                       <VStack gap="8px" pt="8px">
-                        {item.phones?.map((phone, index) => {
-                          return <PhoneBox key={index} title={phone.phoneTitle} number={phone.phoneNumber} deviceType={deviceType} />;
-                        })}
+                        {item.dytm_tlphon && <PhoneBox key={item.dytm_tlphon} title={"주간전화"} number={item.dytm_tlphon} deviceType={deviceType} />}
+                        {item.night_tlphon &&<PhoneBox key={item.night_tlphon} title={"야간전화"} number={item.night_tlphon} deviceType={deviceType} />}
                       </VStack>
                     }
                     buildingInfo={
                       <VStack spacing="4px" margin="4px 0 0 0">
                         <BuildingInfoWrapper deviceType={deviceType}>
-                          <InfoTitle>{item.buildingInfoTitle}</InfoTitle>
+                          <InfoTitle>{item.mnfctretc_detail_se_cd_nm}</InfoTitle>
                           <Stack spacing="2px">
                             <InfoSubTitle>구분번호</InfoSubTitle>
-                            <InfoSubText>{item.categoryNumber}</InfoSubText>
+                            <InfoSubText>{item.mnfctretc_se_no}</InfoSubText>
                           </Stack>
                           <Stack spacing="2px">
                             <InfoSubTitle>제조소일련번호</InfoSubTitle>
-                            <InfoSubText>{item.serialNumber}</InfoSubText>
+                            <InfoSubText>{item.mnfctretc_sn}</InfoSubText>
                           </Stack>
                         </BuildingInfoWrapper>
                       </VStack>
@@ -171,27 +156,26 @@ const DangerFacility = (props: Props) => {
                   />
                 );
               return (
-                <Flex w="100%">
+                <Flex w="100%" key={item.bild_sn}>
                   <TabletFacilityItem
                     isSelected={isSelected}
-                    key={`${props.title} - ${index}`}
-                    title={props.title}
-                    phoneName={item.phoneName}
-                    distance={item.distance}
-                    name={item.name}
-                    storeName={item.storeName}
-                    storeAddress={item.storeAddress}
+                    title={"인근 위험물제조소 등"}
+                    phoneName={"방재실"}
+                    build_sn={item.bild_sn}
+                    distance={item.dist.toString()}
+                    name={item.mnfctretc_detail_se_cd_nm}
+                    storeName={item.obj_nm}
+                    storeAddress={item.itlpc_bunji_adress || item.itlpc_doro_adress}
                     containerBottom={
                       <Flex gap="8px" w="100%">
-                        <BuildingBox number="103동" floor={7} />
+                        <BuildingBox number={`${item.bulddong_sn}동`} floor={item.floor_sn} />
                         <VStack flex={1} gap="8px">
-                          {item.phones?.map((phone, index) => {
-                            return <PhoneBox key={index} title={phone.phoneTitle} number={phone.phoneNumber} />;
-                          })}
+                          {item.dytm_tlphon && <PhoneBox key={item.dytm_tlphon} title={"주간전화"} number={item.dytm_tlphon} deviceType={deviceType} />}
+                          {item.night_tlphon &&<PhoneBox key={item.night_tlphon} title={"야간전화"} number={item.night_tlphon} deviceType={deviceType} />}
                         </VStack>
                       </Flex>
                     }
-                    buildingInfo={<BuildingInfo title={item.buildingInfoTitle} number={item.categoryNumber} serialNumber={item.serialNumber} />}
+                    buildingInfo={<BuildingInfo title={item.mnfctretc_detail_se_cd_nm} number={item.mnfctretc_se_no} serialNumber={item.mnfctretc_sn} />}
                   />
                 </Flex>
               );
@@ -199,16 +183,10 @@ const DangerFacility = (props: Props) => {
           </Grid>
         )}
       </Container>
-      {isModalOpen && <FacilityModal setIsModalOpen={setIsModalOpen} isDangerCategory={true} />}
     </>
   );
 };
 
-DangerFacility.defaultProps = {
-  title: '인근 위험물제조소 등',
-  count: 1,
-  data: DangerFacilityData,
-};
 export default DangerFacility;
 
 const Container = styled.div<{ deviceType?: DeviceType }>`

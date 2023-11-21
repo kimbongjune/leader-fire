@@ -10,27 +10,17 @@ import Call from '../../../../../public/images/icons/call.svg';
 import { TargetFacilityData } from './FacilityData';
 import { useRouter } from 'next/router';
 import usePaging from './hooks/usePaging';
-import { DeviceType } from '@/types/types';
+import { DeviceType, ModFightingPropertyList } from '@/types/types';
 import MobileFacilityItem from './MobileFacilityItem';
 
 interface Props {
-  title: string;
-  count: number;
-  datas: {
-    id: number;
-    phoneName: string;
-    distance: string;
-    name: string;
-    storeName: string;
-    storeAddress: string;
-    phones: { phoneTitle: string; phoneNumber: string }[];
-  }[];
   deviceType?: DeviceType;
+  fightingPropertyList:ModFightingPropertyList[]
 }
 
 export const PhoneBox = ({ title, number, deviceType }: { title: string; number: string; deviceType?: DeviceType }) => {
   return (
-    <PhoneItem deviceType={deviceType} onClick={() => console.log(`전화번호 ${number} 클릭`)}>
+    <PhoneItem deviceType={deviceType} onClick={() => window.location.href = `tel:${number}`}>
       <PhoneItemTitle deviceType={deviceType}>{title}</PhoneItemTitle>
       {deviceType !== 'mobile' && (
         <>
@@ -55,20 +45,20 @@ export const PhoneBox = ({ title, number, deviceType }: { title: string; number:
 //TODO 인근 대상물 페이지
 const TargetFacility = (props: Props) => {
   const { query } = useRouter();
-  const queryId = Number(query.id);
-  const dataLength = props.datas.length;
+  const queryId = query.build_sn;
+  const dataLength = props?.fightingPropertyList?.length;
   const [isOpen, setIsOpen] = useState(true);
   const { visibleIndex, handleNext, handlePrev, setVisibleIndex } = usePaging({ dataLength: dataLength });
   const { deviceType } = props;
 
   useEffect(() => {
-    const index = props.datas.findIndex(item => item.id === queryId);
+    const index = props?.fightingPropertyList?.findIndex(item => item.bild_sn === queryId);
 
     if (index !== -1) {
       const newIndex = Math.floor(index / 2) * 2;
       setVisibleIndex(newIndex);
     }
-  }, [queryId, props.datas]);
+  }, [queryId, props?.fightingPropertyList]);
 
   const handleClickUpButton = () => {
     setIsOpen(false);
@@ -82,9 +72,9 @@ const TargetFacility = (props: Props) => {
     <Container deviceType={deviceType}>
       <TitleWrapper deviceType={deviceType}>
         <Flex align="center" gap="4px">
-          <Title deviceType={deviceType}>{props.title}</Title>
-          {deviceType !== 'mobile' && <Count>({props.count}건)</Count>}
-          {deviceType === 'mobile' && <Count deviceType={deviceType}>{props.count}건</Count>}
+          <Title deviceType={deviceType}>인근대상물</Title>
+          {deviceType !== 'mobile' && <Count>({dataLength}건)</Count>}
+          {deviceType === 'mobile' && <Count deviceType={deviceType}>{dataLength}건</Count>}
         </Flex>
         {deviceType !== 'mobile' && (
           <Flex>
@@ -113,51 +103,50 @@ const TargetFacility = (props: Props) => {
       </TitleWrapper>
       {isOpen && (
         <Grid templateColumns={'repeat(2, 1fr)'} columnGap={deviceType === 'mobile' ? "4px" : "8px"} rowGap={deviceType === 'mobile' ? "4px" : "8px"} marginTop={deviceType ? '4px' : '8px'}>
-          {props.datas?.map((item, index) => {
-            const isSelected = queryId === item.id;
+          {props?.fightingPropertyList?.map((item, index) => {
+            const isSelected = queryId === item.bild_sn;
             if (deviceType === 'mobile')
               return (
+
                 <MobileFacilityItem
                   isSelected={isSelected}
-                  key={`${props.title} - ${index}`}
-                  title={props.title}
-                  phoneName={item.phoneName}
-                  distance={item.distance}
-                  name={item.name}
-                  storeName={item.storeName}
-                  storeAddress={item.storeAddress}
+                  key={index}
+                  build_sn={item.bild_sn}
+                  title={"인근대상물"}
+                  phoneName={"방재실"}
+                  phoneNumber={item.dsprvn_tlphon}
+                  distance={item.dist}
+                  name={item.main_prpos_cd_nm}
+                  storeName={item.obj_nm}
+                  storeAddress={item.bunji_adress || item.doro_adress}
                   containerBottom={
                     <VStack gap="8px" pt="8px">
-                      {item.phones?.map((phone, index) => {
-                        return <PhoneBox key={index} title={phone.phoneTitle} number={phone.phoneNumber} deviceType={deviceType} />;
-                      })}
+                      {item.dytm_tlphon && <PhoneBox key={item.dytm_tlphon} title={"주간전화"} number={item.dytm_tlphon} deviceType={deviceType} />}
+                      {item.night_tlphon &&<PhoneBox key={item.night_tlphon} title={"야간전화"} number={item.night_tlphon} deviceType={deviceType} />}
                     </VStack>
                   }
                 />
               );
-
-            return (
-              <Flex w="100%">
+              return (
                 <TabletFacilityItem
-                  deviceType={deviceType}
-                  isSelected={isSelected}
-                  key={`${props.title} - ${index}`}
-                  title={props.title}
-                  phoneName={item.phoneName}
-                  distance={item.distance}
-                  name={item.name}
-                  storeName={item.storeName}
-                  storeAddress={item.storeAddress}
-                  containerBottom={
-                    <VStack gap="8px">
-                      {item.phones?.map((phone, index) => {
-                        return <PhoneBox key={index} title={phone.phoneTitle} number={phone.phoneNumber} />;
-                      })}
-                    </VStack>
-                  }
+                isSelected={isSelected}
+                key={index}
+                build_sn={item.bild_sn}
+                title={"인근대상물"}
+                phoneName={"방재실"}
+                phoneNumber={item.dsprvn_tlphon}
+                distance={item.dist}
+                name={item.main_prpos_cd_nm}
+                storeName={item.obj_nm}
+                storeAddress={item.bunji_adress || item.doro_adress}
+                containerBottom={
+                  <VStack gap="8px" pt="8px">
+                    {item.dytm_tlphon && <PhoneBox key={item.dytm_tlphon} title={"주간전화"} number={item.dytm_tlphon} deviceType={deviceType} />}
+                    {item.night_tlphon &&<PhoneBox key={item.night_tlphon} title={"야간전화"} number={item.night_tlphon} deviceType={deviceType} />}
+                  </VStack>
+                }
                 />
-              </Flex>
-            );
+              );
           })}
         </Grid>
       )}
@@ -165,11 +154,6 @@ const TargetFacility = (props: Props) => {
   );
 };
 
-TargetFacility.defaultProps = {
-  title: '인근 대상물',
-  count: 1,
-  datas: TargetFacilityData,
-};
 export default TargetFacility;
 
 const Container = styled.div<{ deviceType?: DeviceType }>`

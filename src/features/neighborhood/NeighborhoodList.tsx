@@ -193,7 +193,28 @@ const NeighborhoodList = (props: Props) => {
                                 "gis_y_4326": 35.5679281286,
                                 "dist": 91.15718067,
                                 "keyword_yn": "N"
-                            }
+                            },
+                            {
+                              "bild_sn": "48000000022213",
+                              "obj_nm": "합천군종합사회복지관",
+                              "itlpc_buld_nm": "종합사회복지관",
+                              "itlpc_bunji_adress": "경상남도 합천군 합천읍 합천리 524-1 번지 9필지",
+                              "itlpc_doro_adress": "경상남도 합천군 합천읍 동서로 39 종합사회복지관",
+                              "mnfctretc_sn": "MF482005000626",
+                              "mnfctretc_se_no": "23",
+                              "mnfctretc_detail_se_cd_nm": "옥내탱크저장소",
+                              "bulddong_sn": "1",
+                              "floor_sn": "11",
+                              "dsprvn_tlphon": "방진봉 010-3876-0040",
+                              "dytm_tlphon": "055-930-4924",
+                              "night_tlphon": "055-930-4502(4924)",
+                              "gis_x_5181": 304865.42120541824,
+                              "gis_y_5181": 230719.9018908944,
+                              "gis_x_4326": 128.1567533729,
+                              "gis_y_4326": 35.5679281286,
+                              "dist": 91.15718067,
+                              "keyword_yn": "N"
+                          }
                         ],
                         "ret_cd": "0",
                         "ret_msg": "success",
@@ -249,7 +270,38 @@ const NeighborhoodList = (props: Props) => {
                         "ret_msg": "success",
                         "rec_cnt": 50
                     }
+                },
+                "nearbyBusinessesList": {
+                  "response": "success",
+                        "responseCode": 200,
+                        "responseMsg": "성공",
+                        "result": {
+                            "dataList": [
+                                {
+                                    "bild_sn": "48000000022172",
+                                    "entrps_nm": "한살림",
+                                    "main_prpos_cd_nm": "근린생활시설",
+                                    "sub_prpos_cd_nm": "소매점",
+                                    "buld_nm": "까치빌라",
+                                    "bulddong_sn": "1",
+                                    "floor_sn": "11",
+                                    "cttpc": "055-933-9338",
+                                    "bunji_adress": "경상남도 합천군 합천읍 합천리 1256-0 번지",
+                                    "doro_adress": "경상남도 합천군 합천읍 옥산로 16 까치빌라",
+                                    "gis_x_5181": "304858.0170545473",
+                                    "gis_y_5181": "230811.08909041138",
+                                    "gis_x_4326": "128.156683525",
+                                    "gis_y_4326": "35.56875061320001",
+                                    "dist": "1.74461852",
+                                    "keyword_yn": "N"
+                                }
+                    ],
+                            "ret_cd": "0",
+                            "ret_msg": "success",
+                            "rec_cnt": 154
+                  }
                 }
+
             }
         }
         //협업대응 -> 1:의소전담대, 2:의소일반대, 3:생명지킴이
@@ -291,7 +343,13 @@ const NeighborhoodList = (props: Props) => {
         //인근시설 -> 유독물
         const toxicFacilityList = testData.result.toxicFacilityList.result.dataList.map(item => ({
           ...item,
-          type: 'facilities' as 'facilities'
+          type: 'facilities' as 'facilities',
+          bild_sn : new Date().getTime().toString()
+        }));
+
+        const nearbyBusinessesList = testData.result.nearbyBusinessesList.result.dataList.map(item => ({
+          ...item,
+          type: 'facilities' as 'facilities',
         }));
         
         const combinedData:DispatchLists = {
@@ -302,6 +360,7 @@ const NeighborhoodList = (props: Props) => {
           fightingPropertyList : fightingPropertyList,
           hazardousSubstancList : hazardousSubstancList,
           toxicFacilityList : toxicFacilityList,
+          nearbyBusinessesList: nearbyBusinessesList
         }
 
         const data = {
@@ -352,7 +411,12 @@ const NeighborhoodList = (props: Props) => {
           nearbyResidentsList={neightborHoodData?.dispatchLists?.nearbyResidentsList!!} 
         />}
         {type === 'vulnerablePerson' && <VulnerablePerson />}
-        {type === 'facilities' && <Facility />}
+        {type === 'facilities' && <Facility 
+          fightingPropertyList={neightborHoodData?.dispatchLists?.fightingPropertyList!!}
+          hazardousSubstancList={neightborHoodData?.dispatchLists?.hazardousSubstancList!!}
+          toxicFacilityList={neightborHoodData?.dispatchLists?.toxicFacilityList!!}
+          nearbyBusinessesList={neightborHoodData?.dispatchLists?.nearbyBusinessesList!!}
+        />}
       </VStack>}
     </Container>
   );

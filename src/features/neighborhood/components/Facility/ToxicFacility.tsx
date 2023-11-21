@@ -10,24 +10,13 @@ import { PhoneBox } from './TargetFacility';
 import { ToxicFacilityData } from './FacilityData';
 import { useRouter } from 'next/router';
 import usePaging from './hooks/usePaging';
-import { DeviceType } from '@/types/types';
+import { DeviceType, ModToxicFacilityList } from '@/types/types';
 import MobileFacilityItem from './MobileFacilityItem';
 import { css } from '@emotion/react';
 
 interface Props {
-  title: string;
-  count: number;
-  datas: {
-    id: number;
-    phoneName: string;
-    distance: string;
-    name: string;
-    storeName: string;
-    storeAddress: string;
-    buildingInfo: { title: string; text: string }[];
-    phones: { phoneTitle: string; phoneNumber: string }[];
-  }[];
   deviceType?: DeviceType;
+  toxicFacilityList:ModToxicFacilityList[]
 }
 
 const BuildingInfo = ({ title, text }: { title: string; text: string }) => {
@@ -42,20 +31,21 @@ const BuildingInfo = ({ title, text }: { title: string; text: string }) => {
 //TODO 인근 유독물시설 리스트
 const ToxicFacility = (props: Props) => {
   const { query } = useRouter();
-  const queryId = Number(query.id);
-  const dataLength = props.datas.length;
+  const queryId = query.build_sn;
+
+  const dataLength = props?.toxicFacilityList?.length;
   const [isOpen, setIsOpen] = useState(true);
   const { visibleIndex, handleNext, handlePrev, setVisibleIndex } = usePaging({ dataLength: dataLength });
   const { deviceType } = props;
 
   useEffect(() => {
-    const index = props.datas.findIndex(item => item.id === queryId);
+    const index = props?.toxicFacilityList?.findIndex(item => item.bild_sn === queryId);
 
     if (index !== -1) {
       const newIndex = Math.floor(index / 2) * 2;
       setVisibleIndex(newIndex);
     }
-  }, [queryId, props.datas]);
+  }, [queryId, props?.toxicFacilityList]);
 
   const handleClickUpButton = () => {
     setIsOpen(false);
@@ -69,9 +59,9 @@ const ToxicFacility = (props: Props) => {
     <Container deviceType={deviceType}>
       <TitleWrapper deviceType={deviceType}>
         <Flex align="center" gap="4px">
-          <Title deviceType={deviceType}>{props.title}</Title>
-          {deviceType !== 'mobile' && <Count>({props.count}건)</Count>}
-          {deviceType === 'mobile' && <Count deviceType={deviceType}>{props.count}건</Count>}
+          <Title deviceType={deviceType}>{'인근 유독물시설 등'}</Title>
+          {deviceType !== 'mobile' && <Count>({dataLength}건)</Count>}
+          {deviceType === 'mobile' && <Count deviceType={deviceType}>{dataLength}건</Count>}
         </Flex>
         {deviceType !== 'mobile' && (
           <Flex>
@@ -100,24 +90,27 @@ const ToxicFacility = (props: Props) => {
       </TitleWrapper>
       {isOpen && (
         <Grid templateColumns={'repeat(2, 1fr)'} columnGap={deviceType === 'mobile' ? '4px' : '8px'} rowGap={deviceType === 'mobile' ? '4px' : '8px'} marginTop={deviceType ? '4px' : '8px'}>
-          {props.datas?.map((item, index) => {
-            const isSelected = queryId === item.id;
+          {props?.toxicFacilityList?.map((item, index) => {
+            const isSelected = queryId === item.bild_sn;
             if (deviceType === 'mobile')
               return (
                 <MobileFacilityItem
                   isSelected={isSelected}
-                  key={`${props.title} - ${index}`}
-                  title={props.title}
-                  phoneName={item.phoneName}
-                  distance={item.distance}
-                  name={item.name}
-                  storeName={item.storeName}
-                  storeAddress={item.storeAddress}
+                  key={index}
+                  title={'인근 유독물시설 등'}
+                  phoneName={"연락처"}
+                  phoneNumber={item.txsb_safer_tel1 || item.txsb_safer_tel2 || item.rprsntv_tel1 || item.rprsntv_tel2}
+                  distance={item.dist}
+                  name={item.buld_nm}
+                  storeName={item.entrps_nm}
+                  storeAddress={item.bunji_adress}
+                  build_sn={item.bild_sn}
                   containerBottom={
                     <VStack gap="8px" pt="8px">
-                      {item.phones?.map((phone, index) => {
-                        return <PhoneBox key={index} title={phone.phoneTitle} number={phone.phoneNumber} deviceType={deviceType} />;
-                      })}
+                      {item.txsb_safer_tel1 && <PhoneBox key={item.txsb_safer_tel1} title={"안전관리자1"} number={item.txsb_safer_tel1} deviceType={deviceType} />}
+                      {item.txsb_safer_tel2 && <PhoneBox key={item.txsb_safer_tel2} title={"안전관리자2"} number={item.txsb_safer_tel2} deviceType={deviceType} />}
+                      {item.rprsntv_tel1 &&<PhoneBox key={item.rprsntv_tel1} title={"대표자1"} number={item.rprsntv_tel1} deviceType={deviceType} />}
+                      {item.rprsntv_tel2 &&<PhoneBox key={item.rprsntv_tel2} title={"대표자2"} number={item.rprsntv_tel2} deviceType={deviceType} />}
                     </VStack>
                   }
                   buildingInfo={
@@ -125,11 +118,11 @@ const ToxicFacility = (props: Props) => {
                       <BuildingInfoWrapper deviceType={deviceType}>
                         <Stack spacing="4px">
                           <InfoTitle>보유보호장비</InfoTitle>
-                          <InfoText>보호장비명, 보호장비명</InfoText>
+                          <InfoText>{item.hold_ffgq || "N"}</InfoText>
                         </Stack>
                         <Stack spacing="4px">
                           <InfoTitle>보유중화재</InfoTitle>
-                          <InfoText>중화재명, 중화재명</InfoText>
+                          <InfoText>{item.hold_cout || "N"}</InfoText>
                         </Stack>
                       </BuildingInfoWrapper>
                     </VStack>
@@ -137,28 +130,30 @@ const ToxicFacility = (props: Props) => {
                 />
               );
             return (
-              <Flex w="100%">
+              <Flex w="100%" key={index}>
                 <TabletFacilityItem
                   hasModal={false}
                   isSelected={isSelected}
-                  key={`${props.title} - ${index}`}
-                  title={props.title}
-                  phoneName={item.phoneName}
-                  distance={item.distance}
-                  name={item.name}
-                  storeName={item.storeName}
-                  storeAddress={item.storeAddress}
+                  title={'인근 유독물시설 등'}
+                  phoneName={"연락처"}
+                  phoneNumber={item.txsb_safer_tel1 || item.txsb_safer_tel2 || item.rprsntv_tel1 || item.rprsntv_tel2}
+                  distance={item.dist}
+                  name={item.buld_nm}
+                  storeName={item.entrps_nm}
+                  storeAddress={item.bunji_adress}
+                  build_sn={item.bild_sn}
                   buildingInfo={
                     <Stack spacing="8px">
-                      <BuildingInfo title={'보유보호장비'} text={'보호장비명, 보호장비명'} />
-                      <BuildingInfo title={'보유중화재'} text={'중화재명, 중화재명'} />
+                      <BuildingInfo title={'보유보호장비'} text={item.hold_ffgq || "N"} />
+                      <BuildingInfo title={'보유중화재'} text={item.hold_cout || "N"} />
                     </Stack>
                   }
                   containerBottom={
                     <VStack gap="8px">
-                      {item.phones?.map((phone, index) => {
-                        return <PhoneBox key={index} title={phone.phoneTitle} number={phone.phoneNumber} />;
-                      })}
+                      {item.txsb_safer_tel1 && <PhoneBox key={item.txsb_safer_tel1} title={"안전관리자1"} number={item.txsb_safer_tel1} deviceType={deviceType} />}
+                      {item.txsb_safer_tel2 && <PhoneBox key={item.txsb_safer_tel2} title={"안전관리자2"} number={item.txsb_safer_tel2} deviceType={deviceType} />}
+                      {item.rprsntv_tel1 &&<PhoneBox key={item.rprsntv_tel1} title={"대표자1"} number={item.rprsntv_tel1} deviceType={deviceType} />}
+                      {item.rprsntv_tel2 &&<PhoneBox key={item.rprsntv_tel2} title={"대표자2"} number={item.rprsntv_tel2} deviceType={deviceType} />}
                     </VStack>
                   }
                 />
@@ -169,12 +164,6 @@ const ToxicFacility = (props: Props) => {
       )}
     </Container>
   );
-};
-
-ToxicFacility.defaultProps = {
-  title: '인근 유독물시설 등',
-  count: 1,
-  datas: ToxicFacilityData,
 };
 export default ToxicFacility;
 

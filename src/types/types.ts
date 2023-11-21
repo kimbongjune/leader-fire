@@ -215,6 +215,7 @@ export type NeightBorHoodDataResult = {
   hazardousSubstancList: HazardousSubstancList
   toxicFacilityList: ToxicFacilityList
   nearbyResidentsList: NearbyResidentsList
+  nearbyBusinessesList: nearbyBusinessesList
 }
 type NearbyFacilityPersonnelList = {
   response: string
@@ -409,6 +410,39 @@ type NearbyResidentsListResultList = {
   care_tel: string
 }
 
+type nearbyBusinessesList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: nearbyBusinessesListResult
+}
+
+type nearbyBusinessesListResult = {
+  dataList: nearbyBusinessesListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type nearbyBusinessesListResultList = {
+  bild_sn: string
+  entrps_nm: string
+  main_prpos_cd_nm: string
+  sub_prpos_cd_nm: string
+  buld_nm: string
+  bulddong_sn: string
+  floor_sn: string
+  cttpc: string
+  bunji_adress: string
+  doro_adress: string
+  gis_x_5181: string
+  gis_y_5181: string
+  gis_x_4326: string
+  gis_y_4326: string
+  dist: string
+  keyword_yn: string
+}
+
 export type ModCollaborativeResponseList = {
   appUserId: string
   appUserType: string
@@ -452,6 +486,26 @@ export type ModNearbyResidentsList = {
   care_rel: string
   care_tel: string
   type: 'residents';
+}
+
+export type ModnearbyBusinessesList = {
+  bild_sn: string
+  entrps_nm: string
+  main_prpos_cd_nm: string
+  sub_prpos_cd_nm: string
+  buld_nm: string
+  bulddong_sn: string
+  floor_sn: string
+  cttpc: string
+  bunji_adress: string
+  doro_adress: string
+  gis_x_5181: string
+  gis_y_5181: string
+  gis_x_4326: string
+  gis_y_4326: string
+  dist: string
+  keyword_yn: string
+  type: 'facilities';
 }
 
 export type ModFightingPropertyList = {
@@ -514,6 +568,7 @@ export type ModToxicFacilityList = {
   gis_y_4326: string
   dist: string
   keyword_yn: string
+  bild_sn: string
   type: 'facilities';
 }
 
@@ -525,6 +580,7 @@ export type DispatchLists = {
   fightingPropertyList: ModFightingPropertyList[]
   hazardousSubstancList: ModHazardousSubstancList[]
   toxicFacilityList: ModToxicFacilityList[]
+  nearbyBusinessesList : ModnearbyBusinessesList[]
 }
 
 export type ModDispatchLists = {

@@ -9,24 +9,12 @@ import ArrowDown from '../../../../../public/images/icons/arrow-drop-down.svg';
 import { useRouter } from 'next/router';
 import usePaging from './hooks/usePaging';
 import { FacilityTabletData } from './FacilityData';
-import { DeviceType } from '@/types/types';
+import { DeviceType, ModnearbyBusinessesList } from '@/types/types';
 import MobileFacilityItem from './MobileFacilityItem';
 
 interface Props {
-  title: string;
-  count: number;
-  datas: {
-    id: number;
-    phoneName: string;
-    distance: string;
-    name: string;
-    storeName: string;
-    storeAddress: string;
-    buildingNumber: string;
-    buildingFloor: number;
-    danger: string;
-  }[];
   deviceType?: DeviceType;
+  nearbyBusinessesList:ModnearbyBusinessesList[]
 }
 
 const BuildingInfo = ({ title, text }: { title: string; text: string }) => {
@@ -38,11 +26,11 @@ const BuildingInfo = ({ title, text }: { title: string; text: string }) => {
   );
 };
 
-const BuildNumber = ({ number, floor }: { number: string; floor: number }) => {
+const BuildNumber = ({ number, floor }: { number: string; floor: string }) => {
   return (
     <Flex>
-      <Building>{number}</Building>
-      <Building>{floor}</Building>
+      <Building>{number}동</Building>
+      <Building>{floor}층</Building>
     </Flex>
   );
 };
@@ -50,20 +38,20 @@ const BuildNumber = ({ number, floor }: { number: string; floor: number }) => {
 //TODO 인근 업소 리스트
 const Facility = (props: Props) => {
   const { query } = useRouter();
-  const queryId = Number(query.id);
-  const dataLength = props.datas.length;
+  const queryId = query.build_sn;
+  const dataLength = props?.nearbyBusinessesList?.length;
   const [isOpen, setIsOpen] = useState(true);
   const { visibleIndex, handleNext, handlePrev, setVisibleIndex } = usePaging({ dataLength: dataLength });
   const { deviceType } = props;
 
   useEffect(() => {
-    const index = props.datas.findIndex(item => item.id === queryId);
+    const index = props?.nearbyBusinessesList?.findIndex(item => item.bild_sn === queryId);
 
     if (index !== -1) {
       const newIndex = Math.floor(index / 2) * 2;
       setVisibleIndex(newIndex);
     }
-  }, [queryId, props.datas]);
+  }, [queryId, props?.nearbyBusinessesList]);
 
   const handleClickUpButton = () => {
     setIsOpen(false);
@@ -77,9 +65,9 @@ const Facility = (props: Props) => {
     <Container deviceType={deviceType}>
       <TitleWrapper deviceType={deviceType}>
         <Flex align="center" gap="4px">
-          <Title deviceType={deviceType}>{props.title}</Title>
-          {deviceType !== 'mobile' && <Count>({props.count}건)</Count>}
-          {deviceType === 'mobile' && <Count deviceType={deviceType}>{props.count}건</Count>}
+          <Title deviceType={deviceType}>{'인근 업소'}</Title>
+          {deviceType !== 'mobile' && <Count>({dataLength}건)</Count>}
+          {deviceType === 'mobile' && <Count deviceType={deviceType}>{dataLength}건</Count>}
         </Flex>
         {deviceType !== 'mobile' && (
           <Flex>
@@ -109,23 +97,25 @@ const Facility = (props: Props) => {
       {isOpen && (
         <Grid templateColumns={'repeat(2, 1fr)'} columnGap={deviceType === 'mobile' ? '4px' : '8px'} rowGap={deviceType === 'mobile' ? '4px' : '8px'} marginTop={deviceType ? '4px' : '8px'}>
           {isOpen &&
-            props.datas?.map((item, index) => {
-              const isSelected = queryId === item.id;
+            props.nearbyBusinessesList?.map((item, index) => {
+              const isSelected = queryId === item.bild_sn;
               if (deviceType === 'mobile')
                 return (
                   <MobileFacilityItem
                     isSelected={isSelected}
-                    key={`${props.title} - ${index}`}
-                    title={props.title}
-                    phoneName={item.phoneName}
-                    distance={item.distance}
-                    name={item.name}
-                    storeName={item.storeName}
-                    storeAddress={item.storeAddress}
+                    key={item.bild_sn}
+                    build_sn={item.bild_sn}
+                    title={"인근업소"}
+                    phoneName={"연락처"}
+                    phoneNumber={item.cttpc}
+                    distance={item.dist}
+                    name={item.main_prpos_cd_nm}
+                    storeName={item.buld_nm}
+                    storeAddress={item.bunji_adress || item.doro_adress}
                     buildingInfo={
                       <VStack spacing="4px" margin="4px 0 0 0">
                         <BuildingInfoWrapper deviceType={deviceType}>
-                          <InfoTitle>위험물 저장 및 처리시설</InfoTitle>
+                          <InfoTitle>{item.sub_prpos_cd_nm}</InfoTitle>
                           <InfoText>부용도</InfoText>
                         </BuildingInfoWrapper>
                       </VStack>
@@ -133,19 +123,21 @@ const Facility = (props: Props) => {
                   />
                 );
               return (
-                <Flex w="100%">
+                <Flex w="100%" key={item.bild_sn}>
                   <TabletFacilityItem
                     hasModal={false}
                     isSelected={isSelected}
-                    key={`${props.title} - ${index}`}
-                    title={props.title}
-                    phoneName={item.phoneName}
-                    distance={item.distance}
-                    name={item.name}
-                    storeName={item.storeName}
-                    storeAddress={item.storeAddress}
-                    containerBottom={<BuildingInfo title="위험물 저장 및 처리시설" text={item.danger} />}
-                    buildingAddress={<BuildNumber number={item.buildingNumber} floor={item.buildingFloor} />}
+                    key={index}
+                    build_sn={item.bild_sn}
+                    title={"인근업소"}
+                    phoneName={"연락처"}
+                    phoneNumber={item.cttpc}
+                    distance={item.dist}
+                    name={item.main_prpos_cd_nm}
+                    storeName={item.buld_nm}
+                    storeAddress={item.bunji_adress || item.doro_adress}
+                    containerBottom={<BuildingInfo title={item.sub_prpos_cd_nm} text={"부용도"} />}
+                    buildingAddress={<BuildNumber number={item.bulddong_sn} floor={item.floor_sn} />}
                   />
                 </Flex>
               );
@@ -154,12 +146,6 @@ const Facility = (props: Props) => {
       )}
     </Container>
   );
-};
-
-Facility.defaultProps = {
-  title: '인근 업소',
-  count: 3,
-  datas: FacilityTabletData,
 };
 export default Facility;
 
