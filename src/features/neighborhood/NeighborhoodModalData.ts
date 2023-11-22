@@ -149,17 +149,6 @@ export const tankData = {
       { title: '자동폐쇄장치', text: '없음' },
       { title: '수동폐쇄장치', text: '없음' },
       { title: '지하탱크여부', text: '있음' },
-    ],
-    [
-      { title: '탱크종류', text: '명칭' },
-      { title: '위험물 품명', text: '있음' },
-      { title: '위험물 유종', text: '내용' },
-      { title: '위험물 지정수량', text: '있음' },
-      { title: '위험물 최대수량', text: '있음' },
-      { title: '가연성 증기회수설비', text: '없음' },
-      { title: '자동폐쇄장치', text: '없음' },
-      { title: '수동폐쇄장치', text: '없음' },
-      { title: '지하탱크여부', text: '있음' },
-    ],
+    ]
   ],
 };
