@@ -13,8 +13,7 @@ interface Props {
   isClickWater: boolean;
   isClickTarget: boolean;
   isClickDanger: boolean;
-  isClickVolunteerCaptain: boolean;
-  isClickVulnerble: boolean;
+  isExtinguisherMarkerActive: boolean;
   changeStatus: (value: string) => void;
 }
 
@@ -49,7 +48,12 @@ const DrawerButtons = (props: Props) => {
 
             <VStack marginTop="12px" gap="8px" w="100%">
               <ButtonItem status={props.isClickWater} onClick={() => props.changeStatus('water')}>
-                <ButtonItemText>소방용수</ButtonItemText>
+                <ButtonItemText>소화전</ButtonItemText>
+                <ButtonItemNumber>2</ButtonItemNumber>
+              </ButtonItem>
+
+              <ButtonItem status={props.isExtinguisherMarkerActive} onClick={() => props.changeStatus('extinguisher')}>
+                <ButtonItemText>비상소화장치</ButtonItemText>
                 <ButtonItemNumber>2</ButtonItemNumber>
               </ButtonItem>
 
@@ -60,16 +64,6 @@ const DrawerButtons = (props: Props) => {
 
               <ButtonItem status={props.isClickDanger} onClick={() => props.changeStatus('danger')}>
                 <ButtonItemText>위협물</ButtonItemText>
-                <ButtonItemNumber>2</ButtonItemNumber>
-              </ButtonItem>
-
-              <ButtonItem status={props.isClickVolunteerCaptain} onClick={() => props.changeStatus('captain')}>
-                <ButtonItemText>의용대장</ButtonItemText>
-                <ButtonItemNumber>2</ButtonItemNumber>
-              </ButtonItem>
-
-              <ButtonItem status={props.isClickVulnerble} onClick={() => props.changeStatus('vulnerble')}>
-                <ButtonItemText>피난약자</ButtonItemText>
                 <ButtonItemNumber>2</ButtonItemNumber>
               </ButtonItem>
             </VStack>

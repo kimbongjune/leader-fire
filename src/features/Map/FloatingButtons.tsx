@@ -17,6 +17,11 @@ interface Props {
   isClickVideo: boolean;
   hasSkyButton?: boolean;
   changeStatus: (value: string) => void;
+  setHasSky?: (hasSky: boolean) => void;
+}
+
+interface SkyButtonProps {
+  hasSky: boolean;
 }
 
 const FloatingButtons = (props: Props) => {
@@ -56,8 +61,8 @@ const FloatingButtons = (props: Props) => {
             <Count>10</Count>
           </Button>
         </Flex>
-        {deviceType !== 'mobile' && props.hasSkyButton && (
-          <SkyButton>
+        {deviceType !== 'mobile' && props.hasSkyButton != null && props.setHasSky != undefined && (
+          <SkyButton hasSky={props.hasSkyButton} onClick={() => props.setHasSky && props.setHasSky(!props.hasSkyButton)}>
             <Flex gap="4px">
               <IconWrapper width="16px" height="16px" color={theme.colors.white}>
                 <Airplane />
@@ -158,12 +163,12 @@ const Count = styled.div`
   margin-left: auto;
 `;
 
-const SkyButton = styled.button`
+const SkyButton = styled.button<SkyButtonProps>`
   padding: 8px 30px;
   width: fit-content;
   height: 40px;
   border-radius: 8px;
-  background-color: ${theme.colors.gray3};
+  background-color: ${props => props.hasSky ? theme.colors.orange : theme.colors.gray3};
   color: ${theme.colors.white};
   font-family: 'Pretendard Bold';
   font-size: 14px;

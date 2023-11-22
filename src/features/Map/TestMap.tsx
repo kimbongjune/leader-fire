@@ -17,6 +17,8 @@ import { RootState } from '../../app/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsDangerMarkerActive, setIsExtinguisherMarkerActive, setIsTargetMarkerActive, setIsWaterMarkerActive } from '../../features/slice/disasterSlice';
 import axios from '@/components/common/api/axios';
+import ShareVehicleModal from './ShareVehicleModal';
+import { DispatchVehicleDataType } from './VehicleStatus';
 
 const KakaoMap = dynamic(() => import('./KakaoMap'), { ssr: false });
 
@@ -25,6 +27,7 @@ interface Props {
   latitude: number; // 위도
   longitude: number; // 경도
   alpha: number; // z축 회전 각도
+  vehicleData: DispatchVehicleDataType[];
 }
 
 interface Location {
@@ -75,6 +78,8 @@ const MiniMap = (props: Props) => {
   const mapInstance = useRef<any>();
   const mapContainer = useRef<HTMLDivElement>(null);
 
+  const id = router.query.id as string;
+  console.log(id)
   const [apiInterval, setApiInterval] = useState<NodeJS.Timer>()
 
   const isWaterActive = useSelector((state: RootState) => state.disaster.isWaterMarkerActive);
@@ -85,6 +90,7 @@ const MiniMap = (props: Props) => {
   const [isClickRescuePosition, setIsClickRescuePosition] = useState(true); // 긴급구조위치
   const [isClickVehicle, setIsClickVehicle] = useState(false); //출동 차량
   const [isClickVideo, setIsClickVideo] = useState(false); //영상공유
+  const [position, setPosition] = useState({lat:Number, lng:Number})
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClickCompassButton, setIsClickCompassButton] = useState(false); // 나침반 버튼 클릭 유무
@@ -96,6 +102,7 @@ const MiniMap = (props: Props) => {
   const fireExtinguisherMarkers = useRef<any[]>([]);
   const hydrantMarkers = useRef<any[]>([]);
   const targetMarkers = useRef<any[]>([]);
+  const positionMarker = useRef<any>();
 
   const [carMarkers, setCarMarkers] = useState<Markers[]>([])
   const [videoMarker, setVideoMarker] = useState<Markers[]>([])
@@ -206,21 +213,24 @@ const MiniMap = (props: Props) => {
           ]
         )
 
+      let clickMarkerSize = new window.kakao.maps.Size(32, 32);
+      let clickMarkerOption = { offset: new window.kakao.maps.Point(32 / 2, 32 / 2) };
+
       const clickMarker = new window.kakao.maps.Marker({
         position: mapInstance.current.getCenter(),
-        image: createMarkerImage('/images/icons/makerImage.svg', markerSize, markerOption),
+        image: createMarkerImage('/images/icons/makerImage.svg', clickMarkerSize, clickMarkerOption),
       });
 
       clickMarker.setMap(map)
+      positionMarker.current = clickMarker
 
       const clickHandler = (mouseEvent:any) => {
-        console.log(mouseEvent)
+        console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",mouseEvent)
         // 클릭한 위도, 경도 정보를 가져옵니다 
-        var latlng = mouseEvent.latLng; 
+        const latlng = mouseEvent.latLng; 
+
+        setPosition(latlng)
           
-        // 마커 위치를 클릭한 위치로 옮깁니다
-        clickMarker.setPosition(latlng);
-        
         var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
         message += '경도는 ' + latlng.getLng() + ' 입니다';
         
@@ -228,6 +238,7 @@ const MiniMap = (props: Props) => {
       };
 
       window.kakao.maps.event.addListener(map, 'click', clickHandler);
+      
 
       
     // 차량 위치 정보 API 호출 함수
@@ -439,6 +450,37 @@ const MiniMap = (props: Props) => {
 
   useEffect(() => {
     if (mapInstance.current) {
+      console.log(positionMarker.current)
+      positionMarker.current.setMap(null)
+      positionMarker.current = null
+      var imageSize = new window.kakao.maps.Size(48, 48);
+      var markerImage = createMarkerImage("도착지", imageSize, null),
+      marker = createMarker(position, markerImage);
+
+      let iwContent = `<div style="padding:5px;">지휘 지정
+      <br></div>`
+      const iwRemoveable = true;
+
+      const infowindow = new window.kakao.maps.InfoWindow({
+        content : iwContent,
+        removable : iwRemoveable
+      });
+
+      window.kakao.maps.event.addListener(marker, 'click', function() {
+        // 마커 위에 인포윈도우를 표시합니다
+        //infowindow.open(mapInstance.current, marker);  
+        console.log("????")
+        setIsModalOpen(true)
+      });
+
+      positionMarker.current = marker
+      positionMarker.current.setMap(mapInstance.current)
+    }
+  }, [position]);
+
+
+  useEffect(() => {
+    if (mapInstance.current) {
       toggleCarMarkers();
     }
   }, [isClickVehicle]);
@@ -619,7 +661,7 @@ const MiniMap = (props: Props) => {
         </CircleButton>
         <CircleButton
           onClick={() => {
-            mapInstance.current.setCenter(props.latitude, props.longitude);
+            mapInstance.current.setCenter(new window.kakao.maps.LatLng(props.latitude, props.longitude));
           }}
         >
           <IconWrapper width="24px" height="24px" color={theme.colors.gray}>
@@ -627,7 +669,7 @@ const MiniMap = (props: Props) => {
           </IconWrapper>
         </CircleButton>
       </Stack>
-      <ZoomInButton right="16px" bottom="16px" onClick={() => router.push('/detail/map')}>
+      <ZoomInButton right="16px" bottom="16px" onClick={() => router.push(`/detail/map?id=${id}`)}>
         <Stack align="center" spacing="2px">
           <IconWrapper width="24px" height="24px" color={theme.colors.gray}>
             <FullScreenIcon />
@@ -635,6 +677,7 @@ const MiniMap = (props: Props) => {
           <span>크게보기</span>
         </Stack>
       </ZoomInButton>
+      {isModalOpen && <ShareVehicleModal vehicleData={props.vehicleData} onCloseModal={setIsModalOpen} />}
     </MapWrapper>
   );
 };
@@ -645,6 +688,38 @@ MiniMap.defaultProps = {
   latitude: 37.516633,
   longitude: 127.077374,
   alpha: 130,
+  vehicleData: [
+    {
+      status: '출동',
+      name: '상대펌프1',
+      transmissionStatus: '전송 성공',
+    },
+    {
+      status: '출동',
+      name: '상대펌프2',
+      transmissionStatus: '전송 실패',
+    },
+    {
+      status: '도착',
+      name: '진주구조골절1',
+      transmissionStatus: '전송 성공',
+    },
+    {
+      status: '도착',
+      name: '상대펌프3',
+      transmissionStatus: '확인 완료',
+    },
+    {
+      status: '귀소',
+      name: '진주구조골절2',
+      transmissionStatus: '전송 성공',
+    },
+    {
+      status: '귀소',
+      name: '상대펌프4',
+      transmissionStatus: '확인 완료',
+    },
+  ],
 };
 
 const MapWrapper = styled.div`
