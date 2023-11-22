@@ -14,12 +14,22 @@ interface Props {
   }[][];
 }
 
-const NeighborhoodModalItem = (props: Props) => {
+interface DataItem {
+  title: string;
+  text: string;
+}
+
+interface SectionData {
+  hasNumber: boolean;
+  data: DataItem[][];
+}
+
+const NeighborhoodModalItem = (props: SectionData) => {
   const deviceType = useDeviceType();
 
   return (
-    <Wrapper deviceType={deviceType} length={props.data.length}>
-      {props.data?.map((item, index) => {
+    <Wrapper deviceType={deviceType} length={props?.data?.length}>
+      {props?.data?.map((item, index) => {
         return (
           <Container key={index}>
             {props.hasNumber && <Number>{index + 1}</Number>}

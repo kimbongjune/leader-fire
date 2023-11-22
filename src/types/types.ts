@@ -586,3 +586,202 @@ export type DispatchLists = {
 export type ModDispatchLists = {
   dispatchLists: DispatchLists
 }
+
+export type FacilitiyData = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  totalCount: number
+  result: FacilitiesDataResult
+}
+export type FacilitiesDataResult = {
+  buldInfoEvacuateDataList: BuldInfoEvacuateDataList
+  buldInfoFacilityDataList: BuldInfoFacilityDataList
+  multiUseBsshInfoDataList: MultiUseBsshInfoDataList
+  buldInfoGuardDataList: BuldInfoGuardDataList
+  ojFireoccrrncsttusDataList: OjFireoccrrncsttusDataList
+  buldInfoDngmaterialDataList: BuldInfoDngmaterialDataList
+}
+
+type BuldInfoEvacuateDataList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: BuldInfoEvacuateDataListResult
+}
+
+type BuldInfoEvacuateDataListResult =  {
+  dataList: BuldInfoEvacuateDataListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type BuldInfoEvacuateDataListResultList = {
+  obj_nm: string
+  spital_seq: string
+  direct_stairs: string
+  refge_stairs: string
+  outside_stairs: string
+  spt_refge_stairs: string
+  front_room: string
+  regist_de_14: string
+}
+
+type BuldInfoFacilityDataList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: BuldInfoFacilityDataListResult
+}
+
+type BuldInfoFacilityDataListResult = {
+  dataList: BuldInfoFacilityDataListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type BuldInfoFacilityDataListResultList = {
+  obj_nm: string
+  dtawrinvstg_sn: string
+  fgt_fclty_cn: string
+  fgt_fclty_result: string
+  regist_de_14: string
+}
+
+type MultiUseBsshInfoDataList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: MultiUseBsshInfoDataListResult
+}
+
+type MultiUseBsshInfoDataListResult = {
+  dataList: MultiUseBsshInfoDataListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type MultiUseBsshInfoDataListResultList = {
+  multi_use_bssh_sn: string
+  aplcnt_bssh_nm: string
+  induty_cd_nm: string
+  obj_nm: string
+  bulddong_sn: string
+  aplcnt_telno: string
+  aplcnt_mbtlnum: string
+}
+
+type BuldInfoGuardDataList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: BuldInfoGuardDataListResult
+}
+
+type BuldInfoGuardDataListResult = {
+  dataList: BuldInfoGuardDataListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type BuldInfoGuardDataListResultList = {
+  obj_nm: string
+  hnl_rescue_refge_cntrpln: string
+  arson_manage_cntrvs: string
+  etc_spcmnt_matter: string
+  regist_de_14: string
+}
+
+type OjFireoccrrncsttusDataList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: OjFireoccrrncsttusDataListResult
+}
+
+type OjFireoccrrncsttusDataListResult = {
+  dataList: OjFireoccrrncsttusDataListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type OjFireoccrrncsttusDataListResultList = {
+  buld_nm: string
+  fire_occrrnc_sn: string
+  occrrnc_dt: string
+  occrrnc_fctr_cd_nm: string
+  hnldmge_sm: string
+  prprtydmge_sm: string
+}
+
+type BuldInfoDngmaterialDataList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: BuldInfoDngmaterialDataListResult
+}
+
+type BuldInfoDngmaterialDataListResult = {
+  dataList: BuldInfoDngmaterialDataListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type BuldInfoDngmaterialDataListResultList = {
+  obj_nm: string
+  dgst_sn: string
+  dgst_se_cd_nm: string
+  kind_cd_nm: string
+  prdnm_cd_nm: string
+  prdnm_detail: string
+  dgst_qt: string
+  unit: string
+  dgst_prpos: string
+  regist_de_14: string
+}
+
+export type NearByDangerusList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  totalCount: number
+  result: NearByDangerusListResult
+}
+
+export type NearByDangerusListResult = {
+  danMnfctretcTankDataList: DanMnfctretcTankDataList
+}
+
+type DanMnfctretcTankDataList = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: DanMnfctretcTankDataListResult
+}
+
+type DanMnfctretcTankDataListResult = {
+  dataList: DanMnfctretcTankDataListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+type DanMnfctretcTankDataListResultList = {
+  buld_nm: string
+  tank_sn: string
+  tank_knd_cd_nm: string
+  oknd_cd_nm: string
+  prdnm_cd_nm: string
+  appn_qt: string
+  mxmm_qt: string
+  cmbstb: string
+  atmcclsdevice: string
+  hoprclsdevice: string
+  undgrndtank_at: string
+}
