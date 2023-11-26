@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import HamburgerIcon from '../../../public/images/icons/hamburger.svg';
 import FireStation from '../../../public/images/icons/fire station.svg';
 import Image from 'next/image';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import Person from '../../../public/images/icons/person.svg';
 import Restart from '../../../public/images/icons/restart.svg';
 import Logout from '../../../public/images/icons/logout.svg';
@@ -14,9 +14,13 @@ import { useQueryParam } from 'use-query-params';
 import UserSettingModal from '@/components/common/Modal/UserSettingModal';
 import TokenRefreshModal from '@/components/common/Modal/TokenRefreshModal';
 import SearchDispatch from './SearchDispatch';
-import { DeviceType, DispatchItemType } from '@/types/types';
+import { DeviceType, DispatchItemType, UserInformation } from '@/types/types';
 import { useRouter } from 'next/router';
 import { CountByType } from './HomeFilterItem';
+import { useDispatch } from 'react-redux';
+import { saveLogedInStatus, saveUserInformation } from '../slice/UserinfoSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
 
 interface Props {
   profileUrl?: string;
@@ -33,6 +37,9 @@ const HomeMenu = (props: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [query, setQuery] = useQueryParam('option');
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
 
   const countByType: CountByType = props.testData.reduce(
     (res, dispatch) => {
@@ -41,7 +48,6 @@ const HomeMenu = (props: Props) => {
     },
     { fires: 0, rescue: 0, firstAid: 0, others: 0 },
   );
-
 
   // 홈 메뉴 선택 시 호출
   const handleClickMenu = (query: string) => {
@@ -60,8 +66,13 @@ const HomeMenu = (props: Props) => {
     setQuery(undefined);
   };
 
-  // 모달 확인 버튼 클릭 시 호출
-  const handleClickOkButton = () => {
+  // 설정 모달 확인 버튼 클릭 시 호출
+  const handleSettingClickOkButton = () => {
+    setQuery(undefined);
+  };
+
+  // fcm 모달 확인버튼
+  const handleFcmTokenClickOkButton = () => {
     setQuery(undefined);
   };
 
@@ -69,6 +80,18 @@ const HomeMenu = (props: Props) => {
   const handleLogoutButton = () => {
     onClose();
     router.replace('/logIn');
+    dispatch(saveLogedInStatus(false))
+    const emptyUserInfo:UserInformation = {
+      userId: '',
+      userName: '',
+      classCd: '',
+      wardId: '',
+      wardName: '',
+      deviceTel: '',
+      fcmToken: '',
+      authUserPw: ''
+    };
+    dispatch(saveUserInformation(emptyUserInfo))
   };
 
   return (
@@ -81,7 +104,7 @@ const HomeMenu = (props: Props) => {
           <Flex align="center" gap="16px" w="fit-content">
             <Flex gap="4px">
               <FireStation width={20} height={20} color={theme.colors.orange} />
-              <Text>진주소방서</Text>
+              <Text>{userInfo?.wardName}</Text>
             </Flex>
             <Hamburger onClick={onOpen}>
               <HamburgerIcon width={24} height={24} color="#fff" />
@@ -96,15 +119,15 @@ const HomeMenu = (props: Props) => {
                 <Profile profileUrl={props.profileUrl ?? ''} />
                 <Stack spacing="4px">
                   <Role>지휘관</Role>
-                  <Name>{props.name}</Name>
+                  <Name>{userInfo?.userName}</Name>
                 </Stack>
               </Flex>
               <Flex justify="space-between" pt="16px">
                 <Flex gap="4px">
                   <FireStation width={20} height={20} color={theme.colors.orange} />
-                  <Workspace>{props.workspace}</Workspace>
+                  <Workspace>{userInfo?.wardName}</Workspace>
                 </Flex>
-                <PhoneNumber>{props.phoneNumber}</PhoneNumber>
+                <PhoneNumber>{userInfo?.deviceTel}</PhoneNumber>
               </Flex>
             </DrawerHeader>
             <DrawerBody p="20px 16px">
@@ -133,8 +156,8 @@ const HomeMenu = (props: Props) => {
         </Drawer>
         <SearchDispatch deviceType={deviceType} countByType={countByType} NumberOfEmergencyDispatches={props.testData.length} />
       </Container>
-      {query === 'setting' && <UserSettingModal isOpen={query === 'setting'} onClose={() => handleCloseModal()} onClick={() => handleClickOkButton()} />}
-      {query === 'token' && <TokenRefreshModal isOpen={query === 'token'} onClose={() => handleCloseModal()} onClick={() => handleClickOkButton()} />}
+      {query === 'setting' && <UserSettingModal phoneNumber={userInfo?.deviceTel} isOpen={query === 'setting'} onClose={() => handleCloseModal()} onClick={() => handleSettingClickOkButton()} />}
+      {query === 'token' && <TokenRefreshModal existingToken={userInfo?.fcmToken} isOpen={query === 'token'} onClose={() => handleCloseModal()} onClick={() => handleFcmTokenClickOkButton()} />}
     </Wrapper>
   );
 };

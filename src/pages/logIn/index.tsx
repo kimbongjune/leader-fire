@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from '@emotion/styled';
 import theme from '@/theme/colors';
 import Input from '@/components/common/Input/input';
@@ -9,11 +9,24 @@ import Image from 'next/image';
 import LoginFooter from '@/features/Login/LoginFooter';
 import useDeviceType from '@/hooks/useDeviceType';
 import { useRouter } from 'next/router';
-import axios from "../../components/common/api/axios"
+import axios, {setAuthToken} from "../../components/common/api/axios"
+import { useDispatch } from 'react-redux';
+import { saveLogedInStatus, saveUserInformation } from '../../features/slice/UserinfoSlice';
+import { UserInformation } from '@/types/types';
+import { AppDispatch, RootState  } from '../../app/store';
+import { useSelector } from 'react-redux';
 
 //TODO 로그인 페이지, 로그인 처리, 로그인 성공시 redux에 내정보 넣기
 const LoginPage = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  const isLoggedIn = useSelector((state: RootState) => state.userReducer.logedIn);
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.replace('/home'); // 로그인 상태라면 홈 페이지(또는 다른 페이지)로 리디렉션
+    }
+  }, [isLoggedIn, router]);
 
   const [checked, setChecked] = useState(false);
   const deviceType = useDeviceType();
@@ -40,16 +53,22 @@ const LoginPage = () => {
 
     //TODO 모든 입력이 제대로 되었다면 서버에 로그인 요청 및 네이티브의 vpn 로그인 같이 진행
     try {
-      // const response = await axios.post('/login', {
-      //   username,
-      //   password,
-      // });
+      const response = await axios.post<UserInformation>('/api/user/login/auth', {
+        userId: username,
+        userPassword : password,
+      });
+      
+      console.log(response.headers['authorization'])
+      setAuthToken(response.headers['authorization'])
+      dispatch(saveLogedInStatus(true))
+      dispatch(saveUserInformation(response.data))
       //TODO 성공적으로 로그인되면 JWT 토큰을 앱의 roomdb에 저장
-      if (window.fireAgency && window.fireAgency.saveUserData) {
-        window.fireAgency.saveUserData(username, password, checked, "test_token");
-      }
+      // if (window.fireAgency && window.fireAgency.saveUserData) {
+      //   window.fireAgency.saveUserData(username, password, checked, "test_token");
+      // }
       router.replace('/home');
     } catch (error) {
+      console.log(error)
       // 오류가 발생했을 경우 오류 메시지를 설정
       setLoginError('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
       return;
@@ -57,6 +76,10 @@ const LoginPage = () => {
   };
 
   if (!deviceType) return null;
+
+  if (isLoggedIn) {
+    return null;
+  }
 
   return (
     <Flex minH="100vh" background={theme.colors.gray1}>

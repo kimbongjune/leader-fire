@@ -1,15 +1,10 @@
 // src/features/slice/myInfoSlice.ts
+import { UserInformation } from '@/types/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 // Define a type for the slice state
 interface MyInfoState {
-  tag: string;
-  name: string;
-  group: string;
-  phone: string;
-  address: string;
-  workAddress: string;
-  token: string;
+  userInfo:UserInformation;
   mobilizationTotalCount: number;
   mobilizationAcceptCount: number;
   mobilizationDenyCount: number;
@@ -17,50 +12,39 @@ interface MyInfoState {
   userLocationY:number;
   gpsStatusSatelliteCount:number;
   gpsStatusDbHzAverage:number;
+  logedIn:boolean;
 }
+
+const initialUserInfo: UserInformation = {
+  userId: '',
+  userName: '',
+  classCd: '',
+  wardId: '',
+  wardName: '',
+  deviceTel: '',
+  fcmToken: '',
+  authUserPw: ''
+};
 
 // Define the initial state using that type
 const initialState: MyInfoState = {
-  tag: '부대장',
-  name: '홍길동',
-  group: '장유 남성의용소방대',
-  phone: '010-1234-5678',
-  address: '장유시 율하 도로명 123-456',
-  workAddress: '장유시 율하 도로명 123-456',
-  token: 'zxciv-30948-kjdjv-jfnbc',
+  userInfo : initialUserInfo,
   mobilizationTotalCount: 0,
   mobilizationAcceptCount: 0,
   mobilizationDenyCount: 0,
   userLocationX:0.0,
   userLocationY:0.0,
   gpsStatusSatelliteCount:0,
-  gpsStatusDbHzAverage:0.0
+  gpsStatusDbHzAverage:0.0,
+  logedIn:false
 };
 
 export const myInfoSlice = createSlice({
   name: 'myInfo',
   initialState,
   reducers: {
-    saveTag: (state, action: PayloadAction<string>) => {
-      state.tag = action.payload;
-    },
-    saveName: (state, action: PayloadAction<string>) => {
-      state.name = action.payload;
-    },
-    saveGroup: (state, action: PayloadAction<string>) => {
-      state.group = action.payload;
-    },
-    savePhone: (state, action: PayloadAction<string>) => {
-      state.phone = action.payload;
-    },
-    saveAddress: (state, action: PayloadAction<string>) => {
-      state.address = action.payload;
-    },
-    saveWorkAddress: (state, action: PayloadAction<string>) => {
-      state.workAddress = action.payload;
-    },
-    saveToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload;
+    saveUserInformation: (state, action: PayloadAction<UserInformation>) => {
+      state.userInfo = action.payload;
     },
     saveMobilizationTotalCount: (state, action: PayloadAction<number>) => {
       state.mobilizationTotalCount = action.payload;
@@ -83,25 +67,23 @@ export const myInfoSlice = createSlice({
     saveGpsStatusDbHzAverage: (state, action: PayloadAction<number>) => {
       state.gpsStatusDbHzAverage = action.payload;
     },
+    saveLogedInStatus: (state, action: PayloadAction<boolean>) => {
+      state.logedIn = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
 export const { 
-  saveTag,
-  saveName,
-  saveGroup,
-  savePhone, 
-  saveAddress, 
-  saveWorkAddress, 
-  saveToken, 
+  saveUserInformation,
   saveMobilizationTotalCount, 
   saveMobilizationAcceptCount, 
   saveMobilizationDenyCount,
   saveUserLocationX,
   saveUserLocationY,
   saveGpsStatusSatelliteCount,
-  saveGpsStatusDbHzAverage
+  saveGpsStatusDbHzAverage,
+  saveLogedInStatus
 } = myInfoSlice.actions;
 
 export default myInfoSlice.reducer;
