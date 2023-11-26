@@ -30,6 +30,8 @@ interface Props {
   hasModal?: boolean;
   deviceType?: DeviceType;
   build_sn:string;
+  gis_x_4326:string | number;
+  gis_y_4326:string | number;
 }
 
 const MobileFacilityItem = (props: Props) => {
@@ -60,8 +62,8 @@ const MobileFacilityItem = (props: Props) => {
         <Stack spacing="0">
           <Flex gap="8px" pb="8px" borderBottom="1px solid #E9ECEF">
             <PhoneWrapper>
-              <PhoneIconWrapper onClick={() => window.location.href = `tel:${props?.phoneNumber}`}>
-                <IconWrapper width="24px" height="24px" color={theme.colors.green}>
+              <PhoneIconWrapper onClick={() => props.phoneNumber && (window.location.href = `tel:${props.phoneNumber}`)}>
+                <IconWrapper width="24px" height="24px" color={props?.phoneNumber ? theme.colors.green : theme.colors.gray}>
                   <Calling />
                 </IconWrapper>
               </PhoneIconWrapper>
@@ -70,12 +72,12 @@ const MobileFacilityItem = (props: Props) => {
             <Stack flex={1} spacing="0" align="flex-start">
               <Flex gap="4px" alignItems="center">
                 <Distance>{props.distance}</Distance>
-                <MapButton onClick={e => onClickMap(e)}>
+                {props.gis_x_4326 && props.gis_y_4326 &&<MapButton onClick={e => onClickMap(e)}>
                   <IconWrapper width="14px" height="14px" color={theme.colors.white}>
                     <Map />
                   </IconWrapper>
                   지도
-                </MapButton>
+                </MapButton>}
               </Flex>
               <Name>{props.name}</Name>
             </Stack>
@@ -94,7 +96,7 @@ const MobileFacilityItem = (props: Props) => {
       </Container>
 
       {isModalOpen && <FacilityModal build_sn={props?.build_sn} setIsModalOpen={setIsModalOpen} isDangerCategory={isDangerFacilities} />}
-      {isMapModalOpen && <MapModal setIsMapModalOpen={setIsMapModalOpen} />}
+      {isMapModalOpen && <MapModal gis_x_4326={props.gis_x_4326} gis_y_4326={props.gis_y_4326} setIsMapModalOpen={setIsMapModalOpen} />}
     </>
   );
 };

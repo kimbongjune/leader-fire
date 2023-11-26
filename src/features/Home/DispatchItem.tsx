@@ -10,6 +10,7 @@ import theme from '@/theme/colors';
 import { useDispatch } from 'react-redux';
 import { setSubDisasterInformation } from '../../features/slice/disasterSlice';
 import { useEffect } from 'react';
+import { getPassedTime } from '@/utils/getPassedTime';
 
 interface Props {
   jurisWardId:string;
@@ -57,7 +58,7 @@ const DispatchItem = (props: Props) => {
                   <Title>{props.eventName}</Title>
                   <Time>
                     <Clock width={14} height={14} color="#ADB5BD" />
-                    30분 경과
+                    {getPassedTime(props.created)} 경과
                   </Time>
                 </Flex>
                 <Address>{props.lawAddr}</Address>

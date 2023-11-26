@@ -27,6 +27,8 @@ interface Props {
   hasModal?: boolean;
   deviceType?: DeviceType;
   build_sn:string;
+  gis_x_4326:string | number;
+  gis_y_4326:string | number;
 }
 
 const TabletFacilityItem = (props: Props) => {
@@ -55,8 +57,8 @@ const TabletFacilityItem = (props: Props) => {
         <ContainerSelected isSelected={props.isSelected} />
         <Flex gap={props.deviceType === 'tabletHorizontal' ? '16px' : '8px'} alignItems="center">
           <PhoneWrapper>
-            <PhoneIconWrapper onClick={() => window.location.href = `tel:${props?.phoneNumber}`}>
-              <IconWrapper width="32px" height="32px" color={theme.colors.green}>
+            <PhoneIconWrapper onClick={() => props.phoneNumber && (window.location.href = `tel:${props.phoneNumber}`)}>
+              <IconWrapper width="32px" height="32px" color={props?.phoneNumber ? theme.colors.green : theme.colors.gray}>
                 <Calling />
               </IconWrapper>
             </PhoneIconWrapper>
@@ -68,7 +70,7 @@ const TabletFacilityItem = (props: Props) => {
               <LeftWrapper>
                 <Flex gap="8px" alignItems="center">
                   <Distance>{props.distance}</Distance>
-                  <MapButton onClick={e => onClickMap(e)}>
+                  {props.gis_x_4326 && props.gis_y_4326 && <MapButton onClick={e => onClickMap(e)}>
                     <IconWrapper width="16px" height="16px" color={theme.colors.white}>
                       <Map />
                     </IconWrapper>
@@ -76,7 +78,7 @@ const TabletFacilityItem = (props: Props) => {
                     <IconWrapper width="12px" height="12px" color={theme.colors.gray4}>
                       <ArrowRight />
                     </IconWrapper>
-                  </MapButton>
+                  </MapButton>}
                 </Flex>
                 <Name>{props.name}</Name>
                 {props.buildingAddress && <BuildingAddress>{props.buildingAddress}</BuildingAddress>}
@@ -94,7 +96,7 @@ const TabletFacilityItem = (props: Props) => {
       </Container>
 
       {isModalOpen && <FacilityModal build_sn={props?.build_sn} setIsModalOpen={setIsModalOpen} isDangerCategory={isDangerFacilities} />}
-      {isMapModalOpen && <MapModal setIsMapModalOpen={setIsMapModalOpen} />}
+      {isMapModalOpen && <MapModal gis_x_4326={props.gis_x_4326} gis_y_4326={props.gis_y_4326} setIsMapModalOpen={setIsMapModalOpen} />}
     </>
   );
 };

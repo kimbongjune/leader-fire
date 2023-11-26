@@ -32,7 +32,7 @@ const ReportItem = (props: Props) => {
       <TabBar>
         <Flex justify="space-between" gap="24px" align="center">
           <Flex gap="12px" align="center" width="fit-content">
-           <a href={`tel:${props.callTell}`}><Image src="/images/icons/call.png" width={36} height={36} alt="통화 아이콘" ></Image></a>
+           {props.callTell && <a href={`tel:${props.callTell}`}><Image src="/images/icons/call.png" width={36} height={36} alt="통화 아이콘" ></Image></a>}
             <Image src="/images/icons/naverMap.png" width={36} height={36} alt="네이버지도 아이콘" />
             <Image src="/images/icons/kakaoMap.png" width={36} height={36} alt="카카오지도 아이콘" />
             <Image src="/images/icons/map.png" width={36} height={36} alt="원내비지도 아이콘" />

@@ -113,12 +113,14 @@ const TargetFacility = (props: Props) => {
                   key={index}
                   build_sn={item.bild_sn}
                   title={"인근대상물"}
-                  phoneName={"방재실"}
+                  phoneName={"연락처"}
                   phoneNumber={item.dsprvn_tlphon}
                   distance={item.dist}
                   name={item.main_prpos_cd_nm}
                   storeName={item.obj_nm}
                   storeAddress={item.bunji_adress || item.doro_adress}
+                  gis_x_4326={item.gis_x_4326}
+                  gis_y_4326={item.gis_y_4326}
                   containerBottom={
                     <VStack gap="8px" pt="8px">
                       {item.dytm_tlphon && <PhoneBox key={item.dytm_tlphon} title={"주간전화"} number={item.dytm_tlphon} deviceType={deviceType} />}
@@ -133,12 +135,14 @@ const TargetFacility = (props: Props) => {
                 key={index}
                 build_sn={item.bild_sn}
                 title={"인근대상물"}
-                phoneName={"방재실"}
+                phoneName={"연락처"}
                 phoneNumber={item.dsprvn_tlphon}
                 distance={item.dist}
                 name={item.main_prpos_cd_nm}
                 storeName={item.obj_nm}
                 storeAddress={item.bunji_adress || item.doro_adress}
+                gis_x_4326={item.gis_x_4326}
+                gis_y_4326={item.gis_y_4326}
                 containerBottom={
                   <VStack gap="8px" pt="8px">
                     {item.dytm_tlphon && <PhoneBox key={item.dytm_tlphon} title={"주간전화"} number={item.dytm_tlphon} deviceType={deviceType} />}

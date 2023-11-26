@@ -112,6 +112,8 @@ const Facility = (props: Props) => {
                     name={item.main_prpos_cd_nm}
                     storeName={item.buld_nm}
                     storeAddress={item.bunji_adress || item.doro_adress}
+                    gis_x_4326={item.gis_x_4326}
+                    gis_y_4326={item.gis_y_4326}
                     buildingInfo={
                       <VStack spacing="4px" margin="4px 0 0 0">
                         <BuildingInfoWrapper deviceType={deviceType}>
@@ -135,6 +137,8 @@ const Facility = (props: Props) => {
                     distance={item.dist}
                     name={item.main_prpos_cd_nm}
                     storeName={item.buld_nm}
+                    gis_x_4326={item.gis_x_4326}
+                    gis_y_4326={item.gis_y_4326}
                     storeAddress={item.bunji_adress || item.doro_adress}
                     containerBottom={<BuildingInfo title={item.sub_prpos_cd_nm} text={"부용도"} />}
                     buildingAddress={<BuildNumber number={item.bulddong_sn} floor={item.floor_sn} />}

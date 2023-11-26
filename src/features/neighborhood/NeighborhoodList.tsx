@@ -285,7 +285,7 @@ const NeighborhoodList = (props: Props) => {
                                     "buld_nm": "까치빌라",
                                     "bulddong_sn": "1",
                                     "floor_sn": "11",
-                                    "cttpc": "055-933-9338",
+                                    "cttpc": "",
                                     "bunji_adress": "경상남도 합천군 합천읍 합천리 1256-0 번지",
                                     "doro_adress": "경상남도 합천군 합천읍 옥산로 16 까치빌라",
                                     "gis_x_5181": "304858.0170545473",

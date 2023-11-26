@@ -60,37 +60,43 @@ const Collaboration = (props: Props) => {
                 {deviceType !== 'mobile' && <Count>{data.count}명</Count>}
               </TitleWrapper>
               <ItemContainer deviceType={deviceType}>
-                {data.itemList?.map((item, index) => {
-                  return (
-                    <a href={`tel:${item.phone}`} key={index}><ItemWrapper deviceType={deviceType}>
-                      <Flex alignItems="center">
-                        {deviceType === 'mobile' && (
-                          <PhoneWrapper deviceType={deviceType}>
-                            <Flex gap="4px">
-                              <IconWrapper width="16px" height="16px" color={theme.colors.orange}>
-                                <Call />
-                              </IconWrapper>
-                              <PhoneNumber deviceType={deviceType}>{item.phone}</PhoneNumber>
-                            </Flex>
-                          </PhoneWrapper>
-                        )}
-                        {deviceType !== 'mobile' && (
-                          <PhoneWrapper deviceType={deviceType}>
-                            <IconWrapper width="32px" height="32px" color={theme.colors.orange}>
-                              <Calling/>
+              {data.itemList?.map((item, index) => {
+                const itemContent = (
+                  <ItemWrapper deviceType={deviceType}>
+                    <Flex alignItems="center">
+                      {deviceType === 'mobile' && (
+                        <PhoneWrapper deviceType={deviceType}>
+                          <Flex gap="4px">
+                            <IconWrapper width="16px" height="16px" color={item.phone? theme.colors.orange : theme.colors.gray}>
+                              <Call />
                             </IconWrapper>
-                          </PhoneWrapper>
-                        )}
-                        <NameWrapper>
-                          <Name deviceType={deviceType}>{item.name}</Name>
-                          {deviceType === 'tabletVertical' && <PhoneNumber deviceType={deviceType}>{item.phone}</PhoneNumber>}
-                        </NameWrapper>
-                        <Distance deviceType={deviceType}>{item.distance}</Distance>
-                      </Flex>
-                    </ItemWrapper></a>
-                  );
-                })}
-              </ItemContainer>
+                            <PhoneNumber deviceType={deviceType}>{item.phone}</PhoneNumber>
+                          </Flex>
+                        </PhoneWrapper>
+                      )}
+                      {deviceType !== 'mobile' && (
+                        <PhoneWrapper deviceType={deviceType}>
+                          <IconWrapper width="32px" height="32px" color={item.phone? theme.colors.orange : theme.colors.gray}>
+                            <Calling/>
+                          </IconWrapper>
+                        </PhoneWrapper>
+                      )}
+                      <NameWrapper>
+                        <Name deviceType={deviceType}>{item.name}</Name>
+                        {deviceType === 'tabletVertical' && <PhoneNumber deviceType={deviceType}>{item.phone}</PhoneNumber>}
+                      </NameWrapper>
+                      <Distance deviceType={deviceType}>{item.distance}</Distance>
+                    </Flex>
+                  </ItemWrapper>
+                );
+
+                return item.phone ? (
+                  <a href={`tel:${item.phone}`} key={index}>{itemContent}</a>
+                ) : (
+                  <React.Fragment key={index}>{itemContent}</React.Fragment>
+                );
+              })}
+            </ItemContainer>
             </>
           </Container>
         );

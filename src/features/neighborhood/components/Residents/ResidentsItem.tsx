@@ -19,22 +19,38 @@ const ResidentsItem = (props: Props) => {
   const deviceType = useDeviceType();
 
   return (
-  
     <Container>
-      <a href={props.call && `tel:${props.call}`}>
-      <Flex gap="12px" alignItems="center" width="100%">
-        <PhoneWrapper deviceType={deviceType}>
-          <IconWrapper width="32px" height="32px" color={theme.colors.blue}>
-            <Calling />
-          </IconWrapper>
-        </PhoneWrapper>
-        <ContentArea>
-          <ContentTop>{props.contentTop}</ContentTop>
-          <ContentBottom>{props.contentBottom}</ContentBottom>
-        </ContentArea>
-      </Flex>
-      {props.address && <Address>{props.address}</Address>}
-    </a>
+      {props.call ? (
+        <a href={`tel:${props.call}`}>
+          <Flex gap="12px" alignItems="center" width="100%">
+            <PhoneWrapper deviceType={deviceType}>
+              <IconWrapper width="32px" height="32px" color={theme.colors.blue}>
+                <Calling />
+              </IconWrapper>
+            </PhoneWrapper>
+            <ContentArea>
+              <ContentTop>{props.contentTop}</ContentTop>
+              <ContentBottom>{props.contentBottom}</ContentBottom>
+            </ContentArea>
+          </Flex>
+          {props.address && <Address>{props.address}</Address>}
+        </a>
+      ) : (
+        <React.Fragment>
+          <Flex gap="12px" alignItems="center" width="100%">
+            <PhoneWrapper deviceType={deviceType}>
+              <IconWrapper width="32px" height="32px" color={theme.colors.gray}>
+                <Calling />
+              </IconWrapper>
+            </PhoneWrapper>
+            <ContentArea>
+              <ContentTop>{props.contentTop}</ContentTop>
+              <ContentBottom>{props.contentBottom}</ContentBottom>
+            </ContentArea>
+          </Flex>
+          {props.address && <Address>{props.address}</Address>}
+        </React.Fragment>
+      )}
     </Container>
   );
 };

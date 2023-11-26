@@ -124,7 +124,7 @@ const DangerFacility = (props: Props) => {
                     isSelected={isSelected}
                     key={item.bild_sn}
                     title={"인근 위험물제조소 등"}
-                    phoneName={"방재실"}
+                    phoneName={"연락처"}
                     build_sn={item.bild_sn}
                     distance={item.dist.toString()}
                     name={item.mnfctretc_detail_se_cd_nm}
@@ -132,6 +132,8 @@ const DangerFacility = (props: Props) => {
                     storeAddress={item.itlpc_bunji_adress || item.itlpc_doro_adress}
                     buildingFloor={item.floor_sn}
                     buildingNumber={item.bild_sn}
+                    gis_x_4326={item.gis_x_4326}
+                    gis_y_4326={item.gis_y_4326}
                     containerBottom={
                       <VStack gap="8px" pt="8px">
                         {item.dytm_tlphon && <PhoneBox key={item.dytm_tlphon} title={"주간전화"} number={item.dytm_tlphon} deviceType={deviceType} />}
@@ -160,12 +162,14 @@ const DangerFacility = (props: Props) => {
                   <TabletFacilityItem
                     isSelected={isSelected}
                     title={"인근 위험물제조소 등"}
-                    phoneName={"방재실"}
+                    phoneName={"연락처"}
                     build_sn={item.bild_sn}
                     distance={item.dist.toString()}
                     name={item.mnfctretc_detail_se_cd_nm}
                     storeName={item.obj_nm}
                     storeAddress={item.itlpc_bunji_adress || item.itlpc_doro_adress}
+                    gis_x_4326={item.gis_x_4326}
+                    gis_y_4326={item.gis_y_4326}
                     containerBottom={
                       <Flex gap="8px" w="100%">
                         <BuildingBox number={`${item.bulddong_sn}동`} floor={item.floor_sn} />

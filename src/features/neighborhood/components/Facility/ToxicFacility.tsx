@@ -105,6 +105,8 @@ const ToxicFacility = (props: Props) => {
                   storeName={item.entrps_nm}
                   storeAddress={item.bunji_adress}
                   build_sn={item.bild_sn}
+                  gis_x_4326={item.gis_x_4326}
+                  gis_y_4326={item.gis_y_4326}
                   containerBottom={
                     <VStack gap="8px" pt="8px">
                       {item.txsb_safer_tel1 && <PhoneBox key={item.txsb_safer_tel1} title={"안전관리자1"} number={item.txsb_safer_tel1} deviceType={deviceType} />}
@@ -142,6 +144,8 @@ const ToxicFacility = (props: Props) => {
                   storeName={item.entrps_nm}
                   storeAddress={item.bunji_adress}
                   build_sn={item.bild_sn}
+                  gis_x_4326={item.gis_x_4326}
+                  gis_y_4326={item.gis_y_4326}
                   buildingInfo={
                     <Stack spacing="8px">
                       <BuildingInfo title={'보유보호장비'} text={item.hold_ffgq || "N"} />
