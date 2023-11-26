@@ -8,6 +8,9 @@ interface DisasterState {
   isExtinguisherMarkerActive: boolean;
   isTargetMarkerActive: boolean;
   isDangerMarkerActive: boolean;
+  isRescuePositionActive :boolean;
+  isVehicleActive : boolean;
+  isVideoActive : boolean;
 }
 
 const initialState: DisasterState = {
@@ -34,7 +37,10 @@ const initialState: DisasterState = {
   isWaterMarkerActive: false,
   isExtinguisherMarkerActive: false,
   isTargetMarkerActive: false,
-  isDangerMarkerActive: false
+  isDangerMarkerActive: false,
+  isRescuePositionActive:false,
+  isVehicleActive:false,
+  isVideoActive:false
 };
 
 export const disasterSlice = createSlice({
@@ -58,6 +64,15 @@ export const disasterSlice = createSlice({
     },
     setSubDisasterInformation: (state, action: PayloadAction<DispatchItemType>) => {
       state.subDisasterInformation = action.payload;
+    },
+    setIsRescuePositionActive: (state, action: PayloadAction<boolean>) => {
+      state.isRescuePositionActive = action.payload;
+    },
+    setIsVehicleActive: (state, action: PayloadAction<boolean>) => {
+      state.isVehicleActive = action.payload;
+    },
+    setIsVideoActive: (state, action: PayloadAction<boolean>) => {
+      state.isVideoActive = action.payload;
     }
   },
 });
@@ -68,6 +83,9 @@ export const {
   setIsExtinguisherMarkerActive,
   setIsTargetMarkerActive,
   setIsWaterMarkerActive,
-  setSubDisasterInformation
+  setSubDisasterInformation,
+  setIsRescuePositionActive,
+  setIsVehicleActive,
+  setIsVideoActive
 } = disasterSlice.actions;
 export default disasterSlice.reducer;
