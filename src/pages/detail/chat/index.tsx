@@ -11,14 +11,17 @@ import { useRouter } from 'next/router';
 import TabletPage from './tablet';
 import useDeviceType from '@/hooks/useDeviceType';
 import { RootState } from '../../../app/store';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
+import { selectDisasterById } from '@/features/slice/test';
 
 //TODO 모바일 채팅 페이지
 const ChatPage = () => {
   const router = useRouter();
   const deviceType = useDeviceType();
 
-  const data = useSelector((state: RootState) => state.disaster.subDisasterInformation);
+  const id = router.query.id as string
+
+  const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
   if (!deviceType) return null;
 
@@ -27,16 +30,10 @@ const ChatPage = () => {
   return (
     <Layout>
       <Flex direction="column" height="100%">
-        <Menu title={data?.eventName} timestamp={data?.created} contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />
-        <AddressTab address={data?.lawAddr} />
+        <Menu title={selectedDisaster?.eventName} timestamp={selectedDisaster?.created} contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />
+        <AddressTab address={selectedDisaster?.lawAddr} />
         <Children>
-          <Stack spacing="16px">
-            <FilterWrapper>
-              <Filter queryKey="filter" filterNames={['채팅 대상', '채팅 목록']} filterItem={ChatFilterItem} />
-            </FilterWrapper>
-            {router.query.filter === '채팅 대상' && <ChatTargetList />}
-            {router.query.filter === '채팅 목록' && <ChatRoomList />}
-          </Stack>
+        <iframe src={`http://view2.gnfire.go.kr:8887/chat/${selectedDisaster?.dsrSeq}/0/1?gubun=4`} width="100%" height="100%"></iframe>
         </Children>
       </Flex>
     </Layout>

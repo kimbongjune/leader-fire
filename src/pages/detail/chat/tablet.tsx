@@ -9,7 +9,8 @@ import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import Div100vh from 'react-div-100vh';
 import { RootState } from '../../../app/store';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
+import { selectDisasterById } from '@/features/slice/test';
 
 interface Props {
   deviceType: DeviceType;
@@ -19,19 +20,23 @@ const TabletPage = (props: Props) => {
   const { deviceType } = props;
   const router = useRouter();
 
-  const data = useSelector((state: RootState) => state.disaster.subDisasterInformation);
+  const id = router.query.id as string
+
+  const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
+  console.log(selectedDisaster)
 
   return (
     <Layout>
       <Flex direction="column" height="100%">
         <MenuWrapper deviceType={deviceType}>
-          <Menu title={data?.eventName} status="progress" timestamp={data?.created} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />
+          <Menu title={selectedDisaster?.eventName} status="progress" timestamp={selectedDisaster?.created} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />
         </MenuWrapper>
         <AddressTabWrapper deviceType={deviceType}>
-          <AddressTab address={data?.lawAddr} />
+          <AddressTab address={selectedDisaster?.lawAddr} />
         </AddressTabWrapper>
         <Children>
-          <ChatContainer deviceType={deviceType} />
+        <iframe src={`http://view2.gnfire.go.kr:8887/chat/${selectedDisaster?.dsrSeq}/0/1?gubun=4`} width="100%" height="100%"></iframe>
         </Children>
       </Flex>
     </Layout>

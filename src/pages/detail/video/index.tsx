@@ -9,6 +9,9 @@ import { useRouter } from 'next/router';
 import useDeviceType from '@/hooks/useDeviceType';
 import { DeviceType } from '@/types/types';
 import { IncidentType } from '@/types/types';
+import { shallowEqual, useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { selectDisasterById } from '@/features/slice/test';
 
 interface Props {
   status: IncidentType;
@@ -19,6 +22,10 @@ const VideoPage = (props: Props) => {
   const deviceType = useDeviceType();
   const router = useRouter();
 
+  const id = router.query.id as string
+
+  const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
   if (!deviceType) return null;
 
   return (
@@ -26,8 +33,8 @@ const VideoPage = (props: Props) => {
       <Flex direction="column" height="100%">
         <MenuWrapper deviceType={deviceType}>
           <Menu
-            title="공장화재"
-            status="completion"
+            title={selectedDisaster?.eventName}
+            status={selectedDisaster?.status}
             closeButtonText={deviceType === 'mobile' ? '닫기' : ''}
             hasCloseButtonWithoutString={false}
             onClickBackButton={() => router.back()}
@@ -37,10 +44,10 @@ const VideoPage = (props: Props) => {
           />
         </MenuWrapper>
         <AddressTabWrapper deviceType={deviceType}>
-          <AddressTab />
+          <AddressTab address={selectedDisaster?.lawAddr}/>
         </AddressTabWrapper>
         <Children deviceType={deviceType}>
-          <VideoList deviceType={deviceType} />
+        <iframe allow='camera *;microphone *' src={`http://info.gnfire.go.kr/ERSS_P_T/video2.do?dsr_seq=${selectedDisaster?.dsrSeq}`} width="100%" height="100%"></iframe>
         </Children>
       </Flex>
     </Layout>
