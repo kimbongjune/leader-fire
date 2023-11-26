@@ -12,10 +12,16 @@ interface Props {
   onClose: () => void;
   onClick: () => void;
   existingToken: string;
-  newToken: string;
 }
 
 const TokenRefreshModal = (props: Props) => {
+  const [newToken, setNewToken] = useState("");
+
+  const refreshToken =() =>{
+    //TODO 자바스크립트 인터페이스로 토큰 갱신
+    setNewToken("새로운 토큰")
+  }
+
   return (
     <ModalLayout isOpen={props.isOpen} onClose={props.onClose} borderRadius="12px">
       <ModalContent>
@@ -27,14 +33,14 @@ const TokenRefreshModal = (props: Props) => {
                 <TokenName>기존 토큰</TokenName>
                 <TokenValue>{props.existingToken}</TokenValue>
               </Flex>
-              <RefreshButton>
+              <RefreshButton onClick={refreshToken}>
                 <Refresh width="20px" height="20px" color="#fff" />
                 재발급
               </RefreshButton>
             </Stack>
             <Flex justify="space-between" p="16px" border="1px solid #e9ecef" borderRadius="8px">
               <TokenName>신규 토큰</TokenName>
-              <TokenValue>{props.newToken}</TokenValue>
+              <TokenValue>{newToken}</TokenValue>
             </Flex>
           </Stack>
           <Flex w="100%" gap="16px">

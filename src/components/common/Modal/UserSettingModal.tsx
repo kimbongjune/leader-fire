@@ -12,10 +12,13 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onClick: () => void;
+  phoneNumber: string;
 }
 
 const UserSettingModal = (props: Props) => {
   const [checked, setChecked] = useState(false);
+
+  const [phoneNumber, setPhoneNumber] = useState(props?.phoneNumber)
 
   return (
     <ModalLayout isOpen={props.isOpen} onClose={props.onClose} borderRadius="12px">
@@ -31,7 +34,7 @@ const UserSettingModal = (props: Props) => {
           <Stack w="100%" spacing="16px">
             <InputWrapper>
               <Call width="20px" height="20px" color={theme.colors.orange} />
-              <StyledInput type="number" placeholder="전화번호 입력" />
+              <StyledInput type="number" placeholder="전화번호 입력" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
             </InputWrapper>
             <Flex justify="flex-end" gap="8px" pb="16px" borderBottom="1px solid #e9ecef">
               <Switch id="myPosition" onChange={e => setChecked(e)} checked={checked} onColor={theme.colors.gray4} offColor={theme.colors.blue} width={34} height={18} handleDiameter={12} uncheckedIcon={false} checkedIcon={false} />
