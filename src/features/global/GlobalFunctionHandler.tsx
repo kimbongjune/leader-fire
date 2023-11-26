@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from "../../components/common/api/axios"
 import { setDisasterInformation } from '../../features/slice/disasterSlice';
-import { AppDispatch  } from '../../app/store';
+import { AppDispatch, RootState  } from '../../app/store';
 import { DispatchItemType } from '../../types/types';
 
 //TODO 글로벌 함수
@@ -11,12 +11,13 @@ const fetchDisasterInformation = async (dispatch: AppDispatch) => {
     //const response = await axios.get('API_ENDPOINT');
     // API 응답을 Redux 상태에 저장
     console.log("동원 api 콜")
+
     const testData:DispatchItemType[] = [
       {
         jurisWardId:"관할서 센터 ID",
         dsrKndCd:"긴급구조종류",
         dsrClsCd:"긴급구조유형",
-        dsrSeq: "1",
+        dsrSeq: "XY4800262911",
         status: 'progress',
         reportCount: 5,
         eventName: '기타화재',
@@ -164,16 +165,20 @@ const fetchDisasterInformation = async (dispatch: AppDispatch) => {
 const GlobalFunctionHandler = () => {
   const dispatch = useDispatch<AppDispatch>();
 
+  const isLoggedIn = useSelector((state: RootState) => state.userReducer.logedIn);
+
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
-    fetchDisasterInformation(dispatch);
+    if (isLoggedIn) {
+      // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
+      fetchDisasterInformation(dispatch);
 
-    // setInterval을 사용하여 주기적으로 API를 호출
-    const intervalId = setInterval(() => fetchDisasterInformation(dispatch), 10000);
+      // setInterval을 사용하여 주기적으로 API를 호출
+      const intervalId = setInterval(() => fetchDisasterInformation(dispatch), 10000);
 
-    // 컴포넌트가 언마운트될 때 인터벌을 정리
-    return () => clearInterval(intervalId);
-  }, [dispatch]);
+      // 컴포넌트가 언마운트될 때 인터벌을 정리
+      return () => clearInterval(intervalId);
+    }
+  }, [dispatch, isLoggedIn]);
 
   return null;
 };
