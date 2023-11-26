@@ -1,5 +1,5 @@
 import ArrowDown from '../../../../public/images/icons/arrow-drop-down.svg';
-import Select, { DropdownIndicatorProps, IndicatorsContainerProps, ValueContainerProps, components } from 'react-select';
+import Select, { ActionMeta, DropdownIndicatorProps, IndicatorsContainerProps, MultiValue, SingleValue, ValueContainerProps, components } from 'react-select';
 import styled from '@emotion/styled';
 
 interface Props {
@@ -8,9 +8,26 @@ interface Props {
   padding?: string;
   options: { label: string; value: string }[];
   defaultValue?: { value: string; label: string };
+  onChange: (value: { value: string; label: string } | null) => void;
 }
 
 const SelectBox = (props: Props) => {
+
+  const handleChange = (newValue: MultiValue<{
+    value: string;
+    label: string;
+  }> | SingleValue<{
+      value: string;
+      label: string;
+  }>, actionMeta: ActionMeta<{
+      value: string;
+      label: string;
+  }>) => {
+    if (newValue) {
+      props.onChange(newValue as SingleValue<{ value: string; label: string }>);
+    }
+  };
+
   const DropdownIndicator = (props: DropdownIndicatorProps<any>) => {
     return (
       <components.DropdownIndicator {...props}>
@@ -21,7 +38,7 @@ const SelectBox = (props: Props) => {
 
   return (
     <SelectWrapper padding={props.padding} width={props.width} height={props.height}>
-      <Select classNamePrefix="react-select" defaultValue={props.defaultValue} options={props.options} components={{ DropdownIndicator }} />
+      <Select classNamePrefix="react-select" value={props.defaultValue} defaultValue={props.defaultValue} options={props.options} components={{ DropdownIndicator }} onChange={handleChange} />
     </SelectWrapper>
   );
 };

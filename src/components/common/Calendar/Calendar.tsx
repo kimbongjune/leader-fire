@@ -3,20 +3,37 @@ import { StringParam, useQueryParam } from 'use-query-params';
 import dayjs from 'dayjs';
 import IconWrapper from '../IconWrapper/IconWrapper';
 import ArrowDropDownIcon from '../../../../public/images/icons/arrow-drop-down.svg';
+import { useEffect, useState } from 'react';
 
 interface Props {
   height?: string;
+  onDateChange: (date: Date) => void;
 }
 
 const Calendar = (props: Props) => {
-  const [date, setDate] = useQueryParam('date', StringParam);
+  const [selectedDate, setSelectedDate] = useState('');
+
+  useEffect(() => {
+    // 기본 날짜 설정: 오늘 날짜
+    setSelectedDate(dayjs(new Date()).format('YYYY-MM-DD'));
+  }, []);
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value;
+    setSelectedDate(newDate);
+    props.onDateChange(new Date(newDate));
+  };
+
+  const maxDate = dayjs().format('YYYY-MM-DD');
+  const minDate = dayjs().subtract(7, 'day').format('YYYY-MM-DD');
+
   return (
     <CalendarWrapper className="calendar-container" height={props.height}>
-      <DateDisplay className="calendar-date">{date !== '' && dayjs(date).format('YYYY년 MM월 DD일')}</DateDisplay>
+      <DateDisplay className="calendar-date">{selectedDate && dayjs(selectedDate).format('YYYY년 MM월 DD일')}</DateDisplay>
       <IconWrapper width="20px" height="20px" color="#343A40">
         <ArrowDropDownIcon />
       </IconWrapper>
-      <input id="calendar-input" type="date" onChange={e => setDate(e.target.value)} />
+      <input id="calendar-input" required type="date" onChange={handleDateChange} value={selectedDate} max={maxDate} min={minDate}/>
     </CalendarWrapper>
   );
 };

@@ -22,9 +22,68 @@ const typeMapping: { [K in keyof CountByType]: string } = {
   others: "기타"
 };
 
+const formatTime = (date: Date): string => {
+  return date.toLocaleTimeString('it-IT').substring(0, 5);
+};
+
 const SearchDispatch = (props: Props) => {
   const { deviceType } = props;
   const [dates, setDates] = useState<{ value: string; label: string }[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [startTime, setStartTime] = useState('09:00');
+  const [endTime, setEndTime] = useState(new Date().toLocaleTimeString('it-IT').substring(0, 5));
+
+  useEffect(() => {
+    adjustTimesBasedOnSelectedDate(selectedDate);
+  }, [selectedDate]);
+
+  const adjustTimesBasedOnSelectedDate = (date: Date) => {
+    const now = new Date();
+
+    // 시작 시간 설정: 현재 시간이 오전 9시 이전이면 전날 오전 9시, 그렇지 않으면 오늘 오전 9시
+    const start = new Date(date);
+    if (now.getHours() < 9) {
+      start.setDate(start.getDate() - 1);
+    }
+    start.setHours(9, 0, 0, 0);
+
+    // 종료 시간 설정: 선택된 날짜에서 24시간 더한 시간, 미래라면 현재 시간으로 설정
+    const end = new Date(start);
+    end.setDate(start.getDate() + 1);
+    if (now < end) {
+      end.setTime(now.getTime());
+    }
+
+    setStartTime(formatTime(start));
+    setEndTime(formatTime(end));
+
+    // 콘솔에 출력
+    console.log("설정된 시작 시간:", formatDateAndTime(start));
+    console.log("설정된 종료 시간:", formatDateAndTime(end));
+  };
+
+  const formatDateAndTime = (date: Date) => {
+    return `${date?.toISOString().split('T')[0]} ${formatTime(date)}`;
+  };
+
+  const handleDateChange = (newDate: Date) => {
+    setSelectedDate(newDate);
+    adjustTimesBasedOnSelectedDate(newDate);
+  };
+
+  const handleStartTimeChange = (option: { value: string; label: string } | null) => {
+    setStartTime(option?.value!!);
+  };
+
+  const handleEndTimeChange = (option: { value: string; label: string } | null) => {
+    setEndTime(option?.value!!);
+  };
+
+  const timeOptions = Array.from({ length: 24 }, (_, i) => ({
+    value: `${i.toString().padStart(2, '0')}:00`,
+    label: `${i.toString().padStart(2, '0')}:00`
+  }));
+
 
   const count = (Object.entries(props.countByType) as [keyof CountByType, number][])
   .map(([key, value]) => `${typeMapping[key]} ${value}`)
@@ -51,13 +110,6 @@ const SearchDispatch = (props: Props) => {
     setDates(generateDateOptions());
   }, []);
 
-  const timeOptions = [];
-
-  for (let i = 0; i < 24; i++) {
-    const formattedTime = `${i.toString().padStart(2, '0')}:00`;
-    timeOptions.push({ value: formattedTime, label: formattedTime });
-  }
-
   if (isEmpty(dates)) return null;
 
   if (deviceType === 'tabletVertical' || deviceType === 'tabletHorizontal') {
@@ -66,20 +118,20 @@ const SearchDispatch = (props: Props) => {
         <Flex justify="space-between" align="center">
           {deviceType === 'tabletVertical' && (
             <Box width="148px">
-              <Calendar height="44px" />
+              <Calendar height="44px" onDateChange={handleDateChange}/>
             </Box>
           )}
           <Flex gap="24px">
             {deviceType === 'tabletHorizontal' && (
               <Box width="148px">
-                <Calendar height="44px" />
+                <Calendar height="44px" onDateChange={handleDateChange}/>
               </Box>
             )}
             <Flex gap="8px" align="center">
               <Time>시작시간</Time>
-              <SelectBox width={90} height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: '09:00', value: '09:00' }} />
+              <SelectBox width={90} height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: startTime, value: startTime }} onChange={handleStartTimeChange} />
               <Time>현재시간</Time>
-              <SelectBox width={90} height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: '13:00', value: '13:00' }} />
+              <SelectBox width={90} height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: endTime, value: endTime }}  onChange={handleEndTimeChange} />
               <StyledButton deviceType={deviceType}>조회</StyledButton>
             </Flex>
           </Flex>
@@ -110,7 +162,7 @@ const SearchDispatch = (props: Props) => {
       <Flex gap="16px">
         <Stack minW="149px" flex={1} spacing="8px">
           {/* <SelectBox height={44} options={dates} padding="12px 8px" defaultValue={dates[0]} /> */}
-          <Calendar height="44px" />
+          <Calendar height="44px" onDateChange={handleDateChange}/>
           <EmergencyDispatch>
             <Flex gap="4px" align="center">
               <Box width="24px" height="24px" position="relative">
@@ -126,11 +178,11 @@ const SearchDispatch = (props: Props) => {
         <Stack spacing="8px" flex={1}>
           <Flex w="100%" gap="8px" align="center">
             <Time>시작시간</Time>
-            <SelectBox height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: '09:00', value: '09:00' }} />
+            <SelectBox height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: startTime, value: startTime }} onChange={handleStartTimeChange}  />
           </Flex>
           <Flex w="100%" gap="8px" align="center">
             <Time>현재시간</Time>
-            <SelectBox height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: '10:00', value: '10:00' }} />
+            <SelectBox height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: endTime, value: endTime }} onChange={handleEndTimeChange}   />
           </Flex>
           <StyledButton>조회</StyledButton>
         </Stack>
