@@ -16,6 +16,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import { selectDisasterById } from '../slice/test';
 import {Document, Page, pdfjs} from 'react-pdf';
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -54,6 +55,8 @@ const SOPContainer = (props: Props) => {
   const [searchOccurrences, setSearchOccurrences] = useState<{ page: number; index: number }[]>([]);
   const [currentSearchIndex, setCurrentSearchIndex] = useState<number>(0);
 
+  console.log("pageScale",pageScale)
+
   function highlightPattern(text:string, pattern:string) {
     return text.replace(pattern, (value) => `<mark>${value}</mark>`);
   }
@@ -66,7 +69,6 @@ const SOPContainer = (props: Props) => {
   const onDocumentLoadSuccess = async (document: PDFDocumentProxy) =>{
     setNumPages(document.numPages);
     setPdfDocument(document);
-    setQuery({...query, page:1})
     const outlineData = await getOutlineEntries(await pdfjs.getDocument(pdfFile).promise)
     setTableContents(outlineData)
   }
@@ -86,7 +88,7 @@ const SOPContainer = (props: Props) => {
             const subPageIndex = await pdf.getPageIndex(subItem.dest[0]);
             entry.subtitles.push({
               subtitle: subItem.title,
-              url: 'example', // 실제 URL을 여기에 넣으세요.
+              url: 'example',
               active: false,
               page: subPageIndex + 1
             });
@@ -202,21 +204,19 @@ const SOPContainer = (props: Props) => {
   useEffect(() => {
     if (query.menu === 'SOP') {
       setPdfFile("/pdf/SOP_bookmark.pdf")
-      setQuery({
-        menu: query.menu, // 현재 menu 값을 유지
-        index: undefined, // index를 초기화
-        search: undefined, // search를 초기화
-        page: 1 // page를 1로 설정
-      });
+      const newQuery = { ...query, page: 1 };
+      router.replace({
+        pathname: router.pathname,
+        query: newQuery,
+      }, undefined, { shallow: true });
     };
     if (query.menu === '화학대응메뉴얼') {
       setPdfFile("/pdf/Chemical_bookmark.pdf")
-      setQuery({
-        menu: query.menu, // 현재 menu 값을 유지
-        index: undefined, // index를 초기화
-        search: undefined, // search를 초기화
-        page: 1 // page를 1로 설정
-      });
+      const newQuery = { ...query, page: 1 };
+      router.replace({
+        pathname: router.pathname,
+        query: newQuery,
+      }, undefined, { shallow: true });
     };
   }, [query.menu]);
 
@@ -300,14 +300,18 @@ const SOPContainer = (props: Props) => {
             </Stack>
           </SidebarContent>
         </Sidebar>
-        <PDFWrapper ref={pdfContainerRef} onClick={handleClick} >
-          <Stack spacing="16px" position="absolute" left="50%" transform="translateX(-50%)" height={containerSize.height}>
-          <Document file={pdfFile} onLoadSuccess={onDocumentLoadSuccess}>
-              <Page scale={pageScale} pageNumber={query.page as number} height={containerSize.height} renderTextLayer={true} renderAnnotationLayer={true} customTextRenderer={textRenderer}/>
-          </Document>
-          <PdfPage>{query.page as number} / {numPages}</PdfPage>
-          </Stack>
-        </PDFWrapper>
+          <PDFWrapper ref={pdfContainerRef} onClick={handleClick} >
+            <Stack spacing="16px" position="absolute" left="50%" transform="translateX(-50%)" height={containerSize.height}>
+              <TransformWrapper>
+                <TransformComponent>
+                  <Document file={pdfFile} onLoadSuccess={onDocumentLoadSuccess}>
+                    <Page scale={pageScale} pageNumber={query.page as number} height={containerSize.height} renderTextLayer={true} renderAnnotationLayer={true} customTextRenderer={textRenderer}/>
+                  </Document>
+                </TransformComponent>
+              </TransformWrapper>
+              <PdfPage>{query.page as number} / {numPages}</PdfPage>
+            </Stack>
+          </PDFWrapper>
       </Box>
     </>
   );
