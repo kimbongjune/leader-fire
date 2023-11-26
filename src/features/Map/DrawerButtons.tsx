@@ -8,6 +8,7 @@ import ArrowDown from '../../../public/images/icons/arrowDown.svg';
 import useDeviceType from '@/hooks/useDeviceType';
 import { DeviceType } from '@/types/types';
 import { css } from '@emotion/react';
+import { MarkerType } from './ObjectPosition';
 
 interface Props {
   isClickWater: boolean;
@@ -15,6 +16,10 @@ interface Props {
   isClickDanger: boolean;
   isExtinguisherMarkerActive: boolean;
   changeStatus: (value: string) => void;
+  warterMarkerCount:number;
+  extinguisherMarkerCount:number;
+  targerMarkerCount:number;
+  dangerMarkerCount:number;
 }
 
 const DrawerButtons = (props: Props) => {
@@ -49,22 +54,22 @@ const DrawerButtons = (props: Props) => {
             <VStack marginTop="12px" gap="8px" w="100%">
               <ButtonItem status={props.isClickWater} onClick={() => props.changeStatus('water')}>
                 <ButtonItemText>소화전</ButtonItemText>
-                <ButtonItemNumber>2</ButtonItemNumber>
+                <ButtonItemNumber>{props?.warterMarkerCount}</ButtonItemNumber>
               </ButtonItem>
 
               <ButtonItem status={props.isExtinguisherMarkerActive} onClick={() => props.changeStatus('extinguisher')}>
                 <ButtonItemText>비상소화장치</ButtonItemText>
-                <ButtonItemNumber>2</ButtonItemNumber>
+                <ButtonItemNumber>{props?.extinguisherMarkerCount}</ButtonItemNumber>
               </ButtonItem>
 
               <ButtonItem status={props.isClickTarget} onClick={() => props.changeStatus('target')}>
                 <ButtonItemText>대상물</ButtonItemText>
-                <ButtonItemNumber>2</ButtonItemNumber>
+                <ButtonItemNumber>{props?.targerMarkerCount}</ButtonItemNumber>
               </ButtonItem>
 
               <ButtonItem status={props.isClickDanger} onClick={() => props.changeStatus('danger')}>
-                <ButtonItemText>위협물</ButtonItemText>
-                <ButtonItemNumber>2</ButtonItemNumber>
+                <ButtonItemText>위험물</ButtonItemText>
+                <ButtonItemNumber>{props?.dangerMarkerCount}</ButtonItemNumber>
               </ButtonItem>
             </VStack>
           </>

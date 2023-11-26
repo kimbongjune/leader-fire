@@ -15,15 +15,16 @@ import theme from '@/theme/colors';
 import AddressTab from '@/components/common/Menu/AddressTab';
 import { Flex, Stack } from '@chakra-ui/react';
 import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
-import CompassIcon from '../../../public/images/icons/compass.svg';
+import Satellite from '../../../public/images/mapicons/satellite.svg';
 import MyLocationIcon from '../../../public/images/icons/myLocation.svg';
 import { useRouter } from 'next/router';
 
 import { RootState } from '../../app/store';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsDangerMarkerActive, setIsExtinguisherMarkerActive, setIsTargetMarkerActive, setIsWaterMarkerActive } from '../slice/disasterSlice';
+import { setIsDangerMarkerActive, setIsExtinguisherMarkerActive, setIsTargetMarkerActive, setIsWaterMarkerActive,setIsRescuePositionActive, setIsVehicleActive, setIsVideoActive } from '../../features/slice/disasterSlice';
 import { selectDisasterById } from '../slice/test';
 import { shallowEqual } from 'react-redux';
+import { MarkerType } from './ObjectPosition';
 
 interface Props {
   latitude: number; // 위도
@@ -86,35 +87,38 @@ const Map = (props: Props) => {
   };
 
   const id = router.query.id as string;
+  const gis_x_4326 = router.query.gis_x as string;
+  const gis_y_4326 = router.query.gis_y as string;
 
   const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
-  console.log(selectedDisaster)
-
-  const [apiInterval, setApiInterval] = useState<NodeJS.Timer>()
-
+  const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
   const isWaterActive = useSelector((state: RootState) => state.disaster.isWaterMarkerActive);
   const isExtinguisherActive = useSelector((state: RootState) => state.disaster.isExtinguisherMarkerActive);
   const isTargerActive = useSelector((state: RootState) => state.disaster.isTargetMarkerActive);
   const isDangerActive = useSelector((state: RootState) => state.disaster.isDangerMarkerActive);
+  const isRescuePositionActive = useSelector((state: RootState) => state.disaster.isRescuePositionActive);
+  const isVehicleActive = useSelector((state: RootState) => state.disaster.isVehicleActive);
+  const isVideoActive = useSelector((state: RootState) => state.disaster.isVideoActive);
 
-  const [isClickRescuePosition, setIsClickRescuePosition] = useState(true); // 긴급구조위치
-  const [isClickVehicle, setIsClickVehicle] = useState(false); //출동 차량
-  const [isClickVideo, setIsClickVideo] = useState(false); //영상공유
   const [position, setPosition] = useState({lat:Number, lng:Number})
   const [hasSky, setHasSky] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isClickCompassButton, setIsClickCompassButton] = useState(false); // 나침반 버튼 클릭 유무
 
   const vehicleMarkers = useRef<any[]>([]);
-  const rescueMarkers = useRef<any[]>([]);
+  const rescueMarkers = useRef<any>();
+  const rescueCircles = useRef<any>();
   const videoMarkers = useRef<any[]>([]);
   const dangerousMarkers = useRef<any[]>([]);
   const fireExtinguisherMarkers = useRef<any[]>([]);
   const hydrantMarkers = useRef<any[]>([]);
   const targetMarkers = useRef<any[]>([]);
   const positionMarker = useRef<any>();
+  const positionOverlay = useRef<any>();
+
+  const targetOverlays = useRef<any>();
+  const dangerOverlays = useRef<any>();
 
   const [carMarkers, setCarMarkers] = useState<Markers[]>([])
   const [videoMarker, setVideoMarker] = useState<Markers[]>([])
@@ -130,9 +134,9 @@ const Map = (props: Props) => {
     if (value === 'extinguisher') dispatch(setIsExtinguisherMarkerActive(!isExtinguisherActive));
     if (value === 'target') dispatch(setIsTargetMarkerActive(!isTargerActive));
     if (value === 'danger') dispatch(setIsDangerMarkerActive(!isDangerActive));
-    if (value === 'rescuePosition') setIsClickRescuePosition(prev => !prev);
-    if (value === 'vehicle') setIsClickVehicle(prev => !prev);
-    if (value === 'video') setIsClickVideo(prev => !prev);
+    if (value === 'rescuePosition') dispatch(setIsRescuePositionActive(!isRescuePositionActive));
+    if (value === 'vehicle') dispatch(setIsVehicleActive(!isVehicleActive));
+    if (value === 'video') dispatch(setIsVideoActive(!isVideoActive));
   };
 
   function changeImage(src: string) {
@@ -151,7 +155,7 @@ const Map = (props: Props) => {
     // 도착지
     if (src === '도착지') return (imgSrc = '/images/mapIcons/destinationMarker.svg');
     // 긴급구조
-    if (src === '긴급구조') return (imgSrc = '/images/mapIcons/rescueMarker.svg');
+    if (src === '긴급구조') return (imgSrc = '/images/icons/makerImage.svg');
     // 영상공유
     if (src === '영상공유') return (imgSrc = '/images/mapIcons/videoMarker.svg');
     // 대상물
@@ -191,33 +195,17 @@ const Map = (props: Props) => {
     kakaoMapScript.onload = () => {
       window.kakao.maps.load(() => {
         const options = {
-          center: new window.kakao.maps.LatLng(37.51535, 127.08517),
+          center: gis_x_4326 && gis_y_4326 ? new window.kakao.maps.LatLng(gis_y_4326, gis_x_4326) : new window.kakao.maps.LatLng(props.latitude, props.longitude),
           level: 3,
         };
+        if(gis_x_4326 && gis_y_4326) {
+          dispatch(setIsTargetMarkerActive(true))
+        }
         const map = new window.kakao.maps.Map(mapContainer.current, options);
 
         mapInstance.current = map
-        
-        let markerPosition = new window.kakao.maps.LatLng(37.51535, 127.08517);
-        let markerSize = new window.kakao.maps.Size(191, 191); // 마커이미지의 크기입니다
-        let markerOption = { offset: new window.kakao.maps.Point(191 / 2, 191 / 2) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
-        let marker = new window.kakao.maps.Marker({
-          position: markerPosition,
-          image: createMarkerImage('/images/icons/makerImage.svg', markerSize, markerOption),
-        });
-        marker.setMap(mapInstance.current);
 
-        let circle = new window.kakao.maps.Circle({
-          center : markerPosition,  // 원의 중심좌표 입니다 
-          radius: 200, // 미터 단위의 원의 반지름입니다 
-          strokeWeight: 2, // 선의 두께입니다 
-          strokeColor: '#DE9898', // 선의 색깔입니다
-          strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-          strokeStyle: 'solid', // 선의 스타일 입니다
-          fillColor: '#DE9898', // 채우기 색깔입니다
-          fillOpacity: 0.7  // 채우기 불투명도 입니다   
-        }); 
-        circle.setMap(mapInstance.current);
+        dispatch(setIsRescuePositionActive(true))
 
         setRescueMarker(
           [
@@ -228,17 +216,6 @@ const Map = (props: Props) => {
             }
           ]
         )
-
-      let clickMarkerSize = new window.kakao.maps.Size(32, 32);
-      let clickMarkerOption = { offset: new window.kakao.maps.Point(32 / 2, 32 / 2) };
-
-      const clickMarker = new window.kakao.maps.Marker({
-        position: mapInstance.current.getCenter(),
-        image: createMarkerImage('/images/icons/makerImage.svg', clickMarkerSize, clickMarkerOption),
-      });
-
-      clickMarker.setMap(map)
-      positionMarker.current = clickMarker
 
       const clickHandler = (mouseEvent:any) => {
         console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",mouseEvent)
@@ -324,7 +301,16 @@ const Map = (props: Props) => {
               "build_sn" : "48000000022172",
               "obj_nm" : "까치빌라",
               "main_prpos_cd_nm" : "복합건축물"
-          }
+          },
+          {
+            "lat": " 37.51495",
+            "lon": "127.09242",
+            "type": "대상물",
+            "id": "10",
+            "build_sn" : "48000000022173",
+            "obj_nm" : "까치빌라2",
+            "main_prpos_cd_nm" : "복합건축물"
+        }
           ],
           "dangerous":[
           {
@@ -338,7 +324,28 @@ const Map = (props: Props) => {
           }
           ]
       }
-        console.log("????????")
+        const markerCount:MarkerType[] = [
+          {
+            label: '소화전',
+            value: 'water',
+            count: data.hydrant.length,
+          },
+          {
+            label: '비상소화장치',
+            value: 'extinguisher',
+            count: data.fireExtinguisher.length,
+          },
+          {
+            label: '대상물',
+            value: 'target',
+            count: data.target.length,
+          },
+          {
+            label: '위험물',
+            value: 'danger',
+            count: data.dangerous.length,
+          },
+        ];
         return processMapData(data)
       } catch (error) {
         console.error(error)
@@ -385,13 +392,14 @@ const Map = (props: Props) => {
 
     updateVehicleMarkers();
     console.log("??????????????")
-    const vehicleInterval = setInterval(updateVehicleMarkers, 10000);
-    setApiInterval(vehicleInterval)
+    apiIntervalRef.current = setInterval(updateVehicleMarkers, 10000);
       })
     }
     return () => {
       kakaoMapScript.remove(); // 컴포넌트 언마운트 시 스크립트 제거
-      clearInterval(apiInterval);
+      if (apiIntervalRef.current) {
+        clearInterval(apiIntervalRef.current);
+      }
     };
   }, []);
 
@@ -431,19 +439,18 @@ const Map = (props: Props) => {
 
   const toggleCarMarkers = () => {
     vehicleMarkers.current.forEach((marker) => {
-      marker.setMap(isClickVehicle ? mapInstance.current : null);
+      marker.setMap(isVehicleActive ? mapInstance.current : null);
     });
   };
 
   const toggleRescueMarkers = () => {
-    rescueMarkers.current.forEach((marker) => {
-      marker.setMap(isClickRescuePosition ? mapInstance.current : null);
-    });
+    rescueMarkers?.current?.setMap(isRescuePositionActive ? mapInstance.current : null);
+    rescueCircles?.current?.setMap(isRescuePositionActive ? mapInstance.current : null);
   };
 
   const toggleVideoMarkers = () => {
     videoMarkers.current.forEach((marker) => {
-      marker.setMap(isClickVideo ? mapInstance.current : null);
+      marker.setMap(isVideoActive ? mapInstance.current : null);
     });
   };
 
@@ -451,6 +458,8 @@ const Map = (props: Props) => {
     dangerousMarkers.current.forEach((marker) => {
       marker.setMap(isDangerActive ? mapInstance.current : null);
     });
+    dangerOverlays.current?.setMap(null)
+    dangerOverlays.current = null
   };
 
   const toggleWarterMarkers = () => {
@@ -469,25 +478,42 @@ const Map = (props: Props) => {
     targetMarkers.current.forEach((marker) => {
       marker.setMap(isTargerActive ? mapInstance.current : null);
     });
+    targetOverlays.current?.setMap(null)
+    targetOverlays.current = null
   };
 
   useEffect(() => {
-    if (mapInstance.current) {
-      console.log(positionMarker.current)
-      positionMarker.current.setMap(null)
+    if (mapInstance.current && window.kakao) {
+      positionMarker.current?.setMap(null)
       positionMarker.current = null
+      positionOverlay.current?.setMap(null)
+      positionOverlay.current = null
+
       var imageSize = new window.kakao.maps.Size(48, 48);
-      var markerImage = createMarkerImage("도착지", imageSize, null),
+      let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
+      var markerImage = createMarkerImage("도착지", imageSize, markerOption),
       marker = createMarker(position, markerImage);
 
-      let iwContent = `<div style="padding:5px;">지휘 지정
-      <br></div>`
-      const iwRemoveable = true;
+      const content = document.createElement('div');
+      content.innerHTML = `<div class="destinationMarker-wrapper">
+                <div class="destinationMarker-label">도착지 <div class="delete-button">삭제</div></div>
+                </div>`;
 
-      const infowindow = new window.kakao.maps.InfoWindow({
-        content : iwContent,
-        removable : iwRemoveable
+      const customOverlay = new window.kakao.maps.CustomOverlay({
+        position: position,
+        content: content,
+        clickable: true,
       });
+
+      const deleteButton = content.querySelector('.delete-button');
+      if (deleteButton) {
+        deleteButton.addEventListener('click', event => {
+          customOverlay.setMap(null);
+          marker.setMap(null);
+        });
+      }
+      customOverlay?.setMap(mapInstance.current);
+      positionOverlay.current = customOverlay
 
       window.kakao.maps.event.addListener(marker, 'click', function() {
         // 마커 위에 인포윈도우를 표시합니다
@@ -511,13 +537,13 @@ const Map = (props: Props) => {
     if (mapInstance.current) {
       toggleCarMarkers();
     }
-  }, [isClickVehicle]);
+  }, [isVehicleActive]);
 
   useEffect(() => {
     if (mapInstance.current) {
       toggleVideoMarkers();
     }
-  }, [isClickVideo]);
+  }, [isVideoActive]);
 
   useEffect(() => {
     if (mapInstance.current) {
@@ -547,58 +573,109 @@ const Map = (props: Props) => {
     if (mapInstance.current) {
       toggleRescueMarkers();
     }
-  }, [isClickRescuePosition]);
+  }, [isRescuePositionActive]);
 
 
   useEffect(() => {
     carMarkers.forEach(vehicle => {
       var imageSize = new window.kakao.maps.Size(48, 48);
-      var markerImage = createMarkerImage(vehicle.type, imageSize, null),
+      let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
+      var markerImage = createMarkerImage(vehicle.type, imageSize, markerOption),
       marker = createMarker(vehicle.location, markerImage);
       vehicleMarkers.current.push(marker);
-      if (isClickVehicle) marker.setMap(mapInstance.current);
+      if (isVehicleActive) marker.setMap(mapInstance.current);
     });
   },[carMarkers])
 
   useEffect(() => {
     rescueMarker.forEach(rescue => {
-      var imageSize = new window.kakao.maps.Size(48, 48);
-      var markerImage = createMarkerImage(rescue.type, imageSize, null),
-      marker = createMarker(rescue.location, markerImage);
-      rescueMarkers.current.push(marker);
-      if (isClickRescuePosition) marker.setMap(mapInstance.current);
+        let markerSize = new window.kakao.maps.Size(191, 191); // 마커이미지의 크기입니다
+        let markerOption = { offset: new window.kakao.maps.Point(191 / 2, 191 / 2) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+        var markerImage = createMarkerImage(rescue.type, markerSize, markerOption),
+        marker = createMarker(rescue.location, markerImage);
+        marker.setClickable(false);
+
+        let circle = new window.kakao.maps.Circle({
+          center : rescue.location,  // 원의 중심좌표 입니다 
+          radius: 200, // 미터 단위의 원의 반지름입니다 
+          strokeWeight: 2, // 선의 두께입니다 
+          strokeColor: '#DE9898', // 선의 색깔입니다
+          strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+          strokeStyle: 'solid', // 선의 스타일 입니다
+          fillColor: '#DE9898', // 채우기 색깔입니다
+          fillOpacity: 0.7  // 채우기 불투명도 입니다   
+        }); 
+        rescueMarkers.current = marker;
+        rescueCircles.current = circle
+      if (isRescuePositionActive) {
+        marker.setMap(mapInstance.current)
+        circle.setMap(mapInstance.current);
+      };
     });
   },[rescueMarker])
 
   useEffect(() => {
     videoMarker.forEach(rescue => {
       var imageSize = new window.kakao.maps.Size(48, 48);
-      var markerImage = createMarkerImage(rescue.type, imageSize, null),
+      let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
+      var markerImage = createMarkerImage(rescue.type, imageSize, markerOption),
       marker = createMarker(rescue.location, markerImage);
       videoMarkers.current.push(marker);
-      if (isClickVideo) marker.setMap(mapInstance.current);
+      if (isVideoActive) marker.setMap(mapInstance.current);
     });
   },[videoMarker])
 
   useEffect(() => {
     dangerousMarker.forEach(rescue => {
       var imageSize = new window.kakao.maps.Size(48, 48);
-      var markerImage = createMarkerImage(rescue.type, imageSize, null),
+      let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
+      var markerImage = createMarkerImage(rescue.type, imageSize, markerOption),
       marker = createMarker(rescue.location, markerImage);
       dangerousMarkers.current.push(marker);
       
-      let iwContent = `<div style="padding:5px;">${rescue?.obj_nm && rescue.obj_nm}(${rescue?.mnfctretc_detail_se_cd_nm && rescue?.mnfctretc_detail_se_cd_nm})
-      <br><a href="neighborhood?type=facilities&id=${router.query.id}&build_sn=${rescue?.build_sn}" style="color:blue" >위험물 정보</a></div>`
-      const iwRemoveable = true;
+      const content = document.createElement('div');
+      content.className = "overlay-container"
+      content.innerHTML = `<div class="container">
+                            <div class="header">
+                              <span class="title">${rescue?.obj_nm && rescue.obj_nm}</span>
+                              <span class="subtitle">${rescue?.mnfctretc_detail_se_cd_nm && rescue?.mnfctretc_detail_se_cd_nm}</span>
+                              <button class="close-button">&times;</button>
+                            </div>
+                            <div class="footer">
+                              <button class="action-button">위험물 정보</button>
+                            </div>
+                          </div>`;
 
-      const infowindow = new window.kakao.maps.InfoWindow({
-        content : iwContent,
-        removable : iwRemoveable
+      const customOverlay = new window.kakao.maps.CustomOverlay({
+        position: rescue.location,
+        content: content,
+        xAnchor: 0.5,
+        yAnchor: 1.35,
+        clickable: true,
       });
 
+      const actionButton = content.querySelector('.action-button');
+      if(actionButton){
+        actionButton.addEventListener('click', () => {
+          const url = `neighborhood?type=facilities&id=${router.query.id}&build_sn=${rescue?.build_sn}`;
+          window.location.href = url;
+        });
+      }
+
+      const deleteButton = content.querySelector('.close-button');
+      if (deleteButton) {
+        deleteButton.addEventListener('click', event => {
+          customOverlay.setMap(null);
+        });
+      }
+
       window.kakao.maps.event.addListener(marker, 'click', function() {
-        // 마커 위에 인포윈도우를 표시합니다
-        infowindow.open(mapInstance.current, marker);  
+        dangerOverlays.current?.setMap(null)
+        dangerOverlays.current = null
+        targetOverlays.current?.setMap(null)
+        targetOverlays.current = null
+        customOverlay?.setMap(mapInstance.current);
+        dangerOverlays.current = customOverlay;
       });
       
       if (isDangerActive) marker.setMap(mapInstance.current);
@@ -608,7 +685,8 @@ const Map = (props: Props) => {
   useEffect(() => {
     hydrantMarker.forEach(rescue => {
       var imageSize = new window.kakao.maps.Size(48, 48);
-      var markerImage = createMarkerImage(rescue.type, imageSize, null),
+      let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
+      var markerImage = createMarkerImage(rescue.type, imageSize, markerOption),
       marker = createMarker(rescue.location, markerImage);
       hydrantMarkers.current.push(marker);
       if (isWaterActive) marker.setMap(mapInstance.current);
@@ -618,7 +696,8 @@ const Map = (props: Props) => {
   useEffect(() => {
     fireExtinguisherMarker.forEach(rescue => {
       var imageSize = new window.kakao.maps.Size(48, 48);
-      var markerImage = createMarkerImage(rescue.type, imageSize, null),
+      let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
+      var markerImage = createMarkerImage(rescue.type, imageSize, markerOption),
       marker = createMarker(rescue.location, markerImage);
       fireExtinguisherMarkers.current.push(marker);
       if (isExtinguisherActive) marker.setMap(mapInstance.current);
@@ -628,43 +707,61 @@ const Map = (props: Props) => {
   useEffect(() => {
     targetMarker.forEach(rescue => {
       var imageSize = new window.kakao.maps.Size(48, 48);
-      var markerImage = createMarkerImage(rescue.type, imageSize, null),
+      let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
+      var markerImage = createMarkerImage(rescue.type, imageSize, markerOption),
       marker = createMarker(rescue.location, markerImage);
       targetMarkers.current.push(marker);
+      
+      const content = document.createElement('div');
+      content.className = "overlay-container"
+      content.innerHTML = `<div class="container">
+                            <div class="header">
+                              <span class="title">${rescue?.obj_nm && rescue.obj_nm}</span>
+                              <span class="subtitle">${rescue?.mnfctretc_detail_se_cd_nm && rescue?.mnfctretc_detail_se_cd_nm}</span>
+                              <button class="close-button">&times;</button>
+                            </div>
+                            <div class="footer">
+                              <button class="action-button">대상물 정보</button>
+                            </div>
+                          </div>`;
 
-      let iwContent = `<div style="padding:5px;">${rescue?.obj_nm && rescue.obj_nm}(${rescue?.mnfctretc_detail_se_cd_nm && rescue?.mnfctretc_detail_se_cd_nm})
-      <br><a href="neighborhood?type=facilities&id=${router.query.id}&build_sn=${rescue?.build_sn}" style="color:blue" >위험물 정보</a></div>`
-      const iwRemoveable = true;
+      //<a href="neighborhood?type=facilities&id=${router.query.id}&build_sn=${rescue?.build_sn}" style="color:blue" >위험물 정보</a></div>`
 
-      const infowindow = new window.kakao.maps.InfoWindow({
-        content : iwContent,
-        removable : iwRemoveable
+      const customOverlay = new window.kakao.maps.CustomOverlay({
+        position: rescue.location,
+        content: content,
+        xAnchor: 0.5,
+        yAnchor: 1.35,
+        clickable: true,
       });
 
+      const actionButton = content.querySelector('.action-button');
+      if(actionButton){
+        actionButton.addEventListener('click', () => {
+          const url = `neighborhood?type=facilities&id=${router.query.id}&build_sn=${rescue?.build_sn}`;
+          window.location.href = url;
+        });
+      }
+
+      const deleteButton = content.querySelector('.close-button');
+      if (deleteButton) {
+        deleteButton.addEventListener('click', event => {
+          customOverlay.setMap(null);
+        });
+      }
+
       window.kakao.maps.event.addListener(marker, 'click', function() {
-        // 마커 위에 인포윈도우를 표시합니다
-        infowindow.open(mapInstance.current, marker);  
+        targetOverlays.current?.setMap(null)
+        targetOverlays.current = null
+        dangerOverlays.current?.setMap(null)
+        dangerOverlays.current = null
+        customOverlay?.setMap(mapInstance.current);
+        targetOverlays.current = customOverlay;
       });
       
       if (isTargerActive) marker.setMap(mapInstance.current);
     });
   },[targetMarker])
-
-  useEffect(() => {
-    if (isClickCompassButton) {
-      const content = `<svg xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 76 76" fill="none">
-      <circle opacity=".2" cx="37.594" cy="37.594" r="28" transform="rotate(26.693 37.594 37.594)" fill="#9747FF"/>
-      <path d="M35.822 29.987 44.78 23.3l-.025 11.18-8.934-4.492Z" fill="#9747FF"/>
-      <circle cx="37.594" cy="37.594" r="8" transform="rotate(26.693 37.594 37.594)" fill="#9747FF" stroke="#fff" stroke-width="4"/>
-    </svg>`;
-      const position = new window.kakao.maps.LatLng(37.51535, 127.08517);
-      const customOverlay = new window.kakao.maps.CustomOverlay({
-        position,
-        content,
-      });
-      customOverlay.setMap(mapInstance.current);
-    }
-  },[isClickCompassButton])
 
   function createMarker(position: any, image: any) {
     var marker = new window.kakao.maps.Marker({
@@ -693,13 +790,13 @@ const Map = (props: Props) => {
         <VehicleStatus />
         <Wrapper deviceType={deviceType}>
           <MapWrapper deviceType={deviceType} ref={mapContainer}>
-            <FloatingButtons isClickRescuePosition={isClickRescuePosition} isClickVideo={isClickVideo} changeStatus={changeStatus} isClickVehicle={isClickVehicle} hasSkyButton={hasSky} setHasSky={setHasSky}/>
+            <FloatingButtons vihicleMarkerCount={carMarkers.length} videoMarkerCount={videoMarker.length} isClickRescuePosition={isRescuePositionActive} isClickVideo={isVideoActive} changeStatus={changeStatus} isClickVehicle={isVehicleActive} hasSkyButton={hasSky} setHasSky={setHasSky}/>
             <Stack spacing="16px" position={deviceType === 'tabletHorizontal' ? 'fixed' : 'fixed'} left={deviceType === 'tabletHorizontal' ? '331px' : '16px'} bottom={deviceType === 'tabletHorizontal' ? '120px' : '97px'} zIndex={10}>
-              <CircleButton onClick={() => setIsClickCompassButton(prev => !prev)}>
-                <IconWrapper width="24px" height="24px" color={theme.colors.gray}>
-                  <CompassIcon />
-                </IconWrapper>
-              </CircleButton>
+            <CircleButton>
+              <IconWrapper width="24px" height="24px" color={theme.colors.gray}>
+                <Satellite />
+              </IconWrapper>
+            </CircleButton>
               <CircleButton
                 onClick={() => {
                   mapInstance.current.setCenter(new window.kakao.maps.LatLng(props.latitude, props.longitude));
@@ -714,10 +811,30 @@ const Map = (props: Props) => {
         </Wrapper>
         <NavbarWrapper>
           {deviceType === 'tabletHorizontal' && (
-            <DrawerButtons isClickWater={isWaterActive} isClickTarget={isTargerActive} isClickDanger={isDangerActive} isExtinguisherMarkerActive={isExtinguisherActive} changeStatus={changeStatus} />
+            <DrawerButtons 
+              warterMarkerCount={hydrantMarker.length} 
+              extinguisherMarkerCount={fireExtinguisherMarker.length}
+              targerMarkerCount={targetMarker.length}
+              dangerMarkerCount={dangerousMarker.length}
+              isClickWater={isWaterActive} 
+              isClickTarget={isTargerActive} 
+              isClickDanger={isDangerActive} 
+              isExtinguisherMarkerActive={isExtinguisherActive} 
+              changeStatus={changeStatus} 
+            />
           )}
           {deviceType !== 'tabletHorizontal' && (
-            <DrawerButtons isClickWater={isWaterActive} isClickTarget={isTargerActive} isClickDanger={isDangerActive} isExtinguisherMarkerActive={isExtinguisherActive} changeStatus={changeStatus} />
+            <DrawerButtons 
+              warterMarkerCount={hydrantMarker.length} 
+              extinguisherMarkerCount={fireExtinguisherMarker.length}
+              targerMarkerCount={targetMarker.length}
+              dangerMarkerCount={dangerousMarker.length}
+              isClickWater={isWaterActive} 
+              isClickTarget={isTargerActive} 
+              isClickDanger={isDangerActive} 
+              isExtinguisherMarkerActive={isExtinguisherActive} 
+              changeStatus={changeStatus} 
+            />
           )}
           <Navbar />
         </NavbarWrapper>
@@ -781,6 +898,104 @@ const Container = styled.div<{ deviceType: DeviceType }>`
       `
     );
   }}
+  .destinationMarker-wrapper {
+    position: relative;
+  }
+  .destinationMarker-label {
+    display: flex;
+    position: absolute;
+    width: fit-content;
+    bottom: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    gap: 4px;
+    border-radius: 4px;
+    border: 1px solid ${theme.colors.gray2};
+    background-color: ${theme.colors.white};
+    color: #e57878;
+    font-family: 'Pretendard Bold';
+    font-size: 12px;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: -0.24px;
+  }
+
+  .delete-button {
+    color: ${theme.colors.darkBlue};
+  }
+
+  .container {
+    font-family: 'Arial', sans-serif;
+    background-color: white;
+    position: relative;
+    width: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .content {
+    padding: 16px;
+    position: relative;
+  }
+  
+  .title {
+    margin-right: 30px;
+    display: block;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 8px 8px;/* Space between title and subtitle */
+  }
+  
+  .subtitle {
+    padding: 2px 8px;
+    display: block;
+    font-size: 0.875em;
+    color: #6c757d;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 2px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+  }
+  
+  .footer {
+    padding: 8px 8px; /* Reduced vertical padding */
+    display: flex;
+    align-items: center; /* Aligns button vertically */
+  }
+  
+  .action-button {
+    padding: 4px 8px; /* Adjust as needed */
+    font-size: 1em;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px; /* Rounded corners for the button */
+    cursor: pointer;
+  }
+
+  .overlay-container:after{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 14px solid transparent;
+    border-top-color: white;
+    border-bottom: 0;
+    margin-left: -14px;
+    margin-bottom: -14px;
+  }
 `;
 
 const Wrapper = styled.div<{ deviceType?: DeviceType }>`

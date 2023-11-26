@@ -9,9 +9,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setIsDangerMarkerActive, setIsExtinguisherMarkerActive, setIsTargetMarkerActive, setIsWaterMarkerActive } from '../../features/slice/disasterSlice';
 import { RootState } from '../../app/store';
 
+export interface MarkerType{
+  label:string;
+  value:string;
+  count:number;
+}
+
 interface Props {
-  distances: number[];
-  items: { label: string; value: string; count: number; hasRefreshButton?: boolean }[];
+  items:MarkerType[];
 }
 
 //TODO 지도 하단 소화전, 비상소화장치, 대상물, 위험물 등, 미터, 피난약자, 과거이력 제거
@@ -23,17 +28,6 @@ const ObjectPosition = (props: Props) => {
   const isExtinguisherActive = useSelector((state: RootState) => state.disaster.isExtinguisherMarkerActive);
   const isTargetActive = useSelector((state: RootState) => state.disaster.isTargetMarkerActive);
   const isDangerActive = useSelector((state: RootState) => state.disaster.isDangerMarkerActive);
-
-  const [activeItems, setActiveItems] = useState<Record<string, boolean>>({});
-  const [query, setQuery] = useQueryParams({
-    distance: NumberParam,
-    water: withDefault(StringParam, 'false'),
-    extinguisher: withDefault(StringParam, 'false'),
-    target: withDefault(StringParam, 'false'),
-    danger: withDefault(StringParam, 'false'),
-    vulnerble: withDefault(StringParam, 'false'),
-    history: withDefault(StringParam, 'false'),
-  });
 
   const toggleMarker = (type: string) => {
     if (type === 'water') dispatch(setIsWaterMarkerActive(!isWaterActive));
@@ -69,13 +63,6 @@ const ObjectPosition = (props: Props) => {
               >
                 <Text>{item.label}</Text>
                 <Flex align="center" gap="4px">
-                  {item.hasRefreshButton && (
-                    <button onClick={() => {}}>
-                      <IconWrapper width="16px" height="16px" color={theme.colors.gray}>
-                        <ReFreshIcon />
-                      </IconWrapper>
-                    </button>
-                  )}
                   <NumberOfItem>{item.count}건</NumberOfItem>
                 </Flex>
               </ObjectItem>
@@ -90,7 +77,6 @@ const ObjectPosition = (props: Props) => {
 export default ObjectPosition;
 
 ObjectPosition.defaultProps = {
-  distances: [20, 40, 80, 200],
   items: [
     {
       label: '소화전',
@@ -101,7 +87,6 @@ ObjectPosition.defaultProps = {
       label: '비상소화장치',
       value: 'extinguisher',
       count: 3,
-      hasRefreshButton: true,
     },
     {
       label: '대상물',

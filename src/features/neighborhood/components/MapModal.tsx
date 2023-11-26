@@ -9,6 +9,8 @@ import { useRouter } from 'next/router';
 
 interface Props {
   setIsMapModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  gis_x_4326:string | number;
+  gis_y_4326:string | number;
 }
 
 const MapModal = (props: Props) => {
@@ -24,7 +26,7 @@ const MapModal = (props: Props) => {
           <Button color={theme.colors.gray5} onClick={() => props.setIsMapModalOpen(false)}>
             취소
           </Button>
-          <Button color={theme.colors.orange} onClick={() => router.push('/detail/map')}>
+          <Button color={theme.colors.orange} onClick={() => router.push(`/detail/map?gis_x=${props.gis_x_4326}&gis_y=${props.gis_y_4326}`)}>
             확인
           </Button>
         </Flex>

@@ -18,7 +18,7 @@ import ChevronRightIcon from '../../../public/images/icons/chevron-right.svg';
 import { useEffect, useState } from 'react';
 import { KakaoUtil, Position } from '@/features/Map/kakaoUtil';
 import FloatingButtons from '@/features/Map/FloatingButtons';
-import ObjectPosition from '@/features/Map/ObjectPosition';
+import ObjectPosition, { MarkerType } from '@/features/Map/ObjectPosition';
 import MiniMap from '@/features/Map/MiniMap';
 import TestMap from '@/features/Map/TestMap';
 import { NextPageContext } from 'next';
@@ -40,6 +40,8 @@ const DetailPage = () => {
     //출동대 편성 데이터는 OrganizationItem 컴포넌트에
   })
 
+  const [markerCount, setMarkerCount] = useState<MarkerType[]>([])
+
   useEffect(() => {
     if (id && !isPollingActive()) {
       fetchDisasterDetail(id);
@@ -55,10 +57,10 @@ const DetailPage = () => {
   return (
     <Layout>
       <Flex direction="column" height="100%" background={deviceType === 'tabletHorizontal' ? theme.colors.white : theme.colors.gray1}>
-        {deviceType === 'mobile' && <Menu status={"progress"} title={data?.eventName} timestamp={data?.created} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />}
+        {deviceType === 'mobile' && <Menu status={data?.status} title={data?.eventName} timestamp={data?.created} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />}
         {deviceType !== 'mobile' && (
           <MenuWrapper deviceType={deviceType}>
-            <Menu title={data?.eventName} status="progress" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push("/home")} onCloseButton={() => router.push('/')} timestamp={data?.created} contentAlign="space-between" />
+            <Menu title={data?.eventName} status={data?.status} hasCloseButtonWithoutString={false} onClickBackButton={() => router.push("/home")} onCloseButton={() => router.push('/')} timestamp={data?.created} contentAlign="space-between" />
           </MenuWrapper>
         )}
         <AddressTabWrapper deviceType={deviceType}>
@@ -85,7 +87,7 @@ const DetailPage = () => {
               {deviceType === 'mobile' && <Neighborhood />}
               {deviceType === 'tabletVertical' && (
                 <Box height="424px" borderRadius="8px" overflow="hidden">
-                  <MiniMap deviceType={deviceType} />
+                  <TestMap deviceType={deviceType} setMarkerCount={setMarkerCount} />
                 </Box>
               )}
             </Stack>
@@ -93,10 +95,10 @@ const DetailPage = () => {
               <Flex gap="24px" direction="column" h="100%" flex={1} p="24px 16px" bg={theme.colors.gray1}>
                 <Box flex={2}>
                   {/* <MiniMap deviceType={deviceType} /> */}
-                  <TestMap deviceType={deviceType} />
+                  <TestMap deviceType={deviceType} setMarkerCount={setMarkerCount} />
                 </Box>
                 <Box flex={1}>
-                  <ObjectPosition />
+                  <ObjectPosition items={markerCount} />
                 </Box>
               </Flex>
             )}

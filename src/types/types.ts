@@ -34,6 +34,17 @@ type CarMoveType = {
   dsrSeq:string;
 }
 
+export interface UserInformation {
+  userId: string;
+  userName: string;
+  classCd: string;
+  wardId: string;
+  wardName: string;
+  deviceTel: string;
+  fcmToken: string;
+  authUserPw: string;
+}
+
 export type EmergencyReportType = {
   ctlDesc:string[];
   ctlSeq:number[];

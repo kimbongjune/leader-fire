@@ -18,6 +18,8 @@ interface Props {
   hasSkyButton?: boolean;
   changeStatus: (value: string) => void;
   setHasSky?: (hasSky: boolean) => void;
+  vihicleMarkerCount:number;
+  videoMarkerCount:number;
 }
 
 interface SkyButtonProps {
@@ -48,7 +50,7 @@ const FloatingButtons = (props: Props) => {
               </IconWrapper>
               <ButtonText deviceType={deviceType}>출동차량</ButtonText>
             </Flex>
-            <Count>2</Count>
+            <Count>{props.vihicleMarkerCount}</Count>
           </Button>
 
           <Button deviceType={deviceType} colorType="blue" status={props.isClickVideo} onClick={() => props.changeStatus('video')}>
@@ -58,7 +60,7 @@ const FloatingButtons = (props: Props) => {
               </IconWrapper>
               <ButtonText deviceType={deviceType}>영상공유</ButtonText>
             </Flex>
-            <Count>10</Count>
+            <Count>{props.videoMarkerCount}</Count>
           </Button>
         </Flex>
         {deviceType !== 'mobile' && props.hasSkyButton != null && props.setHasSky != undefined && (
