@@ -45,7 +45,7 @@ type OutlineData = {
 const SOPContainer = (props: Props) => {
   const { deviceType } = props;
   const router = useRouter();
-  const [query, setQuery] = useQueryParams({ index: NumberParam, menu: StringParam, search: StringParam, page:NumberParam});
+  const [query, setQuery] = useQueryParams({ index: NumberParam, menu: StringParam, search: StringParam, page:NumberParam, id:StringParam});
   const [tableContents, setTableContents] = useState<OutlineData[]>([]);
   const [numPages, setNumPages] = useState(0); // 총 페이지수
   const [pageScale, setPageScale] = useState(1);
@@ -200,6 +200,7 @@ const SOPContainer = (props: Props) => {
   const id = router.query.id as string;
   const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
+  console.log(query)
   // 데이터 패칭 임시 코드
   useEffect(() => {
     if (query.menu === 'SOP') {

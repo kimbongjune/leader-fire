@@ -29,7 +29,7 @@ const Navbar = () => {
   const isDetailPage = router.route.includes('detail');
 
   // console.log("isDetailPage",isDetailPage)
-  // console.log("detailId",detailId)
+  console.log("detailId",detailId)
 
   const datas: DataType[] = [
     { icon: <Home />, text: '홈', route: isDetailPage? `/detail/${detailId}` : '/home', active: '/home' },
