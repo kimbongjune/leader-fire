@@ -31,7 +31,7 @@ const EventStatus = (props: Props) => {
           <PhoneInTalk width={24} height={24} />
         </Circle>
       )}
-      {props.reportCount > 1 && props.reportCount <= 5 && <Circle eventType={props.eventType}>{props.reportCount}+</Circle>}
+      {props.reportCount > 1 && props.reportCount <= 5 && <Circle eventType={props.eventType}>{props.reportCount}</Circle>}
       {props.reportCount > 5 && <Circle eventType={props.eventType}>5+</Circle>}
       {props.status === 'progress' && (
         <Text eventType={props.eventType} status={props.status}>
