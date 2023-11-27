@@ -57,10 +57,10 @@ const DetailPage = () => {
   return (
     <Layout>
       <Flex direction="column" height="100%" background={deviceType === 'tabletHorizontal' ? theme.colors.white : theme.colors.gray1}>
-        {deviceType === 'mobile' && <Menu status={data?.status} title={data?.eventName} timestamp={data?.created} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />}
+        {deviceType === 'mobile' && <Menu status={data?.status} title={data?.eventName} timestamp={data?.created!!} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />}
         {deviceType !== 'mobile' && (
           <MenuWrapper deviceType={deviceType}>
-            <Menu title={data?.eventName} status={data?.status} hasCloseButtonWithoutString={false} onClickBackButton={() => router.push("/home")} onCloseButton={() => router.push('/')} timestamp={data?.created} contentAlign="space-between" />
+            <Menu title={data?.eventName} status={data?.status} hasCloseButtonWithoutString={false} onClickBackButton={() => router.push("/home")} onCloseButton={() => router.push('/')} timestamp={data?.created!!} contentAlign="space-between" />
           </MenuWrapper>
         )}
         <AddressTabWrapper deviceType={deviceType}>

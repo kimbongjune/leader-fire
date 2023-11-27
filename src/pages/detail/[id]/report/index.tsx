@@ -10,7 +10,6 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { RootState } from '../../../../app/store';
 import { shallowEqual, useSelector } from 'react-redux';
-import { DispatchItemType } from '../../../../types/types';
 import { selectDisasterById } from '@/features/slice/test';
 
 interface Props {

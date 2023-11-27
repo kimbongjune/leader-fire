@@ -21,13 +21,14 @@ export type DispatchItemType = {
     lawAddr: string;
     roadAddr:string;
     procCd:string;
-    gisX:string;
-    gisY:string;
+    gisX:number;
+    gisY:number;
     dFstRegSeq:string;
-    callTell:string
-    description: string;
-    created: string;
+    callTell:string | null
+    description: string | null
+    created: string | null
     isNew?: boolean;
+    hasRead:boolean;
   };
 
 type CarMoveType = {
@@ -795,4 +796,46 @@ type DanMnfctretcTankDataListResultList = {
   atmcclsdevice: string
   hoprclsdevice: string
   undgrndtank_at: string
+}
+
+export type DisasterInformation = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  totalCount: number
+  result: DisasterInformationResult
+}
+
+type DisasterInformationResult = {
+  CmDsrCallDto: CmDsrCallDto
+}
+
+type CmDsrCallDto = {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: CmDsrCallDtoResult[]
+}
+
+type CmDsrCallDtoResult = {
+  dsrSeq: string
+  dsrKndCd: string
+  dsrClsCd: string
+  wardId: string
+  seoWardName: string
+  jurisWardId: string
+  semiWardName: string
+  procCd: string
+  lawAddr: string
+  roadAddr: string
+  statEndDtime: string
+  gisX: number
+  gisY: number
+  dFstRegSeq: string
+  regDtime: string
+  callContent: string
+  callTel: string
+  sameCall: number
+  chkYn: string | null
+  viewYn: string | null
 }

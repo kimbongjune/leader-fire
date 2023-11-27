@@ -30,13 +30,13 @@ const TabletPage = (props: Props) => {
     <Layout>
       <Flex direction="column" height="100%">
         <MenuWrapper deviceType={deviceType}>
-          <Menu title={selectedDisaster?.eventName} status="progress" timestamp={selectedDisaster?.created} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />
+          <Menu title={selectedDisaster?.eventName} status="progress" timestamp={selectedDisaster?.created!!} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />
         </MenuWrapper>
         <AddressTabWrapper deviceType={deviceType}>
           <AddressTab address={selectedDisaster?.lawAddr} />
         </AddressTabWrapper>
         <Children>
-        <iframe src={`http://view2.gnfire.go.kr:8887/chat/${selectedDisaster?.dsrSeq}/0/1?gubun=4`} width="100%" height="100%"></iframe>
+        <iframe src={`https://view2.gnfire.go.kr:8887/chat/${selectedDisaster?.dsrSeq}/0/1?gubun=4`} width="100%" height="100%"></iframe>
         </Children>
       </Flex>
     </Layout>

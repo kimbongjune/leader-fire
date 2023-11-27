@@ -11,6 +11,8 @@ interface DisasterState {
   isRescuePositionActive :boolean;
   isVehicleActive : boolean;
   isVideoActive : boolean;
+  searchStartDate:string;
+  searchEndDate:string;
 }
 
 const initialState: DisasterState = {
@@ -27,12 +29,13 @@ const initialState: DisasterState = {
     lawAddr: '',
     roadAddr: '',
     procCd: '',
-    gisX: '',
-    gisY: '',
+    gisX: 0.0,
+    gisY: 0.0,
     dFstRegSeq: '',
     callTell: '',
     description: '',
-    created: ''
+    created: '',
+    hasRead : false,
   },
   isWaterMarkerActive: false,
   isExtinguisherMarkerActive: false,
@@ -40,7 +43,9 @@ const initialState: DisasterState = {
   isDangerMarkerActive: false,
   isRescuePositionActive:false,
   isVehicleActive:false,
-  isVideoActive:false
+  isVideoActive:false,
+  searchStartDate : "",
+  searchEndDate : ""
 };
 
 export const disasterSlice = createSlice({
@@ -73,6 +78,12 @@ export const disasterSlice = createSlice({
     },
     setIsVideoActive: (state, action: PayloadAction<boolean>) => {
       state.isVideoActive = action.payload;
+    },
+    setSearchStartDate: (state, action: PayloadAction<string>) => {
+      state.searchStartDate = action.payload;
+    },
+    setSearchEndDate: (state, action: PayloadAction<string>) => {
+      state.searchEndDate = action.payload;
     }
   },
 });
@@ -86,6 +97,8 @@ export const {
   setSubDisasterInformation,
   setIsRescuePositionActive,
   setIsVehicleActive,
-  setIsVideoActive
+  setIsVideoActive,
+  setSearchStartDate,
+  setSearchEndDate
 } = disasterSlice.actions;
 export default disasterSlice.reducer;

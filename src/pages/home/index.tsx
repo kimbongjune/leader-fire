@@ -21,6 +21,7 @@ const HomePage = () => {
 
   
   const testData = useSelector((state: RootState) => state.disaster.disasterInformation);
+  console.log(testData)
 
   if (!deviceType) return null;
 

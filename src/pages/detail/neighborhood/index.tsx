@@ -32,7 +32,7 @@ const Neighborhood = (props: Props) => {
       <Container>
         <div>
           <MenuWrapper deviceType={deviceType}>
-            <Menu title={data?.eventName} timestamp={data?.created} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
+            <Menu title={data?.eventName} timestamp={data?.created!!} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
           </MenuWrapper>
           <AddressTabWrapper deviceType={deviceType}>
             <AddressTab address={data?.lawAddr} />

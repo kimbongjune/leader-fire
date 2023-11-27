@@ -1,7 +1,6 @@
 import { createSelector } from 'reselect';
 import { RootState } from '../../app/store';
 import { disasterSlice } from '../../features/slice/disasterSlice';
-import { DispatchItemType } from '@/types/types';
 
 const selectDisasterState = (state: RootState) => state.disaster;
 
