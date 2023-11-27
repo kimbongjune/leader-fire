@@ -125,8 +125,9 @@ const SearchDispatch = (props: Props) => {
     label: `${i.toString().padStart(2, '0')}:00`
   }));
 
+  console.log(props.countByType)
 
-  const count = (Object.entries(props.countByType) as [keyof CountByType, number][])
+  const count = (Object.entries(props.countByType || {}) as [keyof CountByType, number][])
   .map(([key, value]) => `${typeMapping[key]} ${value}`)
   .join(', ');
 

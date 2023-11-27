@@ -12,7 +12,7 @@ const HomeFilter = (props: Props) => {
   const { deviceType } = props;
   return (
     <Wrapper deviceType={deviceType}>
-      <Filter queryKey="type" filterNames={['fires', 'rescue', 'firstAid', 'others']} filterItem={FilterProps => <HomeFilterItem {...FilterProps} deviceType={deviceType} countByType={props.countByType} />} />
+      <Filter queryKey="type" filterNames={['fires', 'rescue', 'firstAid', 'others']} filterItem={FilterProps => <HomeFilterItem {...FilterProps} deviceType={deviceType} countByType={props?.countByType} />} />
     </Wrapper>
   );
 };

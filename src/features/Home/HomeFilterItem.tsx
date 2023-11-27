@@ -51,34 +51,34 @@ const HomeFilterItem = (props: Props) => {
       // 다른 타입이 선택된 경우, URL에 타입 추가
       router.push({
         pathname: router.pathname,
-        query: { ...router.query, type: props.filterName }
+        query: { ...router.query, type: props?.filterName }
       });
     }
   };
 
   return (
-    <Wrapper onClick={handleClick} isSelected={selectedType === props.filterName} type={props.filterName} deviceType={deviceType}>
+    <Wrapper onClick={handleClick} isSelected={selectedType === props?.filterName} type={props?.filterName} deviceType={deviceType}>
       {/* {(deviceType === 'mobile' || deviceType === 'tabletVertical') && ( */}
       <Stack align="center" justify="center" spacing={deviceType === 'mobile' ? '8px' : '16px'} direction={deviceType === 'mobile' ? 'column' : 'row'}>
         <Stack align="center" spacing="4px" direction={deviceType === 'mobile' ? 'column' : 'row'}>
-          <IconWrapper width={deviceType === 'mobile' ? '20px' : '32px'} height={deviceType === 'mobile' ? '20px' : '32px'} color={getColor(props.filterName)}>
-            {props.filterName === 'fires' && <Fires />}
-            {props.filterName === 'rescue' && <Rescue />}
-            {props.filterName === 'firstAid' && <FirstAid />}
-            {props.filterName === 'others' && <Others />}
+          <IconWrapper width={deviceType === 'mobile' ? '20px' : '32px'} height={deviceType === 'mobile' ? '20px' : '32px'} color={getColor(props?.filterName)}>
+            {props?.filterName === 'fires' && <Fires />}
+            {props?.filterName === 'rescue' && <Rescue />}
+            {props?.filterName === 'firstAid' && <FirstAid />}
+            {props?.filterName === 'others' && <Others />}
           </IconWrapper>
           <Text deviceType={deviceType}>
-            {props.filterName === 'fires' && '화재'}
-            {props.filterName === 'rescue' && '구조'}
-            {props.filterName === 'firstAid' && '구급'}
-            {props.filterName === 'others' && '기타'}
+            {props?.filterName === 'fires' && '화재'}
+            {props?.filterName === 'rescue' && '구조'}
+            {props?.filterName === 'firstAid' && '구급'}
+            {props?.filterName === 'others' && '기타'}
           </Text>
         </Stack>
-        <NumberOfItems isZero={props.countByType[`${props.filterName}`] === 0} deviceType={deviceType}>
-          {props.filterName === 'fires' && props.countByType['fires']}
-          {props.filterName === 'rescue' && props.countByType['rescue']}
-          {props.filterName === 'firstAid' && props.countByType['firstAid']}
-          {props.filterName === 'others' && props.countByType['others']}
+        <NumberOfItems isZero={!props.countByType || props.countByType[`${props?.filterName}`] === 0} deviceType={deviceType}>
+          {props?.filterName === 'fires' && props?.countByType && props.countByType['fires']}
+          {props?.filterName === 'rescue' && props?.countByType && props.countByType['rescue']}
+          {props?.filterName === 'firstAid' && props?.countByType && props.countByType['firstAid']}
+          {props?.filterName === 'others' && props?.countByType && props.countByType['others']}
         </NumberOfItems>
       </Stack>
       {/* )} */}

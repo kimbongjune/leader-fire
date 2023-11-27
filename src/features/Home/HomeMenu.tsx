@@ -41,7 +41,7 @@ const HomeMenu = (props: Props) => {
 
   const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
 
-  const countByType: CountByType = props.testData.reduce(
+  const countByType: CountByType = props.testData?.reduce(
     (res, dispatch) => {
       res[dispatch.type] = (res[dispatch.type] || 0) + 1;
       return res;
@@ -154,7 +154,7 @@ const HomeMenu = (props: Props) => {
             </DrawerBody>
           </DrawerContent>
         </Drawer>
-        <SearchDispatch deviceType={deviceType} countByType={countByType} NumberOfEmergencyDispatches={props.testData.length} />
+        <SearchDispatch deviceType={deviceType} countByType={countByType} NumberOfEmergencyDispatches={props.testData?.length} />
       </Container>
       {query === 'setting' && <UserSettingModal phoneNumber={userInfo?.deviceTel} isOpen={query === 'setting'} onClose={() => handleCloseModal()} onClick={() => handleSettingClickOkButton()} />}
       {query === 'token' && <TokenRefreshModal existingToken={userInfo?.fcmToken} isOpen={query === 'token'} onClose={() => handleCloseModal()} onClick={() => handleFcmTokenClickOkButton()} />}

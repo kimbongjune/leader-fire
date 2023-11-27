@@ -12,8 +12,6 @@ interface Props {
 }
 
 const Calendar = (props: Props) => {
-  const [selectedDate, setSelectedDate] = useState(props.date);
-
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;

@@ -29,21 +29,20 @@ const DispatchList = (props: Props) => {
   // 리스트 필터링
   const filteredList = useMemo(() => {
     if (type === undefined) return props.dispatchLists;
-    return props.dispatchLists.filter(dispatch => dispatch.type === type);
+    return props.dispatchLists?.filter(dispatch => dispatch.type === type);
   }, [type, props.dispatchLists]);
 
   const unreadDsrSeqs = useMemo(() => {
-    return props.dispatchLists
-      .filter(dispatch => !dispatch.hasRead)
+    return props.dispatchLists?.filter(dispatch => !dispatch.hasRead)
       .map(dispatch => dispatch.dsrSeq);
   }, [props.dispatchLists]);
 
-  const hasUnread = useMemo(() => unreadDsrSeqs.length > 0, [unreadDsrSeqs]);
+  const hasUnread = useMemo(() => unreadDsrSeqs?.length > 0, [unreadDsrSeqs]);
   
   const [hasRead, setHasRead] = useState(hasUnread);
 
   // 이벤트 타입별 카운팅
-  const countByType: CountByType = props.dispatchLists.reduce(
+  const countByType: CountByType = props.dispatchLists?.reduce(
     (res, dispatch) => {
       res[dispatch.type] = (res[dispatch.type] || 0) + 1;
       return res;
