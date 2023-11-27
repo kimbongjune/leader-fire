@@ -87,6 +87,10 @@ const SearchDispatch = (props: Props) => {
   };
 
   const handleDateChange = (newDate: Date) => {
+    console.log(newDate)
+    if(newDate.toString() == "Invalid Date"){
+      return;
+    }
     setSelectedDate(newDate);
     setDate(dayjs(newDate).format('YYYY-MM-DD'))
     adjustTimesBasedOnSelectedDate(newDate);
