@@ -24,13 +24,14 @@ interface Props {
   lawAddr: string;
   roadAddr:string;
   procCd:string;
-  gisX:string;
-  gisY:string;
+  gisX:number;
+  gisY:number;
   dFstRegSeq:string;
-  callTell:string
-  description: string;
-  created: string;
+  callTell:string | null
+  description: string | null
+  created: string | null
   isNew?: boolean;
+  hasRead:boolean
   deviceType?: DeviceType;
 }
 
@@ -58,7 +59,7 @@ const DispatchItem = (props: Props) => {
                   <Title>{props.eventName}</Title>
                   <Time>
                     <Clock width={14} height={14} color="#ADB5BD" />
-                    {getPassedTime(props.created)} 경과
+                    {getPassedTime(props?.created!!)} 경과
                   </Time>
                 </Flex>
                 <Address>{props.lawAddr}</Address>
@@ -66,7 +67,7 @@ const DispatchItem = (props: Props) => {
               <Flex gap="9px">
                 {deviceType === 'mobile' && (
                   <>
-                    <Description dangerouslySetInnerHTML={{ __html: props.description }} />
+                    <Description dangerouslySetInnerHTML={{ __html: props?.description!! }} />
                     <Box width="16px" />
                   </>
                 )}
@@ -80,7 +81,7 @@ const DispatchItem = (props: Props) => {
           </Flex>
           {deviceType === 'tabletVertical' && (
             <Flex justify="space-between">
-              <Description dangerouslySetInnerHTML={{ __html: props.description }} />
+              <Description dangerouslySetInnerHTML={{ __html: props?.description!! }} />
               <Flex align="center" gap="16px">
                 {props.isNew && <NewDataDisplay type={props.type}>신규</NewDataDisplay>}
                 <IconWrapper width="16px" height="16px" color="#909AA4">
@@ -93,7 +94,7 @@ const DispatchItem = (props: Props) => {
         {deviceType === 'tabletHorizontal' && (
           <>
             <Divider />
-            <Description dangerouslySetInnerHTML={{ __html: props.description }} />
+            <Description dangerouslySetInnerHTML={{ __html: props?.description!! }} />
             <Flex align="center" gap="16px">
               {props.isNew && <NewDataDisplay type={props.type}>신규</NewDataDisplay>}
               <IconWrapper width="16px" height="16px" color="#909AA4">

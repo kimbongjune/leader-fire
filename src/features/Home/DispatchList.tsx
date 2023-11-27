@@ -25,13 +25,22 @@ const DispatchList = (props: Props) => {
   // 보여줄 리스트
   const router = useRouter();
   const type = router.query.type;
-  const [hasRead, setHasRead] = useState(false);
 
   // 리스트 필터링
   const filteredList = useMemo(() => {
     if (type === undefined) return props.dispatchLists;
     return props.dispatchLists.filter(dispatch => dispatch.type === type);
   }, [type, props.dispatchLists]);
+
+  const unreadDsrSeqs = useMemo(() => {
+    return props.dispatchLists
+      .filter(dispatch => !dispatch.hasRead)
+      .map(dispatch => dispatch.dsrSeq);
+  }, [props.dispatchLists]);
+
+  const hasUnread = useMemo(() => unreadDsrSeqs.length > 0, [unreadDsrSeqs]);
+  
+  const [hasRead, setHasRead] = useState(hasUnread);
 
   // 이벤트 타입별 카운팅
   const countByType: CountByType = props.dispatchLists.reduce(
@@ -54,7 +63,7 @@ const DispatchList = (props: Props) => {
           </Stack>
         )}
       </Wrapper>
-      {!hasRead && <AlertModal hasRead={hasRead} setHasRead={setHasRead} disasterNumber={["sssssss", "???"]} />}
+      {hasRead && <AlertModal hasRead={hasUnread} setHasRead={setHasRead} disasterNumber={unreadDsrSeqs} />}
     </>
   );
 };

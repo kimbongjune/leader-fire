@@ -4,10 +4,16 @@ import Image from 'next/image';
 import SelectBox from '@/components/common/SelectBox/SelectBox';
 import { useEffect, useState } from 'react';
 import { isEmpty } from 'lodash';
-import { DeviceType, DispatchItemType } from '@/types/types';
+import { DeviceType } from '@/types/types';
 import theme from '@/theme/colors';
 import Calendar from '@/components/common/Calendar/Calendar';
 import { CountByType } from './HomeFilterItem';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { setSearchStartDate, setSearchEndDate } from '../slice/disasterSlice';
+import { useDispatch } from 'react-redux';
+import dayjs from 'dayjs';
+import { setDate } from 'date-fns';
 
 interface Props {
   NumberOfEmergencyDispatches: number;
@@ -27,40 +33,54 @@ const formatTime = (date: Date): string => {
 };
 
 const SearchDispatch = (props: Props) => {
+  const dispatch = useDispatch()
   const { deviceType } = props;
   const [dates, setDates] = useState<{ value: string; label: string }[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState(new Date().toLocaleTimeString('it-IT').substring(0, 5));
 
+  const [date, setDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'))
+
   useEffect(() => {
     adjustTimesBasedOnSelectedDate(selectedDate);
-  }, [selectedDate]);
+  }, []);
 
   const adjustTimesBasedOnSelectedDate = (date: Date) => {
     const now = new Date();
-
-    // 시작 시간 설정: 현재 시간이 오전 9시 이전이면 전날 오전 9시, 그렇지 않으면 오늘 오전 9시
+  
+    // 시작 시간 설정
     const start = new Date(date);
     if (now.getHours() < 9) {
+      // 현재 시간이 오전 9시 이전이면 전날 오전 9시로 설정
       start.setDate(start.getDate() - 1);
     }
     start.setHours(9, 0, 0, 0);
-
-    // 종료 시간 설정: 선택된 날짜에서 24시간 더한 시간, 미래라면 현재 시간으로 설정
-    const end = new Date(start);
+  
+    // 종료 시간 설정
+    let end = new Date(start);
     end.setDate(start.getDate() + 1);
-    if (now < end) {
-      end.setTime(now.getTime());
+    if (now < end || now.getHours() < 9) {
+      // 현재 시간이 다음날 오전 9시 이전이면 현재 시간으로 설정
+      end = now;
     }
-
+  
     setStartTime(formatTime(start));
     setEndTime(formatTime(end));
-
+  
     // 콘솔에 출력
     console.log("설정된 시작 시간:", formatDateAndTime(start));
     console.log("설정된 종료 시간:", formatDateAndTime(end));
+    dispatch(setSearchStartDate(formatDateAndTime(start)+":00"))
+    dispatch(setSearchEndDate(formatDateAndTime(end)+":00"))
   };
+
+  const handleSearchCrear = () =>{
+    const date = new Date()
+    const newDate = dayjs(date).format('YYYY-MM-DD')
+    setDate(newDate)
+    adjustTimesBasedOnSelectedDate(new Date(newDate))
+  }
 
   const formatDateAndTime = (date: Date) => {
     return `${date?.toISOString().split('T')[0]} ${formatTime(date)}`;
@@ -68,15 +88,32 @@ const SearchDispatch = (props: Props) => {
 
   const handleDateChange = (newDate: Date) => {
     setSelectedDate(newDate);
+    setDate(dayjs(newDate).format('YYYY-MM-DD'))
     adjustTimesBasedOnSelectedDate(newDate);
   };
 
   const handleStartTimeChange = (option: { value: string; label: string } | null) => {
-    setStartTime(option?.value!!);
+    if (option) {
+      setStartTime(option.value);
+      const newStartDateTime = new Date(selectedDate);
+      newStartDateTime.setHours(parseInt(option.value.split(':')[0]), parseInt(option.value.split(':')[1]));
+      dispatch(setSearchStartDate(formatDateAndTime(newStartDateTime) + ":00"));
+    }
   };
 
+
   const handleEndTimeChange = (option: { value: string; label: string } | null) => {
-    setEndTime(option?.value!!);
+    if (!option) return;
+  
+    const endTimeValue = option.value;
+    const [hour, minute] = endTimeValue.split(':').map(Number);
+  
+    // selectedDate에 기반하여 새로운 종료 날짜 및 시간을 설정
+    const newEndDate = new Date(selectedDate);
+    newEndDate.setHours(hour, minute, 0, 0);
+  
+    setEndTime(formatTime(newEndDate)); // 시간 업데이트
+    dispatch(setSearchEndDate(formatDateAndTime(newEndDate) + ":00")); // Redux 상태 업데이트
   };
 
   const timeOptions = Array.from({ length: 24 }, (_, i) => ({
@@ -118,13 +155,13 @@ const SearchDispatch = (props: Props) => {
         <Flex justify="space-between" align="center">
           {deviceType === 'tabletVertical' && (
             <Box width="148px">
-              <Calendar height="44px" onDateChange={handleDateChange}/>
+              <Calendar height="44px" onDateChange={handleDateChange} date={date}/>
             </Box>
           )}
           <Flex gap="24px">
             {deviceType === 'tabletHorizontal' && (
               <Box width="148px">
-                <Calendar height="44px" onDateChange={handleDateChange}/>
+                <Calendar height="44px" onDateChange={handleDateChange} date={date}/>
               </Box>
             )}
             <Flex gap="8px" align="center">
@@ -132,7 +169,7 @@ const SearchDispatch = (props: Props) => {
               <SelectBox width={90} height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: startTime, value: startTime }} onChange={handleStartTimeChange} />
               <Time>현재시간</Time>
               <SelectBox width={90} height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: endTime, value: endTime }}  onChange={handleEndTimeChange} />
-              <StyledButton deviceType={deviceType}>조회</StyledButton>
+              <StyledButton onClick={handleSearchCrear} deviceType={deviceType}>초기화</StyledButton>
             </Flex>
           </Flex>
           <EmergencyDispatch deviceType={deviceType}>
@@ -162,7 +199,7 @@ const SearchDispatch = (props: Props) => {
       <Flex gap="16px">
         <Stack minW="149px" flex={1} spacing="8px">
           {/* <SelectBox height={44} options={dates} padding="12px 8px" defaultValue={dates[0]} /> */}
-          <Calendar height="44px" onDateChange={handleDateChange}/>
+          <Calendar height="44px" onDateChange={handleDateChange} date={date}/>
           <EmergencyDispatch>
             <Flex gap="4px" align="center">
               <Box width="24px" height="24px" position="relative">
@@ -184,7 +221,7 @@ const SearchDispatch = (props: Props) => {
             <Time>현재시간</Time>
             <SelectBox height={32} options={timeOptions} padding="0px 8px" defaultValue={{ label: endTime, value: endTime }} onChange={handleEndTimeChange}   />
           </Flex>
-          <StyledButton>조회</StyledButton>
+          <StyledButton onClick={handleSearchCrear}>초기화</StyledButton>
         </Stack>
       </Flex>
     </Wrapper>

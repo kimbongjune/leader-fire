@@ -8,19 +8,15 @@ import { useEffect, useState } from 'react';
 interface Props {
   height?: string;
   onDateChange: (date: Date) => void;
+  date : string;
 }
 
 const Calendar = (props: Props) => {
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(props.date);
 
-  useEffect(() => {
-    // 기본 날짜 설정: 오늘 날짜
-    setSelectedDate(dayjs(new Date()).format('YYYY-MM-DD'));
-  }, []);
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
-    setSelectedDate(newDate);
     props.onDateChange(new Date(newDate));
   };
 
@@ -29,11 +25,11 @@ const Calendar = (props: Props) => {
 
   return (
     <CalendarWrapper className="calendar-container" height={props.height}>
-      <DateDisplay className="calendar-date">{selectedDate && dayjs(selectedDate).format('YYYY년 MM월 DD일')}</DateDisplay>
+      <DateDisplay className="calendar-date">{props.date && dayjs(props.date).format('YYYY년 MM월 DD일')}</DateDisplay>
       <IconWrapper width="20px" height="20px" color="#343A40">
         <ArrowDropDownIcon />
       </IconWrapper>
-      <input id="calendar-input" required type="date" onChange={handleDateChange} value={selectedDate} max={maxDate} min={minDate}/>
+      <input id="calendar-input" required type="date" onChange={handleDateChange} value={props.date} max={maxDate} min={minDate}/>
     </CalendarWrapper>
   );
 };

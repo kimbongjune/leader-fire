@@ -16,7 +16,7 @@ interface Props {
 const AlertModal = (props: Props) => {
   const onClickCloseModal = () => {
     //TODO axios로 재난번호에 대해 수신 확인 전송
-    props.setHasRead(true);
+    props.setHasRead(false);
     console.log("disasternumber is ",props.disasterNumber)
   };
 
@@ -27,7 +27,7 @@ const AlertModal = (props: Props) => {
         <Text>긴급구조 알림</Text>
         <Flex gap="8px" padding="12px 16px" borderRadius="8px" bgColor={theme.colors.gray1} margin="16px 0px">
           <Image src="/images/icons/Police car light.png" width={24} height={24} alt="알림" />
-          <SubText>신규 긴급 구조 정보가 발생했습니다.</SubText>
+          <SubText>신규 긴급 구조 정보가{props.disasterNumber.length}건 발생했습니다.</SubText>
         </Flex>
         <Button onClick={onClickCloseModal}>확인</Button>
       </ModalContent>
