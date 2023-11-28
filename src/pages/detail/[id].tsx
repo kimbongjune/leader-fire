@@ -19,7 +19,6 @@ import { useEffect, useState } from 'react';
 import { KakaoUtil, Position } from '@/features/Map/kakaoUtil';
 import FloatingButtons from '@/features/Map/FloatingButtons';
 import ObjectPosition, { MarkerType } from '@/features/Map/ObjectPosition';
-import MiniMap from '@/features/Map/MiniMap';
 import TestMap from '@/features/Map/TestMap';
 import { NextPageContext } from 'next';
 import { RootState } from '../../app/store';
