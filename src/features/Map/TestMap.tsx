@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 import { Box, Stack } from '@chakra-ui/react';
 import theme from '@/theme/colors';
 import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
-import Satellite from '../../../public/images/mapicons/satellite.svg';
+import Satellite from '../../../public/images/icons/satellite.svg';
 import MyLocationIcon from '../../../public/images/icons/myLocation.svg';
 import FullScreenIcon from '../../../public/images/icons/fullscreen.svg';
 import { useRouter } from 'next/router';

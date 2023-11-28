@@ -15,7 +15,7 @@ import theme from '@/theme/colors';
 import AddressTab from '@/components/common/Menu/AddressTab';
 import { Flex, Stack } from '@chakra-ui/react';
 import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
-import Satellite from '../../../public/images/mapicons/satellite.svg';
+import Satellite from '../../../public/images/icons/satellite.svg';
 import MyLocationIcon from '../../../public/images/icons/myLocation.svg';
 import { useRouter } from 'next/router';
 
