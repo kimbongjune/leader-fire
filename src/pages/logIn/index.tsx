@@ -58,8 +58,13 @@ const LoginPage = () => {
         userPassword : password,
       });
       
+      
       console.log(response.headers['authorization'])
       setAuthToken(response.headers['authorization'])
+
+      if (window.fireAgency && window.fireAgency.saveUserData) {
+        window.fireAgency.saveUserData(username, password, checked, response.headers['authorization']);
+      }
       dispatch(saveLogedInStatus(true))
       dispatch(saveUserInformation(response.data))
       //TODO 성공적으로 로그인되면 JWT 토큰을 앱의 roomdb에 저장

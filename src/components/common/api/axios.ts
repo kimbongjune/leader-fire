@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux';
 
 // Axios 인스턴스를 생성
 const axiosInstance = axios.create({
-  //baseURL: 'http://121.152.148.227:18080/gnfire-1.0.0-BUILD-SNAPSHOT',
-  baseURL: 'http://192.168.10.210:8080/gnfire-1.0.0-BUILD-SNAPSHOT',
+  baseURL: 'http://121.152.148.227:18080/gnfire-1.0.0-BUILD-SNAPSHOT',
+  //baseURL: 'http://192.168.10.210:8080/gnfire-1.0.0-BUILD-SNAPSHOT',
 });
 
 // 토큰을 동적으로 axios 헤더에 추가하는 함수

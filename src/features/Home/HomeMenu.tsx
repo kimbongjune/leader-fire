@@ -92,6 +92,13 @@ const HomeMenu = (props: Props) => {
       authUserPw: ''
     };
     dispatch(saveUserInformation(emptyUserInfo))
+
+    if (window.fireAgency && window.fireAgency.logout) {
+      window.fireAgency.logout();
+    }
+    if (window.fireAgency && window.fireAgency.stopLocationService) {
+      window.fireAgency.stopLocationService();
+    }
   };
 
   return (
