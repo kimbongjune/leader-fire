@@ -4,8 +4,21 @@ import { useSelector } from 'react-redux';
 
 // Axios 인스턴스를 생성
 const axiosInstance = axios.create({
-  baseURL: 'http://121.152.148.227:18080/gnfire-1.0.0-BUILD-SNAPSHOT',
+  //baseURL: 'http://121.152.148.227:18080/gnfire-1.0.0-BUILD-SNAPSHOT',
   //baseURL: 'http://192.168.10.210:8080/gnfire-1.0.0-BUILD-SNAPSHOT',
+  baseURL: 'http://localhost:8080/',
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  //TODO 앱의 room db에서 jwt 토큰을 가져와서 할당.
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (token) {
+    config.headers['Authorization'] = `${token}`;
+  }
+  return config;
+}, (error) => {
+  // 요청 오류가 있을 때 실행
+  return Promise.reject(error);
 });
 
 // 토큰을 동적으로 axios 헤더에 추가하는 함수
