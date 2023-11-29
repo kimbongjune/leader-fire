@@ -9,7 +9,6 @@ interface Window {
       openThirdPartyMapApplication?: (mapType:string, coordinateX:string, coordinateY:string, address:string) => void;
       startLocationService?: () => void;
       copyClipboard?: (copyText:string) => void;
-      startLocationService?: () => void;
       stopLocationService?: () => void
       getUserData?: () => string
       runCamera?: () => void;
