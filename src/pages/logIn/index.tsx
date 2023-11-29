@@ -60,6 +60,7 @@ const LoginPage = () => {
       
       
       console.log(response.headers['authorization'])
+      localStorage.setItem("token", response.headers['authorization']);
       setAuthToken(response.headers['authorization'])
 
       if (window.fireAgency && window.fireAgency.saveUserData) {
