@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import theme from '@/theme/colors';
@@ -8,6 +8,9 @@ import HistoryFilter from './HistoryFilter';
 import { useRouter } from 'next/router';
 import { DeviceType, DisasterHistoryData, HistoryData } from '@/types/types';
 import axios from "../../components/common/api/axios"
+import { shallowEqual, useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { selectDisasterById } from '../slice/test';
 
 export interface CountByType {
   report: number;
@@ -28,154 +31,63 @@ const HistoryList = (props: Props) => {
   const router = useRouter();
   const type = router.query.type;
 
-  const [historyData, setHistoryData] = useState<DisasterHistoryData>();
+  const id = router.query.id as string;
+  const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
-  const fetchHistoryData = () =>{
-    //10초마다 과거이력 정보 조회
-    try {
-      //axios.get("history_data")
-      const testData:HistoryData = {
-            "totalCount" : 4,
-            "response": "success",
-            "responseCode": 200,
-            "responseMsg": "성공",
-            "result": {
-            "reportHistoryList": {
-              "response": "success",
-              "responseCode": 200,
-              "responseMsg": "성공",
-              "result": {
-                "dataList": [
-                  {
-                    "reg_dtime": "20210818081323",
-                    "dsr_knd_cd_nm": "구급",
-                    "treat_cls_cd_nm": "정상",
-                    "call_content": "동남로49번길 7-23\r\n할아버지 의식호흡없음(추가)의식없음 호흡없음/80대 남/CPR(동보)대동구급 / 의료지도",
-                    "aware_yn": "",
-                    "breath_yn": "",
-                    "cpr_yn": "",
-                    "noemer_yn": " "
-                  },
-                  {
-                    "reg_dtime": "20210818081323",
-                    "dsr_knd_cd_nm": "구급",
-                    "treat_cls_cd_nm": "정상",
-                    "call_content": "동남로49번길 7-23\r\n할아버지 의식호흡없음(추가)의식없음 호흡없음/80대 남/CPR(동보)대동구급 / 의료지도",
-                    "aware_yn": "",
-                    "breath_yn": "",
-                    "cpr_yn": "",
-                    "noemer_yn": " "
-                  }
-                ]
-              }
-            },
-            "rescueHistoryList": {
-              "response": "success",
-                    "responseCode": 200,
-                    "responseMsg": "성공",
-                    "result": {
-                        "dataList": [
-                  {
-                    "reg_dtime": "20200125134300",
-                    "age_cd_nm": "50세이하",
-                    "acc_place_cd_nm": "고속도로(기타)",
-                    "acc_rsn_cd_nm": "차대차",
-                    "acc_rsn_etc_desc": "",
-                    "act_desc": "화재출동 귀소중 사고 목격하여 조치한건으로, 3중추돌 교통사고 현장(투싼53버5510, 스포티지34구4233, 아반테 14허8337) 요구조자 전원 구조완료후,주변안전확인한 뒤 통영분대에 환자 및 현장 인계후 인원장비 이상없이 귀소함.",
-                    "guide": "",
-                    "proc_rslt_cd_nm": "인명구조",
-                    "crime_cd_nm": "",
-                    "dsr_act_trouble_cd_nm": "장애없음",
-                    "dsr_act_trouble_desc": ""
-                  }
-                ]
-              }
-            },
-            "firstAidHistoryList": {
-              "response": "success",
-              "responseCode": 200,
-              "responseMsg": "성공",
-              "result": {
-                "dataList": [
-                  {
-                    "reg_dtime": "20210813105200",
-                    "emg_acc_type_cd_nm": "",
-                    "emg_acc_type_etc_desc": "",
-                    "pat_stat_cd_nm": "잠재응급증상",
-                    "pat_name": "김정자",
-                    "pat_sex_cd_nm": "여",
-                    "pat_age": "78",
-                    "crime_cd_nm": "",
-                    "doc_guide": "",
-                    "emger_opinion": "상습신고자 민원출동으로 민원 처리후 귀소."
-                  }
-                ]
-              }
-            },
-            "dispatchHistoryList": {
-              "response": "success",
-              "responseCode": 200,
-              "responseMsg": "성공",
-              "result": {
-                "dataList": [
-                  {
-                    "reg_dtime": "20190207081456",
-                    "dsr_seq": "TP4806897877",
-                    "dsr_knd_cd_nm": "구급",
-                    "dsr_cls_cd_nm": "질병외",
-                    "dsr_bunji_adress": "경상남도 합천군 합천읍 합천리 1256 (까치빌라302호)",
-                    "dsr_doro_adress": "경상남도 합천군 합천읍 옥산로 16 (까치빌라)",
-                    "call_content": "까치빌라 302호// 할아버지 거동불가",
-                    "copertn_cntrmsr_yn": "",
-                    "gis_x_5181": "304858.6514",
-                    "gis_y_5181": "230808.9272",
-                    "gis_x_4326": "128.1566902411275",
-                    "gis_y_4326": "35.56873106496122",
-                    "dist": "2.70204529"
-                  }
-                ]
-              }
-            }
-          }
-        }
-        const reportHistoryList = testData.result.reportHistoryList.result.dataList.map(item => ({
+  const [historyData, setHistoryData] = useState<DisasterHistoryData>();
+  const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
+
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
+      const fetchData = async () =>{
+          const historyData = await axios.post<HistoryData>("/api/past_history/all",{
+            "callTel": selectedDisaster?.callTell, //selectedDisaster?.callTell
+            "dsrClsCd": selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
+            "dsrKndCd": selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
+            "dsrSeq": id,//id
+            "gisX": selectedDisaster?.gisX,  //selectedDisaster?.gisX
+            "gisY": selectedDisaster?.gisY, //selectedDisaster?.gisY
+            "radius": "null"
+        });
+
+        const reportHistoryList = historyData.data.result.reportHistoryList?.result?.dataList?.map(item => ({
           ...item,
           type: 'report' as 'report'
         }));
 
-        const rescueHistoryList = testData.result.rescueHistoryList.result.dataList.map(item => ({
+        const rescueHistoryList = historyData.data.result.rescueHistoryList?.result?.dataList?.map(item => ({
           ...item,
           type: 'rescue' as 'rescue'
         }));
-        const firstAidHistoryList = testData.result.firstAidHistoryList.result.dataList.map(item => ({
+        const firstAidHistoryList = historyData.data.result.firstAidHistoryList?.result?.dataList?.map(item => ({
           ...item,
           type: 'patient' as 'patient'
         }));
-        const dispatchHistoryList = testData.result.dispatchHistoryList.result.dataList.map(item => ({
+        const dispatchHistoryList = historyData.data.result.dispatchHistoryList?.result?.dataList?.map(item => ({
           ...item,
           type: 'mobilize' as 'mobilize'
         }));
+        console.log(firstAidHistoryList)
         const combinedData = [
-          ...reportHistoryList,
-          ...rescueHistoryList,
-          ...firstAidHistoryList,
-          ...dispatchHistoryList
+          ...reportHistoryList || [],
+          ...rescueHistoryList || [],
+          ...firstAidHistoryList || [],
+          ...dispatchHistoryList || []
         ];
         const data = {
-          reportNumber : testData.totalCount,
+          reportNumber : historyData.data.totalCount,
           dispatchLists : combinedData
         }
         setHistoryData(data)
         console.log(data)
-      }catch(e){
-
       }
-    }
-
-  useEffect(() => {
-    // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
-    fetchHistoryData();
-
+      fetchData()
+      apiIntervalRef.current =  setInterval(() => fetchData(), 60000);
+    return () => {
+      if (apiIntervalRef.current) {
+        clearInterval(apiIntervalRef.current);
+      }
+    };
   }, []);
 
   // 이벤트 타입별 카운팅

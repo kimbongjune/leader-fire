@@ -35,7 +35,7 @@ const HistoryListItem = (props: Props) => {
       case 'rescue':
         return props.acc_place_cd_nm;
       case 'patient':
-        return props.pat_stat_cd_nm;
+        return props.pat_stat_cd_nm? props.pat_stat_cd_nm : "알 수 없음";
       case 'mobilize':
         return props.dsr_knd_cd_nm;
       default:
@@ -50,7 +50,7 @@ const HistoryListItem = (props: Props) => {
       case 'rescue':
         return props.acc_rsn_cd_nm;
       case 'patient':
-        return props.pat_stat_cd_nm;
+        return props.pat_stat_cd_nm? props.pat_stat_cd_nm : "알 수 없음";
       case 'mobilize':
         return props.dsr_cls_cd_nm;
       default:

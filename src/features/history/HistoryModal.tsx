@@ -72,7 +72,7 @@ const HistoryModal = (props: Props) => {
   const deviceType = useDeviceType();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log(props)
+  //console.log(props)
 
   const data = Object.entries(props).reduce((acc, [key, value]) => {
     let formattedValue = value;
