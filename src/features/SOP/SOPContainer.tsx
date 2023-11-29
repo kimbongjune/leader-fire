@@ -247,10 +247,10 @@ const SOPContainer = (props: Props) => {
 
   return (
     <>
-      {deviceType === 'mobile' && <Menu title={selectedDisaster?.eventName} timestamp={selectedDisaster?.created!!} contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />}
+      {deviceType === 'mobile' && <Menu  status={selectedDisaster?.status} title={selectedDisaster?.eventName} timestamp={selectedDisaster?.created!!} contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />}
       {deviceType !== 'mobile' && (
         <MenuWrapper deviceType={deviceType}>
-          <Menu title={selectedDisaster?.eventName} status={props.status} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} onCloseButton={() => router.push('/')} timestamp={'2023 10 20 23:09'} contentAlign="space-between" />
+          <Menu title={selectedDisaster?.eventName} status={selectedDisaster?.status} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} onCloseButton={() => router.push('/')} timestamp={selectedDisaster?.created!!} contentAlign="space-between" />
         </MenuWrapper>
       )}
       <AddressTabWrapper deviceType={deviceType}>

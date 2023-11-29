@@ -11,7 +11,7 @@ import useDeviceType from '@/hooks/useDeviceType';
 import { useRouter } from 'next/router';
 import axios, {setAuthToken} from "../../components/common/api/axios"
 import { useDispatch } from 'react-redux';
-import { saveLogedInStatus, saveUserInformation } from '../../features/slice/UserinfoSlice';
+import { MyInfoState, saveLogedInStatus, saveUserInformation } from '../../features/slice/UserinfoSlice';
 import { UserInformation } from '@/types/types';
 import { AppDispatch, RootState  } from '../../app/store';
 import { useSelector } from 'react-redux';
@@ -22,6 +22,7 @@ const LoginPage = () => {
   const dispatch = useDispatch();
 
   const isLoggedIn = useSelector((state: RootState) => state.userReducer.logedIn);
+  const sendLocationFlag = useSelector((state: RootState) => state.userReducer.sendLocationFlag);
   useEffect(() => {
     if (isLoggedIn) {
       router.replace('/home'); // 로그인 상태라면 홈 페이지(또는 다른 페이지)로 리디렉션
@@ -33,6 +34,8 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+
+  const [userInfo, setUserInfo] = useState<UserInformation>()
 
   const usernameInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
@@ -58,7 +61,6 @@ const LoginPage = () => {
         userPassword : password,
       });
       
-      
       console.log(response.headers['authorization'])
       localStorage.setItem("token", response.headers['authorization']);
       setAuthToken(response.headers['authorization'])
@@ -66,13 +68,29 @@ const LoginPage = () => {
       if (window.fireAgency && window.fireAgency.saveUserData) {
         window.fireAgency.saveUserData(username, password, checked, response.headers['authorization']);
       }
-      dispatch(saveLogedInStatus(true))
-      dispatch(saveUserInformation(response.data))
-      //TODO 성공적으로 로그인되면 JWT 토큰을 앱의 roomdb에 저장
-      // if (window.fireAgency && window.fireAgency.saveUserData) {
-      //   window.fireAgency.saveUserData(username, password, checked, "test_token");
+
+      //위치전송 플래그 조회해서 전송한다면 보냄
+      // if (window.fireAgency && window.fireAgency.startLocationService) {
+      //   window.fireAgency.startLocationService();
       // }
-      router.replace('/home');
+      dispatch(saveLogedInStatus(true))
+      setUserInfo(response.data)
+
+      if (window.fireAgency && window.fireAgency.requestGetToken) {
+        window.fireAgency.requestGetToken();
+      }
+
+      if(sendLocationFlag){
+        if (window.fireAgency && window.fireAgency.startLocationService) {
+            window.fireAgency.startLocationService();
+        }
+      }else{
+        if (window.fireAgency && window.fireAgency.stopLocationService) {
+          window.fireAgency.stopLocationService();
+        }
+      }
+      
+      
     } catch (error) {
       console.log(error)
       // 오류가 발생했을 경우 오류 메시지를 설정
@@ -80,6 +98,19 @@ const LoginPage = () => {
       return;
     }
   };
+
+  window.updateToken = (token: string) => {
+    axios.post(`/api/user/info/${userInfo?.userId}`,{
+      "deviceTel": userInfo?.deviceTel,
+      "fcmToken": token,
+      "userId": userInfo?.userId
+    }).then(response =>{
+      dispatch(saveUserInformation({...userInfo!!, fcmToken : token}))
+      router.replace('/home');
+    }).catch(error =>{
+      console.log(error)
+    })
+  }; 
 
   if (!deviceType) return null;
 

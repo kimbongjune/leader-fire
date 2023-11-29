@@ -9,7 +9,8 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Div100vh from 'react-div-100vh';
 import { RootState } from '../../../app/store';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
+import { selectDisasterById } from '@/features/slice/test';
 
 interface Props {
   messages: MessageType[];
@@ -19,15 +20,16 @@ const ChatRoomPage = () => {
   const router = useRouter();
   const id = router.query.id as string;
 
+  const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
   return (
     <Div100vh>
       <Flex direction="column" height="100%" position="relative">
         <Box position="sticky" top="0" zIndex={10}>
           <MenuWrapper>
-            <Menu title="채팅" closeButtonText="닫기" onClickBackButton={() => router.back()} onCloseButton={() => router.back()} />
+            <Menu title={selectedDisaster?.eventName} status={selectedDisaster?.status} timestamp={selectedDisaster?.created!!} closeButtonText="닫기" onClickBackButton={() => router.back()} onCloseButton={() => router.back()} />
           </MenuWrapper>
           <AddressTabWrapper>
-            <AddressTab address="경남 진주시 진주대로 345-13, 203호" />
+            <AddressTab address={selectedDisaster?.lawAddr} />
           </AddressTabWrapper>
         </Box>
         <Children>

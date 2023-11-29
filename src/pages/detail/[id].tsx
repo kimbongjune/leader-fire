@@ -86,7 +86,7 @@ const DetailPage = () => {
         const TotalNumberOfVehicle = data.data.result[0].dspAggregateDtoList.result.briefCar?.reduce((sum, item) => {
           const count = item.type1TeamCnt ? parseInt(item.type1TeamCnt, 10) : 0;
           return sum + count;
-      }, 0);
+        }, 0);
         setTotalNumberOfVehicle(TotalNumberOfVehicle)
 
         const group = data.data.result[0].dspAggregateDtoList.result.briefCenter?.map(item => ({
@@ -137,7 +137,7 @@ const DetailPage = () => {
   return (
     <Layout>
       <Flex direction="column" height="100%" background={deviceType === 'tabletHorizontal' ? theme.colors.white : theme.colors.gray1}>
-        {deviceType === 'mobile' && <Menu status={data?.status} title={data?.eventName} timestamp={data?.created!!} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />}
+        {deviceType === 'mobile' && <Menu status={data?.status} title={data?.eventName} timestamp={data?.created!!} contentAlign={'space-between'} hasCloseButtonWithoutString={false} onClickBackButton={() => router.push("/home")} />}
         {deviceType !== 'mobile' && (
           <MenuWrapper deviceType={deviceType}>
             <Menu title={data?.eventName} status={data?.status} hasCloseButtonWithoutString={false} onClickBackButton={() => router.push("/home")} onCloseButton={() => router.push('/')} timestamp={data?.created!!} contentAlign="space-between" />
@@ -171,7 +171,7 @@ const DetailPage = () => {
                 vehicles={vehicles}
                 deviceType={deviceType} 
               />
-              {deviceType === 'mobile' && <Neighborhood />}
+              {deviceType === 'mobile' && <Neighborhood data={markerCount}/>}
               {deviceType === 'tabletVertical' && (
                 <Box height="424px" borderRadius="8px" overflow="hidden">
                   <TestMap deviceType={deviceType} setMarkerCount={setMarkerCount} />

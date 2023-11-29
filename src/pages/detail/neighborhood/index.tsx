@@ -9,7 +9,8 @@ import { useRouter } from 'next/router';
 import useDeviceType from '@/hooks/useDeviceType';
 import { DeviceType } from '@/types/types';
 import { RootState } from '../../../app/store';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
+import { selectDisasterById } from '@/features/slice/test';
 
 interface Props {
   title: string;
@@ -20,10 +21,10 @@ interface Props {
 //TODO 연관인근 페이지
 const Neighborhood = (props: Props) => {
   const router = useRouter();
-  const id = router.query.id;
+  const id = router.query.id as string;
   const deviceType = useDeviceType();
 
-  const data = useSelector((state: RootState) => state.disaster.subDisasterInformation);
+  const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
   if (!deviceType) return null;
 
@@ -32,10 +33,10 @@ const Neighborhood = (props: Props) => {
       <Container>
         <div>
           <MenuWrapper deviceType={deviceType}>
-            <Menu title={data?.eventName} timestamp={data?.created!!} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
+            <Menu title={selectedDisaster?.eventName} status={selectedDisaster?.status} timestamp={selectedDisaster?.created!!} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
           </MenuWrapper>
           <AddressTabWrapper deviceType={deviceType}>
-            <AddressTab address={data?.lawAddr} />
+            <AddressTab address={selectedDisaster?.lawAddr} />
           </AddressTabWrapper>
         </div>
         <Wrapper>

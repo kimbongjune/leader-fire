@@ -47,7 +47,7 @@ const VideoPage = (props: Props) => {
           <AddressTab address={selectedDisaster?.lawAddr}/>
         </AddressTabWrapper>
         <Children deviceType={deviceType}>
-        <iframe allow='camera *;microphone *' src={`http://info.gnfire.go.kr/ERSS_P_T/video2.do?dsr_seq=${selectedDisaster?.dsrSeq}`} width="100%" height="100%"></iframe>
+        <iframe allow='camera; microphone' src={`https://info.gnfire.go.kr/ERSS_P_T/video2.do?dsr_seq=${selectedDisaster?.dsrSeq}`} width="100%" height="100%"></iframe>
         </Children>
       </Flex>
     </Layout>

@@ -30,7 +30,7 @@ const TabletPage = (props: Props) => {
     <Layout>
       <Flex direction="column" height="100%">
         <MenuWrapper deviceType={deviceType}>
-          <Menu title={selectedDisaster?.eventName} status="progress" timestamp={selectedDisaster?.created!!} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />
+          <Menu title={selectedDisaster?.eventName} status={selectedDisaster?.status} timestamp={selectedDisaster?.created!!} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.back()} />
         </MenuWrapper>
         <AddressTabWrapper deviceType={deviceType}>
           <AddressTab address={selectedDisaster?.lawAddr} />

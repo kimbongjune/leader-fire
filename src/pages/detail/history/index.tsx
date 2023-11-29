@@ -33,7 +33,7 @@ const HistoryComponent = () => {
       <Container deviceType={deviceType}>
         <div>
           <MenuWrapper deviceType={deviceType}>
-            <Menu status={"progress"} title={selectedDisaster?.eventName} timestamp={selectedDisaster?.created!!} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
+            <Menu status={selectedDisaster.status} title={selectedDisaster?.eventName} timestamp={selectedDisaster?.created!!} contentAlign="space-between" hasCloseButtonWithoutString={false} onClickBackButton={() => router.push(`/detail/${id}`)} />
           </MenuWrapper>
           <AddressTabWrapper deviceType={deviceType}>
             <AddressTab address={selectedDisaster?.lawAddr}/>

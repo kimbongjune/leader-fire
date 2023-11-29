@@ -36,7 +36,7 @@ const ReportDetailPage = (props: Props) => {
     <Layout>
       <Flex direction="column" height="100%" background="#F8F9FA">
         <MenuWrapper deviceType={deviceType}>
-          <Menu status={"progress"} title="신고 내용" contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
+          <Menu status={selectedData?.status} title={selectedData?.description} contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
         </MenuWrapper>
         <Children>
           <Stack spacing="24px">

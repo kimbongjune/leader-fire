@@ -30,7 +30,7 @@ const ChatPage = () => {
   return (
     <Layout>
       <Flex direction="column" height="100%">
-        <Menu title={selectedDisaster?.eventName} timestamp={selectedDisaster?.created!!} contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />
+        <Menu title={selectedDisaster?.eventName} timestamp={selectedDisaster?.created!!} status={selectedDisaster?.status} contentAlign="space-between" onClickBackButton={() => router.back()} hasCloseButtonWithoutString={false} />
         <AddressTab address={selectedDisaster?.lawAddr} />
         <Children>
         <iframe src={`https://view2.gnfire.go.kr:8887/chat/${selectedDisaster?.dsrSeq}/0/1?gubun=4`} width="100%" height="100%"></iframe>

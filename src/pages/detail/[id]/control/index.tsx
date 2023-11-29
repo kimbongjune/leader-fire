@@ -69,6 +69,8 @@ const ControlDetail = (props: Props) => {
 
   const id = router.query.id as string;
 
+  const selectedData = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
   const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
 
   const [controlContent, setControlContent] = useState<Props>();
@@ -83,6 +85,7 @@ const ControlDetail = (props: Props) => {
         });
         const controlContentList = data.data.result[0].disasterDetailInfo
         const histories = convertToHistoryFormat(controlContentList);
+        console.log(histories)
         setControlContent(histories);
       }
       fetchData()
@@ -99,7 +102,7 @@ const ControlDetail = (props: Props) => {
     <Layout>
       <Flex direction="column" height="100%">
         <MenuWrapper deviceType={deviceType}>
-          <Menu status={"progress"} title="관제 내용" contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
+          <Menu status={selectedData?.status} title={selectedData?.description} contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
         </MenuWrapper>
         <Children deviceType={deviceType}>
           {controlContent?.histories?.map((history, index) => {
