@@ -24,6 +24,8 @@ const ObjectPosition = (props: Props) => {
   //const [position, setPosition] = useState(props.distances?.[0]);
   const dispatch = useDispatch()
 
+  console.log(props)
+
   const isWaterActive = useSelector((state: RootState) => state.disaster.isWaterMarkerActive);
   const isExtinguisherActive = useSelector((state: RootState) => state.disaster.isExtinguisherMarkerActive);
   const isTargetActive = useSelector((state: RootState) => state.disaster.isTargetMarkerActive);

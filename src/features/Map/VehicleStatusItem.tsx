@@ -64,21 +64,75 @@ const Status = styled.div<{ status: string; deviceType: DeviceType }>`
   }}
 
   ${({ status }) => {
-    if (status === '출동') {
+    if (status === '업무운행') {
       return `
           background:${theme.colors.orange};
         `;
     }
 
-    if (status === '도착') {
+    if (status === '본소출동대기') {
       return `
           background:${theme.colors.blue};
         `;
     }
 
-    if (status === '귀소') {
+    if (status === '본소출동불가능대기') {
       return `
-          background:${theme.colors.gray3};
+          background:${theme.colors.red};
+        `;
+    }
+
+    if (status === '편성중') {
+      return `
+          background:${theme.colors.yellow};
+        `;
+    }
+
+    if (status === '출동중') {
+      return `
+          background:${theme.colors.green};
+        `;
+    }
+
+    if (status === '귀소중편성가') {
+      return `
+          background:${theme.colors.purple};
+        `;
+    }
+
+    if (status === '귀소중편성불가') {
+      return `
+          background:${theme.colors.gray1};
+        `;
+    }
+
+    if (status === '이동대기중') {
+      return `
+          background:${theme.colors.orange};
+        `;
+    }
+
+    if (status === '고장수리중') {
+      return `
+          background:${theme.colors.blue};
+        `;
+    }
+
+    if (status === '기타편성가능') {
+      return `
+          background:${theme.colors.red};
+        `;
+    }
+
+    if (status === '기타편성불가능') {
+      return `
+          background:${theme.colors.yellow};
+        `;
+    }
+
+    if (status === '활동중') {
+      return `
+          background:${theme.colors.green};
         `;
     }
   }}

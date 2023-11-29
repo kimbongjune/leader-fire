@@ -9,7 +9,7 @@ import ShareVehicleModal from './ShareVehicleModal';
 import { KakaoUtil, Position } from './kakaoUtil';
 import useDeviceType from '@/hooks/useDeviceType';
 import Menu from '@/components/common/Menu/Menu';
-import { DeviceType } from '@/types/types';
+import { CarPostionData, DeviceType, DspCarMoveResultDtoList, FireFacilityData } from '@/types/types';
 import { css } from '@emotion/react';
 import theme from '@/theme/colors';
 import AddressTab from '@/components/common/Menu/AddressTab';
@@ -18,7 +18,8 @@ import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
 import Satellite from '../../../public/images/icons/satellite.svg';
 import MyLocationIcon from '../../../public/images/icons/myLocation.svg';
 import { useRouter } from 'next/router';
-
+import proj4 from 'proj4';
+import axios from '@/components/common/api/axios';
 import { RootState } from '../../app/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsDangerMarkerActive, setIsExtinguisherMarkerActive, setIsTargetMarkerActive, setIsWaterMarkerActive,setIsRescuePositionActive, setIsVehicleActive, setIsVideoActive } from '../../features/slice/disasterSlice';
@@ -72,6 +73,45 @@ interface markerData {
   dangerous: Markers[]
 }
 
+const epsg5181: string = '+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +units=m +no_defs';
+
+const convertCoordinateSystem = (x:number, y:number):[number, number] => {
+  return proj4(epsg5181, 'EPSG:4326', [x,y]);
+}
+
+const transformData = (data:DspCarMoveResultDtoList[]):DispatchVehicleDataType[] => {
+  const statusMap: { [key: string]: DispatchVehicleDataType['status'] } = {
+    "0060200": "업무운행" as "업무운행",
+    "0930001": "본소출동대기" as "본소출동대기",
+    "0930002": "본소출동불가능대기" as "본소출동불가능대기",
+    "0930003": "편성중" as "편성중",
+    "0930004": "출동중" as "출동중",
+    "0930005": "귀소중편성가" as "귀소중편성가",
+    "0930006": "귀소중편성불가" as "귀소중편성불가",
+    "0930007": "이동대기중" as "이동대기중",
+    "0930008": "고장수리중" as "고장수리중",
+    "0930010": "기타편성가능" as "기타편성가능",
+    "0930011": "기타편성불가능" as "기타편성불가능",
+    "0930014": "활동중" as "활동중",
+  };
+
+  return data.map(item => {
+    const status = statusMap[item.carstatCd] || '상태 미정';
+    let transmissionStatus: DispatchVehicleDataType['transmissionStatus'] = '미확인';
+    if (item.targetlocRoger) {
+        transmissionStatus = item.targetlocAcceptRoger ? '승인' : '미승인';
+    }
+
+    return {
+        status,
+        name: item.radioCallsign,
+        transmissionStatus,
+        carId : item.carId
+    };
+});
+};
+
+
 //TODO 지도(핸드폰 or 태블릿 크게보기), 소화전, 비상소화장치, 대상물, 위험물 표시/ 미터, 피난약자, 과거이력 제거, 롱클릭 시 오버레이와 마커 표시(마커는 한건만)
 //TODO 지도 화면의 버튼이 미니맵의 버튼과 다름 개수, 이름 뭐로 맞춰야하는지
 const Map = (props: Props) => {
@@ -101,7 +141,7 @@ const Map = (props: Props) => {
   const isVehicleActive = useSelector((state: RootState) => state.disaster.isVehicleActive);
   const isVideoActive = useSelector((state: RootState) => state.disaster.isVideoActive);
 
-  const [position, setPosition] = useState({lat:Number, lng:Number})
+  const [position, setPosition] = useState({La:0.0, Ma:0.0})
   const [hasSky, setHasSky] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -129,6 +169,8 @@ const Map = (props: Props) => {
 
   const [rescueMarker, setRescueMarker] = useState<Markers[]>([])
 
+  const [aponintList, setAponintList] = useState<DispatchVehicleDataType[]>([])
+
   const changeStatus = (value: string) => {
     if (value === 'water') dispatch(setIsWaterMarkerActive(!isWaterActive));
     if (value === 'extinguisher') dispatch(setIsExtinguisherMarkerActive(!isExtinguisherActive));
@@ -145,17 +187,18 @@ const Map = (props: Props) => {
     if (src === '지상') return (imgSrc = '/images/mapIcons/groundWater.svg');
     if (src === '지하') return (imgSrc = '/images/mapIcons/underGroundWater.svg');
     if (src === '비상') return (imgSrc = '/images/mapIcons/emergency.svg');
-    // 차량
-    if (src === '펌프') return (imgSrc = '/images/mapIcons/pumpVehicle.svg');
-    if (src === '탱크') return (imgSrc = '/images/mapIcons/tankVehicle.svg');
-    if (src === '화학') return (imgSrc = '/images/mapIcons/chemistryVehicle.svg');
-    if (src === '기타') return (imgSrc = '/images/mapIcons/etcVehicle.svg');
-    if (src === '구조') return (imgSrc = '/images/mapIcons/rescueVehicle.svg');
-    if (src === '구급') return (imgSrc = '/images/mapIcons/firstAidVehicle.svg');
     // 도착지
     if (src === '도착지') return (imgSrc = '/images/mapIcons/destinationMarker.svg');
     // 긴급구조
     if (src === '긴급구조') return (imgSrc = '/images/icons/makerImage.svg');
+    // 차량
+    if (src.includes('펌프')) return (imgSrc = '/images/mapIcons/pumpVehicle.svg');
+    if (src.includes('탱크')) return (imgSrc = '/images/mapIcons/tankVehicle.svg');
+    if (src.includes('화학')) return (imgSrc = '/images/mapIcons/chemistryVehicle.svg');
+    if (src.includes('기타')) return (imgSrc = '/images/mapIcons/etcVehicle.svg');
+    if (src.includes('구조')) return (imgSrc = '/images/mapIcons/rescueVehicle.svg');
+    if (src.includes('구급')) return (imgSrc = '/images/mapIcons/firstAidVehicle.svg');
+    
     // 영상공유
     if (src === '영상공유') return (imgSrc = '/images/mapIcons/videoMarker.svg');
     // 대상물
@@ -170,6 +213,9 @@ const Map = (props: Props) => {
     if (src === '비상소화장치') return (imgSrc = '/images/mapIcons/flag.svg');
     // 과거이력
     if (src === '과거이력') return (imgSrc = '/images/mapIcons/flag.svg');
+
+    else imgSrc = '/images/mapIcons/flag.svg'
+
     return imgSrc;
   }
 
@@ -240,113 +286,92 @@ const Map = (props: Props) => {
       // 실제 API 호출 로직
       // 예시로는 가상의 데이터 반환
       try {
-        //const result = await axios.get<locationData>("/ccf853b7-cfa8-4d04-b875-39b32e2a4e49");
-        //const data = result.data;
-  
-        const data = {
-          "car":[
-          {
-              "lat": "37.518195",
-              "lon": "127.071881",
-              "type": "탱크",
-              "id": "1"
-          },
-          {
-              "lat": "36.35930",
-              "lon": "127.96978",
-              "type": "펌프",
-              "id": "2"
-          }],
-          "video":[
-          {
-              "lat": " 37.51208",
-              "lon": "127.06334",
-              "type": "영상공유",
-              "id": "3"
-          },
-          {
-              "lat": " 37.51287",
-              "lon": "127.07252",
-              "type": "영상공유",
-              "id": "4"
-          }],
-          "hydrant":[
-           {
-              "lat": "37.51222",
-              "lon": "127.07030",
-              "type": "지상",
-              "id": "5"
-          },
-          {
-              "lat": "37.51113",
-              "lon": "127.07176",
-              "type": "지하",
-              "id": "6"
+        const carPositionResult = await axios.get<CarPostionData>("/api/disaster_info/car/seq",{
+          params: {
+            dsrSeq : id //id
           }
-          ],
-          "fireExtinguisher" :[
-          {
-              "lat": "37.51297",
-              "lon": "127.07279",
-              "type": "비상소화장치",
-              "id": "7"
+        });
+
+        setAponintList(transformData(carPositionResult.data.result[0].dspCarMoveResultDtoList))
+
+        const carPosition = carPositionResult.data.result[0]?.dspCarMoveResultDtoList?.map((item) => {
+          const coordinate = convertCoordinateSystem(item.avlGisX, item.avlGisY)
+          console.log(coordinate)
+          return{
+            id :item.targetlocDspcarId,
+            lat : coordinate[1].toString(),
+            lon : coordinate[0].toString(),
+            type : item.cdGrpName
           }
-          ],
-          "target":[
-          {
-              "lat": "37.51344",
-              "lon": "127.07691",
-              "type": "대상물",
-              "id": "8",
-              "build_sn" : "48000000022172",
-              "obj_nm" : "까치빌라",
-              "main_prpos_cd_nm" : "복합건축물"
-          },
-          {
-            "lat": " 37.51495",
-            "lon": "127.09242",
-            "type": "대상물",
-            "id": "10",
-            "build_sn" : "48000000022173",
-            "obj_nm" : "까치빌라2",
-            "main_prpos_cd_nm" : "복합건축물"
+        })
+      
+        const carFireFacilityResult = await axios.post<FireFacilityData>("/api/fire_facility/all",{
+            "callTel": selectedDisaster?.callTell, //selectedDisaster?.callTell
+            "dsrClsCd": selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
+            "dsrKndCd": selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
+            "dsrSeq": id,//id
+            "gisX": selectedDisaster?.gisX,  //selectedDisaster?.gisX
+            "gisY": selectedDisaster?.gisY, //selectedDisaster?.gisY
+            "radius": "null"
+        });
+        const emergancyFireExcuterList = carFireFacilityResult.data.result.emergFireExtinguisherList.result?.dataList?.map((item) =>{
+          const coordinate = convertCoordinateSystem(parseInt(item.gis_x_5181), parseInt(item.gis_y_5181))
+          return {
+            id : item.emerhyd_id,
+            lat : coordinate[1].toString(),
+            lon : coordinate[0].toString(),
+            type : "비상소화장치"
+          }
+        })
+
+        const targetList = carFireFacilityResult.data.result.fightingPropertyList.result?.dataList?.map((item) =>{
+          const coordinate = convertCoordinateSystem(parseInt(item.gis_x_5181), parseInt(item.gis_y_5181))
+          return {
+            id : item.bild_sn,
+            lat : coordinate[1].toString(),
+            lon : coordinate[0].toString(),
+            type : "대상물",
+            build_sn : item.bild_sn,
+            obj_nm : item.obj_nm,
+            main_prpos_cd_nm :item.main_prpos_cd_nm
+          }
+        })
+
+        const hazardousList = carFireFacilityResult.data.result.hazardousSubstancList.result?.dataList?.map((item) =>{
+          const coordinate = convertCoordinateSystem(item.gis_x_5181, item.gis_y_5181)
+          return {
+            id : item.bild_sn,
+            lat : coordinate[1].toString(),
+            lon : coordinate[0].toString(),
+            type : "위험물",
+            build_sn : item.bild_sn,
+            obj_nm : item.obj_nm,
+            main_prpos_cd_nm :item.mnfctretc_detail_se_cd_nm
+          }
+        })
+
+        const firePlugList = carFireFacilityResult.data.result.firePlugList.result?.dataList?.map((item) =>{
+          const coordinate = convertCoordinateSystem(item.gis_x_5181, item.gis_y_5181)
+          return {
+            id : item.hyd_id,
+            lat : coordinate[1].toString(),
+            lon : coordinate[0].toString(),
+            type : item.form_cd_nm.includes("지상") ? "지상" : "지하",
+          }
+        })
+        
+        const resultData = {
+          car:carPosition,
+          hydrant :  firePlugList,
+          fireExtinguisher : emergancyFireExcuterList,
+          target : targetList,
+          dangerous: hazardousList,
+          video : []
         }
-          ],
-          "dangerous":[
-          {
-              "lat": "37.51508",
-              "lon": "127.07553",
-              "type": "위험물",
-              "id": "9",
-              "build_sn": "48000000022212",
-              "obj_nm": "합천군종합사회복지관",
-              "mnfctretc_detail_se_cd_nm" : "옥내탱크저장소"
-          }
-          ]
-      }
-        const markerCount:MarkerType[] = [
-          {
-            label: '소화전',
-            value: 'water',
-            count: data.hydrant.length,
-          },
-          {
-            label: '비상소화장치',
-            value: 'extinguisher',
-            count: data.fireExtinguisher.length,
-          },
-          {
-            label: '대상물',
-            value: 'target',
-            count: data.target.length,
-          },
-          {
-            label: '위험물',
-            value: 'danger',
-            count: data.dangerous.length,
-          },
-        ];
-        return processMapData(data)
+
+        console.log(resultData)
+
+        return processMapData(resultData)
       } catch (error) {
         console.error(error)
         return null
@@ -392,7 +417,7 @@ const Map = (props: Props) => {
 
     updateVehicleMarkers();
     console.log("??????????????")
-    apiIntervalRef.current = setInterval(updateVehicleMarkers, 10000);
+    apiIntervalRef.current = setInterval(updateVehicleMarkers, 60000);
       })
     }
     return () => {
@@ -404,7 +429,7 @@ const Map = (props: Props) => {
   }, []);
 
   function processMapData(data: locationData) {
-    const processData = (items: Location[]) => items.map(item => {
+    const processData = (items: Location[]) => items?.map(item => {
       const result: any = {
         location: new window.kakao.maps.LatLng(parseFloat(item.lat), parseFloat(item.lon)),
         type: item.type,
@@ -626,7 +651,7 @@ const Map = (props: Props) => {
   },[videoMarker])
 
   useEffect(() => {
-    dangerousMarker.forEach(rescue => {
+    dangerousMarker?.forEach(rescue => {
       var imageSize = new window.kakao.maps.Size(48, 48);
       let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
       var markerImage = createMarkerImage(rescue.type, imageSize, markerOption),
@@ -683,7 +708,7 @@ const Map = (props: Props) => {
   },[dangerousMarker])
 
   useEffect(() => {
-    hydrantMarker.forEach(rescue => {
+    hydrantMarker?.forEach(rescue => {
       var imageSize = new window.kakao.maps.Size(48, 48);
       let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
       var markerImage = createMarkerImage(rescue.type, imageSize, markerOption),
@@ -694,7 +719,7 @@ const Map = (props: Props) => {
   },[hydrantMarker])
 
   useEffect(() => {
-    fireExtinguisherMarker.forEach(rescue => {
+    fireExtinguisherMarker?.forEach(rescue => {
       var imageSize = new window.kakao.maps.Size(48, 48);
       let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
       var markerImage = createMarkerImage(rescue.type, imageSize, markerOption),
@@ -705,7 +730,7 @@ const Map = (props: Props) => {
   },[fireExtinguisherMarker])
 
   useEffect(() => {
-    targetMarker.forEach(rescue => {
+    targetMarker?.forEach(rescue => {
       var imageSize = new window.kakao.maps.Size(48, 48);
       let markerOption = { offset: new window.kakao.maps.Point(48 / 2, 48 / 2) };
       var markerImage = createMarkerImage(rescue.type, imageSize, markerOption),
@@ -787,7 +812,7 @@ const Map = (props: Props) => {
       )}
       {deviceType === 'tabletHorizontal' && <Menu status={"progress"} title={selectedDisaster?.eventName} subTitle={selectedDisaster?.lawAddr} contentGap="12px" onClickBackButton={onClickClose} onCloseButton={onClickClose} />}
       <Container deviceType={deviceType}>
-        <VehicleStatus />
+        <VehicleStatus  data={aponintList}/>
         <Wrapper deviceType={deviceType}>
           <MapWrapper deviceType={deviceType} ref={mapContainer}>
             <FloatingButtons vihicleMarkerCount={carMarkers.length} videoMarkerCount={videoMarker.length} isClickRescuePosition={isRescuePositionActive} isClickVideo={isVideoActive} changeStatus={changeStatus} isClickVehicle={isVehicleActive} hasSkyButton={hasSky} setHasSky={setHasSky}/>
@@ -812,10 +837,10 @@ const Map = (props: Props) => {
         <NavbarWrapper>
           {deviceType === 'tabletHorizontal' && (
             <DrawerButtons 
-              warterMarkerCount={hydrantMarker.length} 
-              extinguisherMarkerCount={fireExtinguisherMarker.length}
-              targerMarkerCount={targetMarker.length}
-              dangerMarkerCount={dangerousMarker.length}
+              warterMarkerCount={hydrantMarker?.length | 0} 
+              extinguisherMarkerCount={fireExtinguisherMarker?.length | 0}
+              targerMarkerCount={targetMarker?.length | 0}
+              dangerMarkerCount={dangerousMarker?.length | 0}
               isClickWater={isWaterActive} 
               isClickTarget={isTargerActive} 
               isClickDanger={isDangerActive} 
@@ -825,10 +850,10 @@ const Map = (props: Props) => {
           )}
           {deviceType !== 'tabletHorizontal' && (
             <DrawerButtons 
-              warterMarkerCount={hydrantMarker.length} 
-              extinguisherMarkerCount={fireExtinguisherMarker.length}
-              targerMarkerCount={targetMarker.length}
-              dangerMarkerCount={dangerousMarker.length}
+              warterMarkerCount={hydrantMarker?.length | 0} 
+              extinguisherMarkerCount={fireExtinguisherMarker?.length | 0}
+              targerMarkerCount={targetMarker?.length | 0}
+              dangerMarkerCount={dangerousMarker?.length | 0}
               isClickWater={isWaterActive} 
               isClickTarget={isTargerActive} 
               isClickDanger={isDangerActive} 
@@ -838,7 +863,7 @@ const Map = (props: Props) => {
           )}
           <Navbar />
         </NavbarWrapper>
-        {isModalOpen && <ShareVehicleModal vehicleData={props.vehicleData} onCloseModal={setIsModalOpen} />}
+        {isModalOpen && <ShareVehicleModal position={position}  vehicleData={aponintList} onCloseModal={setIsModalOpen} />}
       </Container>
     </Flex>
   );

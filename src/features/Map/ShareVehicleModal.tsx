@@ -4,48 +4,56 @@ import ModalLayout from '@/components/common/Modal/ModalLayout';
 import { Checkbox, Flex } from '@chakra-ui/react';
 import theme from '@/theme/colors';
 import { DispatchVehicleDataType } from './VehicleStatus';
+import proj4 from 'proj4';
 
 interface Props {
   vehicleData: DispatchVehicleDataType[];
   onCloseModal: React.Dispatch<React.SetStateAction<boolean>>;
+  position: { La: number; Ma: number };
+}
+
+
+const epsg5181: string = '+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +units=m +no_defs';
+
+const convertCoordinateSystem = (x:number, y:number):[number, number] => {
+  return proj4('EPSG:4326', epsg5181, [x,y]);
 }
 
 const ShareVehicleModal = (props: Props) => {
   const [isCheckAll, setIsCheckAll] = useState(false);
   const checkboxItemStatus = props.vehicleData?.map(item => false);
   const [checkItemList, setCheckItemList] = useState(checkboxItemStatus);
+  const [checkedCarIds, setCheckedCarIds] = useState<string[]>([]);
 
   const onClickCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const arrayLength = props.vehicleData?.length;
     if (e.target.checked) {
-      setCheckItemList(Array(arrayLength).fill(true));
+      // 모든 차량의 carId를 checkedCarIds에 추가
+      setCheckedCarIds(props.vehicleData.map(item => item.carId!!));
     } else {
-      setCheckItemList(Array(arrayLength).fill(false));
+      // checkedCarIds를 비움
+      setCheckedCarIds([]);
     }
-    setIsCheckAll(e.target.checked);
   };
 
-  const toggleItem = (index: number) => {
-    const updatedCheckItems = [...checkItemList];
-    updatedCheckItems[index] = !updatedCheckItems[index];
-    setCheckItemList(updatedCheckItems);
-    return updatedCheckItems;
-  };
-
-  const onClickCheckItem = (index: number) => {
-    const toggleItemList = toggleItem(index);
-    const allChecked = toggleItemList.every(item => item === true);
-    setIsCheckAll(allChecked);
+  const onClickCheckItem = (carId: string) => {
+    if (checkedCarIds.includes(carId)) {
+      // 이미 체크된 차량의 경우 목록에서 제거
+      setCheckedCarIds(checkedCarIds.filter(id => id !== carId));
+    } else {
+      // 체크되지 않은 차량의 경우 목록에 추가
+      setCheckedCarIds([...checkedCarIds, carId]);
+    }
   };
 
   const onClickSendingButton = async () => {
-    if (checkItemList.filter(item => item === true).length > 0) {
+    if (checkedCarIds.length > 0) {
+      console.log(checkedCarIds); // 선택된 차량의 carId를 콘솔에 출력
+      console.log(convertCoordinateSystem(props.position.La, props.position.Ma))
       await alert('전송에 성공하였습니다.');
       props.onCloseModal(false);
-      return;
+    } else {
+      alert('전송할 차량을 선택하세요');
     }
-    alert('전송할 차량을 선택하세요')
-
   };
 
   return (
@@ -60,9 +68,10 @@ const ShareVehicleModal = (props: Props) => {
           </Header>
           <Divider />
           {props.vehicleData?.map((item, index) => {
+            const isChecked = checkedCarIds.includes(item.carId!!);
             return (
               <Body key={index}>
-                <Checkbox variant="orangeCheckbox" isChecked={checkItemList[index]} onChange={() => onClickCheckItem(index)}>
+                <Checkbox variant="orangeCheckbox" isChecked={isChecked} onChange={() => onClickCheckItem(item.carId!!)}>
                   {item.name}
                 </Checkbox>
               </Body>
