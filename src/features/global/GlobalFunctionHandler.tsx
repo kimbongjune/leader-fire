@@ -4,6 +4,7 @@ import axios from "../../components/common/api/axios"
 import { setDisasterInformation } from '../../features/slice/disasterSlice';
 import { AppDispatch, RootState  } from '../../app/store';
 import { DisasterInformation, DispatchItemType } from '../../types/types';
+import { saveGpsStatusDbHzAverage, saveGpsStatusSatelliteCount, saveUserLocationX, saveUserLocationY } from '../slice/UserinfoSlice';
 
 interface TypeMapping {
   [key: string]: 'others' | 'fires' | 'rescue' | 'firstAid';
@@ -205,6 +206,19 @@ const GlobalFunctionHandler = () => {
 
   console.log(isLoggedIn , searchStartDate,searchEndDate)
   useEffect(() => {
+
+    window.setGpsStatus = (satelliteCount: number, dbHzAverage: number) => {
+      console.log(`satelliteCount is ${satelliteCount} dbHzAverage is ${dbHzAverage}`)
+      dispatch(saveGpsStatusSatelliteCount(satelliteCount));
+      dispatch(saveGpsStatusDbHzAverage(dbHzAverage));
+    };
+
+    window.updateLocation = (latitude: number, longitude: number) => {
+        console.log(`location latitude=${latitude} longitude=${longitude}`)
+        dispatch(saveUserLocationX(latitude));
+        dispatch(saveUserLocationY(longitude));
+    };
+
     if (isLoggedIn && searchStartDate && searchEndDate) {
       // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
       fetchDisasterInformation(dispatch, searchStartDate, searchEndDate, useInfo.wardId, useInfo.userId);
