@@ -21,12 +21,10 @@ const AddressTab = (props: Props) => {
   const router = useRouter();
   const id = router.query.id;
   const handleClickCopyIcon = async (address?: string) => {
-    try {
-      await navigator.clipboard.writeText(address || '');
-      alert('복사 성공하였습니다.');
-    } catch (e) {
-      console.error(e);
-      alert('복사 실패하였습니다.');
+    if (window.fireAgency && window.fireAgency.copyClipboard && address) {
+      window.fireAgency.copyClipboard(address);
+    }else{
+      alert("재난 주소 정보가 올바르지 않습니다.")
     }
   };
   return (
