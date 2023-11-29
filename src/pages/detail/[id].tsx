@@ -7,7 +7,7 @@ import OrganizationItem from '@/features/Detail/OrganizationItem';
 import ReportItem from '@/features/Detail/ReportItem';
 import useDeviceType from '@/hooks/useDeviceType';
 import theme from '@/theme/colors';
-import { DeviceType } from '@/types/types';
+import {BriefDisasterInfo, DeviceType, DisasterDetailInfo} from '@/types/types';
 import { Box, Flex, Stack } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
@@ -15,7 +15,7 @@ import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
 import VehicleStatusPanelContainer from '@/features/Detail/VehicleStatusPanelContainer';
 import dynamic from 'next/dynamic';
 import ChevronRightIcon from '../../../public/images/icons/chevron-right.svg';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { KakaoUtil, Position } from '@/features/Map/kakaoUtil';
 import FloatingButtons from '@/features/Map/FloatingButtons';
 import ObjectPosition, { MarkerType } from '@/features/Map/ObjectPosition';
@@ -25,7 +25,30 @@ import { RootState } from '../../app/store';
 import { shallowEqual, useSelector } from 'react-redux';
 import axios from "../../components/common/api/axios"
 import { selectDisasterById } from '@/features/slice/test';
-import { setPollingInterval, isPollingActive, fetchDisasterDetail } from '../../features/global/GlobalApiCallHandler';
+import { type } from 'os';
+
+type Groups = {
+  name: string;
+  unit: number;
+  numberOfPeople?: number;
+}[];
+
+type Volunteer = {
+  name: string;
+  unit?: number;
+  numberOfPeople: number;
+}[];
+
+type HSaver = {
+  name: string;
+  unit?: number;
+  numberOfPeople: number;
+}[];
+
+type Vehicles = {
+  name: string;
+  numberOfVehicles: number;
+}[];
 
 //TODO 상세 페이지, 상세정보 조회(폴링)
 const DetailPage = () => {
@@ -41,17 +64,75 @@ const DetailPage = () => {
 
   const [markerCount, setMarkerCount] = useState<MarkerType[]>([])
 
+  const [controlContent, setControlContent] = useState<string>("")
+
+  const [totalNumberOfVehicle, setTotalNumberOfVehicle] = useState<number>(0)
+  const [groups, setGroups] = useState<Groups>([])
+  const [volunteers, setVolunteers] = useState<Volunteer>([])
+  const [hSaver, seyHSaver] = useState<HSaver>([])
+  const [vehicles, setVehicles] = useState<Vehicles>([])
+  
+  const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
+
   useEffect(() => {
-    if (id && !isPollingActive()) {
-      fetchDisasterDetail(id);
-      const interval =  setInterval(() => fetchDisasterDetail(id), 10000);
-      setPollingInterval(interval);
+    if (id) {
+      const fetchData = async () =>{
+        const data = await axios.get<BriefDisasterInfo>('/api/disaster_info/brief/seq',{
+          params: {
+            dsrSeq : id
+          }
+        });
+        console.log(data.data.result[0].dspAggregateDtoList.result)
+        const TotalNumberOfVehicle = data.data.result[0].dspAggregateDtoList.result.briefCar?.reduce((sum, item) => {
+          const count = item.type1TeamCnt ? parseInt(item.type1TeamCnt, 10) : 0;
+          return sum + count;
+      }, 0);
+        setTotalNumberOfVehicle(TotalNumberOfVehicle)
+
+        const group = data.data.result[0].dspAggregateDtoList.result.briefCenter?.map(item => ({
+            name: item.teamClsNm,
+            unit: parseInt(item.type1TeamCnt) || 0
+          }));
+
+        setGroups(group)
+
+        const volunteer = data.data.result[0].dspAggregateDtoList.result.briefVolunteeFire?.map(item =>({
+            name : item.teamClsNm,
+            numberOfPeople : parseInt(item.type1TeamCnt) || 0
+        }))
+
+        setVolunteers(volunteer)
+
+        const hSaver = data.data.result[0].dspAggregateDtoList.result.briefHsaver?.map(item =>({
+          name : item.teamClsNm,
+          numberOfPeople : parseInt(item.type1TeamCnt) || 0
+        }))
+
+        seyHSaver(hSaver)
+
+        const car = data.data.result[0].dspAggregateDtoList.result.briefCar?.map(item =>({
+          name : item.teamName,
+          numberOfVehicles : parseInt(item.type1TeamCnt) || 0
+        }))
+
+        setVehicles(car)
+
+        const conterContentData = data.data.result[0].disasterDetailInfo[0].ctlDesc
+        setControlContent(conterContentData)
+      }
+      fetchData()
+      apiIntervalRef.current =  setInterval(() => fetchData(), 60000);
     }
+    return () => {
+      if (apiIntervalRef.current) {
+        clearInterval(apiIntervalRef.current);
+      }
+    };
   }, [id]);
 
   const data = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
-  if (!deviceType) return null;
+  if (!deviceType || !controlContent) return null;
 
   return (
     <Layout>
@@ -71,7 +152,7 @@ const DetailPage = () => {
               {/* 신고내용 */}
               <ReportItem callTell={data?.callTell!!} deviceType={deviceType} description={data?.description!!} />
               {/* 관제내용 */}
-              <ControlItem deviceType={deviceType} />
+              <ControlItem deviceType={deviceType} controlContent={controlContent} />
               {/* 모바일 지도보기 버튼 추가 */}
               {deviceType === 'mobile' && (
                 <MapButton onClick={() => router.push(`/detail/map?id=${router.query.id}`)}>
@@ -82,7 +163,14 @@ const DetailPage = () => {
                 </MapButton>
               )}
               {/* 출동대 편성 */}
-              <OrganizationItem deviceType={deviceType} />
+              <OrganizationItem 
+                TotalNumberOfVehicle={totalNumberOfVehicle} 
+                groups={groups}
+                volunteer={volunteers}
+                hSaver={hSaver}
+                vehicles={vehicles}
+                deviceType={deviceType} 
+              />
               {deviceType === 'mobile' && <Neighborhood />}
               {deviceType === 'tabletVertical' && (
                 <Box height="424px" borderRadius="8px" overflow="hidden">
