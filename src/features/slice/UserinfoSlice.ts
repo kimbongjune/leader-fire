@@ -3,7 +3,7 @@ import { UserInformation } from '@/types/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 // Define a type for the slice state
-interface MyInfoState {
+export interface MyInfoState {
   userInfo:UserInformation;
   mobilizationTotalCount: number;
   mobilizationAcceptCount: number;
@@ -13,6 +13,7 @@ interface MyInfoState {
   gpsStatusSatelliteCount:number;
   gpsStatusDbHzAverage:number;
   logedIn:boolean;
+  sendLocationFlag:boolean
 }
 
 const initialUserInfo: UserInformation = {
@@ -36,7 +37,8 @@ const initialState: MyInfoState = {
   userLocationY:0.0,
   gpsStatusSatelliteCount:0,
   gpsStatusDbHzAverage:0.0,
-  logedIn:false
+  logedIn:false,
+  sendLocationFlag:false
 };
 
 export const myInfoSlice = createSlice({
@@ -70,6 +72,9 @@ export const myInfoSlice = createSlice({
     saveLogedInStatus: (state, action: PayloadAction<boolean>) => {
       state.logedIn = action.payload;
     },
+    saveSendLocationFlag: (state, action: PayloadAction<boolean>) => {
+      state.sendLocationFlag = action.payload;
+    },
   },
 });
 
@@ -83,7 +88,8 @@ export const {
   saveUserLocationY,
   saveGpsStatusSatelliteCount,
   saveGpsStatusDbHzAverage,
-  saveLogedInStatus
+  saveLogedInStatus,
+  saveSendLocationFlag
 } = myInfoSlice.actions;
 
 export default myInfoSlice.reducer;
