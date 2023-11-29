@@ -5,7 +5,12 @@ import styled from '@emotion/styled';
 import Refresh from '../../../../public/images/icons/refresh.svg';
 import Call from '../../../../public/images/icons/call.svg';
 import theme from '@/theme/colors';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from '@/components/common/api/axios';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { useDispatch } from 'react-redux';
+import { saveUserInformation } from '@/features/slice/UserinfoSlice';
 
 interface Props {
   isOpen: boolean;
@@ -16,11 +21,59 @@ interface Props {
 
 const TokenRefreshModal = (props: Props) => {
   const [newToken, setNewToken] = useState("");
+  const [tokent, setToken] = useState(props.existingToken)
+
+  const useInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
+  const dispatch = useDispatch();
 
   const refreshToken =() =>{
-    //TODO 자바스크립트 인터페이스로 토큰 갱신
-    setNewToken("새로운 토큰")
+    try {
+      //앱과 통신하여 새로운 토큰을 받아오고 state에 저장함
+      if (window.fireAgency && window.fireAgency.requestUpdateFcmToken) {
+        window.fireAgency.requestUpdateFcmToken();
+      }
+    } catch (error) {
+      // 에러 처리
+      console.error('Failed to fetch user info status:', error);
+    }
+
+    window.updateToken = (token: string) => {
+      console.log(token)
+      setNewToken(token)
+    }; 
   }
+
+  useEffect(() =>{
+    if (window.fireAgency && window.fireAgency.requestGetToken) {
+      window.fireAgency.requestGetToken();
+    }
+    window.updateToken = (token: string) => {
+      console.log(token)
+      setToken(token)
+    }; 
+  }, [])
+
+  const handleAcceptButton = () =>{
+    console.log("????????????")
+    axios.post(`/api/user/info/${useInfo.userId}`,{
+      "deviceTel": useInfo.deviceTel,
+      "fcmToken": newToken,
+      "userId": useInfo.userId
+    }).then(response =>{
+      dispatch(saveUserInformation({...useInfo, fcmToken : newToken}))
+      setToken(newToken)
+      setNewToken("")
+      console.log(response)
+      props.onClick()
+    }).catch(error =>{
+      console.log(error)
+      props.onClick()
+    })
+    
+    //api를 이용해 토큰 갱신
+  }
+  
 
   return (
     <ModalLayout isOpen={props.isOpen} onClose={props.onClose} borderRadius="12px">
@@ -31,7 +84,7 @@ const TokenRefreshModal = (props: Props) => {
             <Stack w="100%" spacing="16px" p="16px" border="1px solid #e9ecef" borderRadius="8px">
               <Flex justify="space-between">
                 <TokenName>기존 토큰</TokenName>
-                <TokenValue>{props.existingToken}</TokenValue>
+                <TokenValue>{tokent}</TokenValue>
               </Flex>
               <RefreshButton onClick={refreshToken}>
                 <Refresh width="20px" height="20px" color="#fff" />
@@ -45,7 +98,7 @@ const TokenRefreshModal = (props: Props) => {
           </Stack>
           <Flex w="100%" gap="16px">
             <StyledButton onClick={props.onClose}>취소</StyledButton>
-            <StyledButton bgColor={theme.colors.orange} onClick={props.onClick}>
+            <StyledButton bgColor={theme.colors.orange} onClick={() => handleAcceptButton()}>
               확인
             </StyledButton>
           </Flex>

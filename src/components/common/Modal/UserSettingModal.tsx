@@ -5,8 +5,13 @@ import styled from '@emotion/styled';
 import Person from '../../../../public/images/icons/person2.svg';
 import Call from '../../../../public/images/icons/call.svg';
 import theme from '@/theme/colors';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Switch from 'react-switch';
+import axios from '@/components/common/api/axios';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { useDispatch } from 'react-redux';
+import { saveSendLocationFlag, saveUserInformation } from '@/features/slice/UserinfoSlice';
 
 interface Props {
   isOpen: boolean;
@@ -18,7 +23,49 @@ interface Props {
 const UserSettingModal = (props: Props) => {
   const [checked, setChecked] = useState(false);
 
+  const dispatch = useDispatch()
+
   const [phoneNumber, setPhoneNumber] = useState(props?.phoneNumber)
+
+  const useInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
+  const phonNumberInput = useRef<HTMLInputElement>(null);
+
+  const [phoneError, setPhoneError] = useState('');
+  
+  dispatch(saveSendLocationFlag(checked))
+  if(checked){
+    if (window.fireAgency && window.fireAgency.startLocationService) {
+        window.fireAgency.startLocationService();
+    }
+  }else{
+    if (window.fireAgency && window.fireAgency.stopLocationService) {
+      window.fireAgency.stopLocationService();
+    }
+  }
+
+  const handleAcceptButton = () => {
+
+    if (phoneNumber === null || phoneNumber ==="") {
+      setPhoneError('전화번호를 입력해주세요.'); // 아이디 입력값이 없을 경우 오류 메시지
+      phonNumberInput.current?.focus();
+      return; // 입력값이 없으면 여기서 실행중단
+    }
+    console.log("????????????")
+    axios.post(`/api/user/info/${useInfo.userId}`,{
+      "deviceTel": phoneNumber,
+      "fcmToken": useInfo.fcmToken,
+      "userId": useInfo.userId
+    }).then(response =>{
+      dispatch(saveUserInformation({...useInfo, deviceTel : phoneNumber}))
+      console.log(response)
+      props.onClick()
+    }).catch(error =>{
+      console.log(error)
+      props.onClick()
+    })
+
+  }
 
   return (
     <ModalLayout isOpen={props.isOpen} onClose={props.onClose} borderRadius="12px">
@@ -34,10 +81,11 @@ const UserSettingModal = (props: Props) => {
           <Stack w="100%" spacing="16px">
             <InputWrapper>
               <Call width="20px" height="20px" color={theme.colors.orange} />
-              <StyledInput type="number" placeholder="전화번호 입력" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+              <StyledInput ref={phonNumberInput} type="number" placeholder="전화번호 입력" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
             </InputWrapper>
             <Flex justify="flex-end" gap="8px" pb="16px" borderBottom="1px solid #e9ecef">
-              <Switch id="myPosition" onChange={e => setChecked(e)} checked={checked} onColor={theme.colors.gray4} offColor={theme.colors.blue} width={34} height={18} handleDiameter={12} uncheckedIcon={false} checkedIcon={false} />
+            {phoneError && <FaildChangePhoneNumber>{phoneError}</FaildChangePhoneNumber>}
+              <Switch id="myPosition" onChange={e => setChecked(e)} checked={checked} onColor={theme.colors.blue} offColor={theme.colors.gray4} width={34} height={18} handleDiameter={12} uncheckedIcon={false} checkedIcon={false} />
               <SwitchText htmlFor="myPosition">내 위치 전송</SwitchText>
             </Flex>
           </Stack>
@@ -46,7 +94,7 @@ const UserSettingModal = (props: Props) => {
           </Stack>
           <Flex w="100%" gap="16px">
             <StyledButton onClick={props.onClose}>취소</StyledButton>
-            <StyledButton bgColor={theme.colors.orange} onClick={props.onClick}>
+            <StyledButton bgColor={theme.colors.orange} onClick={() => handleAcceptButton()}>
               확인
             </StyledButton>
           </Flex>
@@ -77,6 +125,16 @@ const Description = styled.div`
   font-size: 16px;
   line-height: 20px; /* 125% */
   letter-spacing: -0.32px;
+`;
+
+const FaildChangePhoneNumber = styled.div`
+  color: ${theme.colors.red};
+  font-family: 'Pretendard SemiBold';
+  font-size: 14px;
+  font-style: normal;
+  line-height: 16px;
+  letter-spacing: -0.28px;
+  margin-left: auto;
 `;
 
 const InputWrapper = styled.div`
