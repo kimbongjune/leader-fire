@@ -2,25 +2,27 @@ import styled from '@emotion/styled';
 import DetailItem from './DetailItem';
 import theme from '@/theme/colors';
 import { Flex, Stack } from '@chakra-ui/react';
+import { MarkerType } from '../Map/ObjectPosition';
 
 interface Props {
-  positions: {
-    name: string;
-    disasterCount: number;
-  }[];
+  data :MarkerType[]
 }
 
 //TODO 핸드폰 모드일 떄 표시되는 주변 정보/ 미터 제거
 const Neighborhood = (props: Props) => {
+
+  if(props.data.length == 0){
+    return
+  }
   return (
     <DetailItem title="재난위치 인근">
       <ContentWrapper>
         <Stack spacing="0" divider={<Divider />}>
-          {props.positions?.map((position, index) => {
+          {props.data?.map((position, index) => {
             return (
               <Flex key={index} justify="space-between" align="center">
-                <Name>{position.name}</Name>
-                <Count>{position.disasterCount} 건</Count>
+                <Name>{position.label}</Name>
+                <Count>{position.count} 건</Count>
               </Flex>
             );
           })}

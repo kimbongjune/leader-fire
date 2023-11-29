@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { DeviceType } from '@/types/types';
 import theme from '@/theme/colors';
+import { shallowEqual, useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { selectDisasterById } from '../slice/test';
 
 interface Props {
   description: string;
@@ -16,6 +19,26 @@ interface Props {
 const ReportItem = (props: Props) => {
   const { deviceType } = props;
   const router = useRouter();
+
+  const id = router.query.id as string;
+
+  const data = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
+  console.log(data)
+
+
+  const openThirdPartyMapApplication = (mapType:string) =>{
+    if(data){
+      if (window.fireAgency && window.fireAgency.openThirdPartyMapApplication) {
+        console.log(data?.gisX, data?.gisY)
+        if(data.gisX && data.gisY){
+          window.fireAgency.openThirdPartyMapApplication(mapType, data.gisX.toString(), data.gisY.toString(), data.lawAddr);
+        }else{
+          return alert("재난 좌표 정보가 없습니다.")
+        }
+      }
+    }
+  }
 
   return (
     <Stack spacing="8px">
@@ -32,10 +55,10 @@ const ReportItem = (props: Props) => {
       <TabBar>
         <Flex justify="space-between" gap="24px" align="center">
           <Flex gap="12px" align="center" width="fit-content">
-           {props.callTell && <a href={`tel:${props.callTell}`}><Image src="/images/icons/call.png" width={36} height={36} alt="통화 아이콘" ></Image></a>}
-            <Image src="/images/icons/naverMap.png" width={36} height={36} alt="네이버지도 아이콘" />
-            <Image src="/images/icons/kakaoMap.png" width={36} height={36} alt="카카오지도 아이콘" />
-            <Image src="/images/icons/map.png" width={36} height={36} alt="원내비지도 아이콘" />
+           {props.callTell && props.callTell.trim() != '' && <a href={`tel:${props.callTell}`}><Image src="/images/icons/call.png" width={36} height={36} alt="통화 아이콘" ></Image></a>}
+            <Image src="/images/icons/naverMap.png" width={36} height={36} alt="네이버지도 아이콘" onClick={() => openThirdPartyMapApplication("naver")}/>
+            <Image src="/images/icons/kakaoMap.png" width={36} height={36} alt="카카오지도 아이콘"onClick={() => openThirdPartyMapApplication("kakao")} />
+            <Image src="/images/icons/map.png" width={36} height={36} alt="원내비지도 아이콘" onClick={() => openThirdPartyMapApplication("onenavi")} />
           </Flex>
           <Response deviceType={deviceType}>대응 단계 없음</Response>
         </Flex>
