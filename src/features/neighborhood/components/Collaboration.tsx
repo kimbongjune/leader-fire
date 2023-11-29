@@ -49,6 +49,10 @@ const Collaboration = (props: Props) => {
 
   const collaborationData = transformData(props.data)
 
+  if(!collaborationData?.length){
+    return null
+  }
+
   return (
     <>
       {collaborationData.map((data, index) => {

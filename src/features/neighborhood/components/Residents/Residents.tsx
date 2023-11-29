@@ -13,6 +13,12 @@ type Props = {
 const Residents = (props:Props) => {
   const deviceType = useDeviceType();
 
+  console.log(props.nearbyFacilityPersonnelList?.length && props.nearbyResidentsList?.length && props.nearbyOfficialsList?.length)
+
+  if(!props.nearbyOfficialsList?.length && !props.nearbyFacilityPersonnelList?.length && !props.nearbyResidentsList?.length){
+    return null
+  }
+
   if (deviceType !== 'mobile') return <TabletResidents {...props}/>;
   return <MobileResidents {...props}/>;
 };

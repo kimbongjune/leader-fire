@@ -15,6 +15,10 @@ interface Props {
 const Facility = (props:Props) => {
   const deviceType = useDeviceType();
 
+  if(!props.fightingPropertyList?.length && !props.hazardousSubstancList?.length && !props.toxicFacilityList?.length && !props.nearbyBusinessesList?.length){
+    return null
+  }
+
   return <TabletFacility deviceType={deviceType} 
   fightingPropertyList={props?.fightingPropertyList}
   hazardousSubstancList={props?.hazardousSubstancList}
