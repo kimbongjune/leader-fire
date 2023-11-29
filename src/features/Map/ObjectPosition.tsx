@@ -78,42 +78,6 @@ const ObjectPosition = (props: Props) => {
 
 export default ObjectPosition;
 
-ObjectPosition.defaultProps = {
-  items: [
-    {
-      label: '소화전',
-      value: 'water',
-      count: 3,
-    },
-    {
-      label: '비상소화장치',
-      value: 'extinguisher',
-      count: 3,
-    },
-    {
-      label: '대상물',
-      value: 'target',
-      count: 3,
-    },
-    {
-      label: '위험물',
-      value: 'danger',
-      count: 3,
-    },
-    // {
-    //   label: '피난약자',
-    //   value: 'vulnerble',
-    //   count: 3,
-    // },
-    // {
-    //   label: '과거이력',
-    //   value: 'history',
-    //   count: 3,
-    //   hasRefreshButton: true,
-    // },
-  ],
-};
-
 const Wrapper = styled.div`
   padding: 16px;
   border-radius: 8px;

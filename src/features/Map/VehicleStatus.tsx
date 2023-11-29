@@ -253,12 +253,70 @@ const VehicleStatus = (props: Props) => {
     <Container deviceType={deviceType}>
       <Title deviceType={deviceType}>출동차량</Title>
       <Wrapper deviceType={deviceType}>
-        <VehicleStatusItem status="출동" name="상대펌프" transmissionStatus="전송 성공" />
-        <VehicleStatusItem status="출동" name="상대펌프" transmissionStatus="전송 실패" />
-        <VehicleStatusItem status="도착" name="진주구조골절" transmissionStatus="전송 성공" />
-        <VehicleStatusItem status="도착" name="상대펌프" transmissionStatus="확인 완료" />
-        <VehicleStatusItem status="귀소" name="진주구조골절" transmissionStatus="전송 성공" />
-        <VehicleStatusItem status="귀소" name="상대펌프" transmissionStatus="확인 완료" />
+      {/* {props.data
+                ?.filter(data => data.status === '업무운행')
+                ?.map((data, index) => {
+                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+                })}
+
+      {props.data
+                ?.filter(data => data.status === '본소출동대기')
+                ?.map((data, index) => {
+                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+                })}
+
+        {props.data
+                ?.filter(data => data.status === '본소출동불가능대기')
+                ?.map((data, index) => {
+                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+                })}
+                
+            {props.data
+              ?.filter(data => data.status === '편성중')
+              ?.map((data, index) => {
+                return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+              })}
+      {props.data
+                ?.filter(data => data.status === '출동중')
+                ?.map((data, index) => {
+                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+                })}
+      {props.data
+          ?.filter(data => data.status === '귀소중편성가')
+          ?.map((data, index) => {
+            return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+          })}
+
+      {props.data
+                ?.filter(data => data.status === '귀소중편성불가')
+                ?.map((data, index) => {
+                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+                })}
+      {props.data
+                ?.filter(data => data.status === '이동대기중')
+                ?.map((data, index) => {
+                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+                })}
+      {props.data
+                ?.filter(data => data.status === '고장수리중')
+                ?.map((data, index) => {
+                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+                })}
+      {props.data
+                ?.filter(data => data.status === '기타편성가능')
+                ?.map((data, index) => {
+                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+                })}
+      {props.data
+                ?.filter(data => data.status === '기타편성불가능')
+                ?.map((data, index) => {
+                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+                })}
+      {props.data
+          ?.filter(data => data.status === '활동중')
+          ?.map((data, index) => {
+            return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
+          })} */}
       </Wrapper>
     </Container>
   );

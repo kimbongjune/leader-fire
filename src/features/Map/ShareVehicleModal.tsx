@@ -5,11 +5,13 @@ import { Checkbox, Flex } from '@chakra-ui/react';
 import theme from '@/theme/colors';
 import { DispatchVehicleDataType } from './VehicleStatus';
 import proj4 from 'proj4';
+import axios from "../../components/common/api/axios"
 
 interface Props {
   vehicleData: DispatchVehicleDataType[];
   onCloseModal: React.Dispatch<React.SetStateAction<boolean>>;
   position: { La: number; Ma: number };
+  dsrSeq : string
 }
 
 
@@ -48,7 +50,39 @@ const ShareVehicleModal = (props: Props) => {
   const onClickSendingButton = async () => {
     if (checkedCarIds.length > 0) {
       console.log(checkedCarIds); // 선택된 차량의 carId를 콘솔에 출력
+
+      const apiKey = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY;
+      console.log(apiKey)
+
+      // const address = await axios.get("https://dapi.kakao.com/v2/local/geo/coord2address.json",{
+      //   data:{
+      //     x : props.position.La,
+      //     y : props.position.Ma
+      //   },
+      //   headers : {'Authorization': `KakaoAK ${apiKey}`}
+      // })
+
+      // console.log(address)
       console.log(convertCoordinateSystem(props.position.La, props.position.Ma))
+      // const data = {
+      //   dsrSeq : props.dsrSeq,
+      //   targetCarList :checkedCarIds,
+      //   targetlocBunziAddr : 
+      console.log(checkedCarIds)
+      const data = {
+        dsrSeq : props.dsrSeq,
+        targetCarList : checkedCarIds.map(id => ({ targetlocDspcarId: Number(id) })),
+        targetlocBunziAddr: "김해시 주촌면 서부로 1638번안길 14-10",
+        targetlocDspcarId: 4800000372,
+        targetlocId: 202311090002,
+        targetlocRoadAddr: "경남 통영시 한산면 추봉로 280",
+        targetlocRoger: true,
+        targetlocUserid: "2gang5",
+        targetlocX: 350582.75,
+        targetlocY: 153972.42
+      }
+      const result = await axios.post("/api/commander_appoint/seq",data)
+      console.log(result)
       await alert('전송에 성공하였습니다.');
       props.onCloseModal(false);
     } else {

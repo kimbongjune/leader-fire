@@ -171,6 +171,28 @@ const Map = (props: Props) => {
 
   const [aponintList, setAponintList] = useState<DispatchVehicleDataType[]>([])
 
+  const gpsStatusSatelliteCount = useSelector((state: RootState) => state.userReducer.gpsStatusSatelliteCount);
+  const gpsStatusDbHzAverage = useSelector((state: RootState) => state.userReducer.gpsStatusDbHzAverage);
+
+  const [isReceivingGPS, setIsReceivingGPS] = useState(true);
+
+  const userLocationX = useSelector((state: RootState) => state.userReducer.userLocationX);
+  const userLocationY = useSelector((state: RootState) => state.userReducer.userLocationY);
+  const userLocationMarker = useRef<any>(null);
+
+  console.log("userLocationX", userLocationX)
+  console.log("userLocationY", userLocationY)
+
+
+  useEffect(() => {
+    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@",gpsStatusDbHzAverage)
+    if(gpsStatusDbHzAverage >= 30){
+      setIsReceivingGPS(true);
+    }else{
+      setIsReceivingGPS(false);
+    }
+  }, [gpsStatusDbHzAverage]);
+
   const changeStatus = (value: string) => {
     if (value === 'water') dispatch(setIsWaterMarkerActive(!isWaterActive));
     if (value === 'extinguisher') dispatch(setIsExtinguisherMarkerActive(!isExtinguisherActive));
@@ -225,6 +247,24 @@ const Map = (props: Props) => {
     return markerImage;
   }
 
+  const requestLocation = () =>{
+    if (userLocationX && userLocationY) {
+        const position = new window.kakao.maps.LatLng(userLocationX, userLocationY);
+        const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
+        const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
+        const markerImage = createMarkerImage('/images/icons/Ripple-3.1s-354px.gif', imageSize, imageOption);
+        const marker = createMarker(position, markerImage);
+  
+        marker.setMap(null)
+  
+        // 새로운 마커를 지도에 추가하고, 참조를 업데이트합니다.
+        marker.setMap(mapInstance.current);
+        userLocationMarker.current = marker;
+    }else{
+      alert("위치정보 수신 불가")
+    }
+  }
+
   useEffect(() => {
     dispatch(setIsWaterMarkerActive(isWaterActive === true));
     dispatch(setIsExtinguisherMarkerActive(isExtinguisherActive === true));
@@ -252,6 +292,43 @@ const Map = (props: Props) => {
         mapInstance.current = map
 
         dispatch(setIsRescuePositionActive(true))
+
+        if (window.fireAgency && window.fireAgency.getLastLocation) {
+          const location = window.fireAgency.getLastLocation();
+          console.log("location", location)
+          if(location != ""){
+            const [locationX, locationY] = location.split(" ")
+            const position = new window.kakao.maps.LatLng(locationX, locationY);
+            const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
+            const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
+            const markerImage = createMarkerImage('/images/icons/Ripple-3.1s-354px.gif', imageSize, imageOption);
+            const marker = createMarker(position, markerImage);
+      
+            marker.setMap(null)
+      
+            // 새로운 마커를 지도에 추가하고, 참조를 업데이트합니다.
+            marker.setMap(mapInstance.current);
+            userLocationMarker.current = marker;
+          }
+        }
+      
+        if (userLocationX && userLocationY) {
+          console.log("?????")
+          const position = new window.kakao.maps.LatLng(userLocationX, userLocationY);
+          const imageSize = new window.kakao.maps.Size(24, 35); // 마커의 크기 설정
+          const imageOption = { offset: new window.kakao.maps.Point(12, 35) }; // 마커의 옵션 설정
+          const markerImage = createMarkerImage('/images/icons/Ripple-3.1s-354px.gif', imageSize, imageOption);
+          const marker = createMarker(position, markerImage);
+      
+          marker.setMap(null)
+      
+          // 새로운 마커를 지도에 추가하고, 참조를 업데이트합니다.
+          marker.setMap(mapInstance.current);
+          userLocationMarker.current = marker;
+          // 여기서 마커 생성 로직을 실행
+        } else {
+          console.log("사용자 위치가 유효하지 않습니다.");
+        }
 
         setRescueMarker(
           [
@@ -801,30 +878,30 @@ const Map = (props: Props) => {
     <Flex direction="column" h="100vh">
       {deviceType === 'mobile' && (
         <>
-          <Menu title={selectedDisaster?.eventName} subTitle={selectedDisaster?.lawAddr} contentGap="12px" hasCloseButtonWithoutString={true} closeButtonText="닫기" onClickBackButton={onClickClose} onCloseButton={onClickClose} />
+          <Menu title={selectedDisaster?.eventName} status={selectedDisaster?.status} subTitle={selectedDisaster?.lawAddr} contentGap="12px" hasCloseButtonWithoutString={true} closeButtonText="닫기" onClickBackButton={onClickClose} onCloseButton={onClickClose} />
         </>
       )}
       {deviceType === 'tabletVertical' && (
         <>
-          <Menu title={selectedDisaster?.eventName} subTitle={selectedDisaster?.lawAddr} contentGap="12px" onClickBackButton={onClickClose} onCloseButton={onClickClose} />
+          <Menu title={selectedDisaster?.eventName} status={selectedDisaster?.status} subTitle={selectedDisaster?.lawAddr} contentGap="12px" onClickBackButton={onClickClose} onCloseButton={onClickClose} />
           <AddressTab contentJustify={'flex-start'} marginLeft="8px" />
         </>
       )}
-      {deviceType === 'tabletHorizontal' && <Menu status={"progress"} title={selectedDisaster?.eventName} subTitle={selectedDisaster?.lawAddr} contentGap="12px" onClickBackButton={onClickClose} onCloseButton={onClickClose} />}
+      {deviceType === 'tabletHorizontal' && <Menu status={selectedDisaster?.status} title={selectedDisaster?.eventName} subTitle={selectedDisaster?.lawAddr} contentGap="12px" onClickBackButton={onClickClose} onCloseButton={onClickClose} />}
       <Container deviceType={deviceType}>
         <VehicleStatus  data={aponintList}/>
         <Wrapper deviceType={deviceType}>
           <MapWrapper deviceType={deviceType} ref={mapContainer}>
             <FloatingButtons vihicleMarkerCount={carMarkers.length} videoMarkerCount={videoMarker.length} isClickRescuePosition={isRescuePositionActive} isClickVideo={isVideoActive} changeStatus={changeStatus} isClickVehicle={isVehicleActive} hasSkyButton={hasSky} setHasSky={setHasSky}/>
             <Stack spacing="16px" position={deviceType === 'tabletHorizontal' ? 'fixed' : 'fixed'} left={deviceType === 'tabletHorizontal' ? '331px' : '16px'} bottom={deviceType === 'tabletHorizontal' ? '120px' : '97px'} zIndex={10}>
-            <CircleButton>
+            <GpsWarper isActive={isReceivingGPS}>
               <IconWrapper width="24px" height="24px" color={theme.colors.gray}>
                 <Satellite />
               </IconWrapper>
-            </CircleButton>
+            </GpsWarper>
               <CircleButton
                 onClick={() => {
-                  mapInstance.current.setCenter(new window.kakao.maps.LatLng(props.latitude, props.longitude));
+                  requestLocation();
                 }}
               >
                 <IconWrapper width="24px" height="24px" color={theme.colors.gray}>
@@ -863,7 +940,7 @@ const Map = (props: Props) => {
           )}
           <Navbar />
         </NavbarWrapper>
-        {isModalOpen && <ShareVehicleModal position={position}  vehicleData={aponintList} onCloseModal={setIsModalOpen} />}
+        {isModalOpen && <ShareVehicleModal dsrSeq={id} position={position}  vehicleData={aponintList} onCloseModal={setIsModalOpen} />}
       </Container>
     </Flex>
   );
@@ -1067,4 +1144,18 @@ const CircleButton = styled.button`
   border-radius: 44px;
   border: 1px solid ${theme.colors.gray2};
   background: #fff;
+`;
+
+const GpsWarper = styled.div<{ isActive?: boolean }>`
+  width: fit-content;
+  padding: 16px;
+  border-radius: 44px;
+  border: 1px solid ${theme.colors.gray2};
+  background: ${theme.colors.orange};
+  box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.25);
+  ${({ isActive }) =>
+    isActive &&
+    `
+    background: ${theme.colors.green};
+  `}
 `;
