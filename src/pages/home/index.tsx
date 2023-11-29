@@ -7,18 +7,12 @@ import HomeMenu from '@/features/Home/HomeMenu';
 import useDeviceType from '@/hooks/useDeviceType';
 import { DeviceType } from '@/types/types';
 import { NextPageContext } from 'next';
-import { clearPollingInterval } from '@/features/global/GlobalApiCallHandler';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 
 //TODO 메인페이지
 const HomePage = () => {
   const deviceType = useDeviceType();
-  
-  useEffect(() => {
-    clearPollingInterval();
-  }, []);
-
   
   const testData = useSelector((state: RootState) => state.disaster.disasterInformation);
   console.log(testData)
