@@ -8,12 +8,12 @@ export type VehicleStatusTableDataType = {
   rowData: {
     callingName: string; // 무선 호출명
     status?: string; // 출동대 동태
-    peopleCount: number; // 인원 수
+    peopleCount?: number; // 인원 수
   }[];
   total: {
     // 합계 데이터
     vehicleCount: number; // 차량 수
-    peopleCount: number; // 인원 수
+    peopleCount?: number; // 인원 수
   };
 };
 
@@ -30,25 +30,25 @@ const VehicleStatusTable = (props: Props) => {
         <TableHeadRow>
           <TableData>구분</TableData>
           <TableData>동태</TableData>
-          <TableData>인원</TableData>
+          {/* <TableData>인원</TableData> */}
         </TableHeadRow>
       </TableHead>
       <TableBody>
-        {props.data?.rowData?.map((row, index) => {
+        {props?.data?.rowData?.map((row, index) => {
           return (
             <TableRow key={index} deviceType={props.deviceType}>
               <TableData>{index + 1}</TableData>
               <TableData>{row.callingName}</TableData>
               <TableData color={!row.status && theme.colors.gray5}>{row.status ?? '-'}</TableData>
-              <TableData>{row.peopleCount}명</TableData>
+              {/* <TableData>{row.peopleCount}명</TableData> */}
             </TableRow>
           );
         })}
         <TotalRow>
           <TableData>소계</TableData>
-          <TableData>{props.data.total.vehicleCount}대</TableData>
+          <TableData>{props?.data?.total.vehicleCount}대</TableData>
           <TableData color={theme.colors.gray5}>-</TableData>
-          <TableData>{props.data.total.peopleCount}명</TableData>
+          {/* <TableData>{props.data.total.peopleCount}명</TableData> */}
         </TotalRow>
       </TableBody>
     </Table>

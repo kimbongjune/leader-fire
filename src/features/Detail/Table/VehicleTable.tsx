@@ -34,7 +34,7 @@ const VehicleTable = (props: Props) => {
         <TableHeadRow deviceType={deviceType}>
           <TableData>구분</TableData>
           <TableData>차량수</TableData>
-          <TableData>인원수</TableData>
+          {/* <TableData>인원수</TableData> */}
         </TableHeadRow>
       </TableHead>
       <TableBody>
@@ -52,10 +52,10 @@ const VehicleTable = (props: Props) => {
                           {item.vehicleCount || '-'}
                           {item.vehicleCount && '대'}
                         </TableData>
-                        <TableData flex={1} color={!item.type && !item.peopleCount && theme.colors.gray5}>
+                        {/* <TableData flex={1} color={!item.type && !item.peopleCount && theme.colors.gray5}>
                           {item.peopleCount || '-'}
                           {item.peopleCount && '명'}
-                        </TableData>
+                        </TableData> */}
                       </TableDataWrapper>
                     </Flex>
                   );
@@ -68,7 +68,7 @@ const VehicleTable = (props: Props) => {
           <>
             <TableData>소계</TableData>
             <TableData flex={1}>{props.rowData.total.vehicleCount}대</TableData>
-            <TableData flex={1}>{props.rowData.total.peopleCount}명</TableData>
+            {/* <TableData flex={1}>{props.rowData.total.peopleCount}명</TableData> */}
           </>
         </TotalRow>
       </TableBody>

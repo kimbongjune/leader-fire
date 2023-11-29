@@ -16,8 +16,8 @@ export interface OrganizationTableDataType {
     dispatcherColor?: string; // 출동대 컬러
     data: {
       type?: string; // 데이터 타입
-      vehicleCount?: number; // 차량 수
-      peopleCount?: number; // 인원 수
+      vehicleCount: number; // 차량 수
+      peopleCount: number; // 인원 수
     }[];
   }[];
   total: OrganizationTotalType;
@@ -31,17 +31,18 @@ interface Props {
 }
 
 const OrganizationTable = (props: Props) => {
+  
   return (
     <Table deviceType={props.deviceType}>
       <TableHead>
         <TableHeadRow>
           {props.columnNames?.map((column, index) => {
-            return <TableData>{column}</TableData>;
+            return <TableData key={index}>{column}</TableData>;
           })}
         </TableHeadRow>
       </TableHead>
       <TableBody>
-        {props.data.rowData?.map((rowData, index) => {
+        {props.data?.rowData?.map((rowData, index) => {
           return (
             <TableRow deviceType={props.deviceType} key={index} typeColor={rowData.dispatcherColor} count={rowData.data.length}>
               <TableData isSingle={rowData.data.length === 1 && rowData.data[0].type === undefined} flex="0 0 1">
@@ -53,34 +54,33 @@ const OrganizationTable = (props: Props) => {
                     <Flex w="100%" key={index}>
                       {item.type !== '소계' && (
                         <TableDataWrapper>
-                          {item.type && (
-                            <TableData color={item.type && rowData.data.length === 1 && theme.colors.gray5} width="104px">
-                              {item.type && rowData.data.length > 1 && item.type}
-                              {item.type && rowData.data.length === 1 && '-'}
-                            </TableData>
-                          )}
-                          <TableData flex={1}>
-                            {item.vehicleCount || '-'}
-                            {item.vehicleCount && props.rowDataValueFormat?.[0]}
+                        {item.type && (
+                          <TableData color={item.type && rowData.data.length === 0 && theme.colors.gray5} width="104px">
+                            {item.type ? item.type : '-'}
                           </TableData>
-                          <TableData flex={1}>
-                            {item.peopleCount || '-'}
-                            {item.vehicleCount && props.rowDataValueFormat?.[1]}
-                          </TableData>
-                        </TableDataWrapper>
-                      )}
-                      {item.type === '소계' && (
-                        <TableDataWrapper type={item.type}>
-                          <TableData width="104px">{item.type}</TableData>
-                          <TableData flex={1}>
-                            {item.vehicleCount || '-'}
-                            {item.vehicleCount && props.rowDataValueFormat?.[0]}
-                          </TableData>
-                          <TableData flex={1}>
-                            {item.peopleCount || '-'}
-                            {item.vehicleCount && props.rowDataValueFormat?.[1]}
-                          </TableData>
-                        </TableDataWrapper>
+                        )}
+                        <TableData flex={1}>
+                          {item.vehicleCount > 0 ? item.vehicleCount : '-'}
+                          {item.vehicleCount > 0 && props.rowDataValueFormat?.[0]}
+                        </TableData>
+                        <TableData flex={1}>
+                          {item.peopleCount > 0 ? item.peopleCount : '-'}
+                          {item.peopleCount > 0 && props.rowDataValueFormat?.[1]}
+                        </TableData>
+                      </TableDataWrapper>
+                    )}
+                    {item.type === '소계' && (
+                      <TableDataWrapper type={item.type}>
+                        <TableData width="104px">{item.type}</TableData>
+                        <TableData flex={1}>
+                          {item.vehicleCount > 0 ? item.vehicleCount : '-'}
+                          {item.vehicleCount > 0 && props.rowDataValueFormat?.[0]}
+                        </TableData>
+                        <TableData flex={1}>
+                          {item.peopleCount > 0 ? item.peopleCount : '-'}
+                          {item.peopleCount > 0 && props.rowDataValueFormat?.[1]}
+                        </TableData>
+                      </TableDataWrapper>
                       )}
                     </Flex>
                   );

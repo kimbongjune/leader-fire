@@ -10,8 +10,17 @@ import { useRouter } from 'next/router';
 
 interface Props {
   TotalNumberOfVehicle: number;
-  TotalNumberOfPeople: number;
   groups: {
+    name: string;
+    unit: number;
+    numberOfPeople?: number;
+  }[];
+  volunteer : {
+    name: string;
+    unit?: number;
+    numberOfPeople: number;
+  }[];
+  hSaver : {
     name: string;
     unit?: number;
     numberOfPeople: number;
@@ -28,15 +37,29 @@ const OrganizationItem = (props: Props) => {
   const router = useRouter();
   const id = router.query.id;
   const { deviceType } = props;
+
+  const totalVolunteerPeople = props.volunteer?.reduce((sum, item) => {
+    const count = item.numberOfPeople;
+    return sum + count;
+  }, 0);
+
+  const totalHSaverPeople = props.hSaver?.reduce((sum, item) => {
+    const count = item.numberOfPeople;
+    return sum + count;
+  }, 0);
+
+  const totalPeople = totalVolunteerPeople + totalHSaverPeople
+  console.log(totalPeople)
+
   return (
-    <Box onClick={() => router.push(`/detail/organization`)}>
+    <Box onClick={() => router.push(`/detail/organization?id=${id}`)}>
       <DetailItem title="출동대 편성">
         <ContentWrapper>
           <Stack spacing="8px" flex={1}>
             <Content>
               <PersonnelStatus>
                 <Flex gap="4px" align="center">
-                  총<span>{String(props.TotalNumberOfVehicle).padStart(3, '0')}</span>대 / <span>{String(props.TotalNumberOfPeople).padStart(3, '0')}</span> 명
+                  총<span>{String(props.TotalNumberOfVehicle).padStart(3, '0')}</span>대 / <span>{String(totalPeople || 0).padStart(3, '0')}</span> 명
                 </Flex>
               </PersonnelStatus>
             </Content>
@@ -44,6 +67,34 @@ const OrganizationItem = (props: Props) => {
               <Content flex={1} height="100%" align="flex-start">
                 <Stack flex={1} divider={<Divider deviceType={deviceType} />}>
                   {props.groups?.map((group, index) => {
+                    return (
+                      <Flex key={index} justify="space-between" align="center">
+                        <Name>{group.name}</Name>
+                        {!isUndefined(group.unit) && (
+                          <Status>
+                            {String(group.unit).padStart(2, '0')}개소 
+                            {/* <span>({String(group.numberOfPeople).padStart(2, '0')}명)</span> */}
+                          </Status>
+                        )}
+                        {isUndefined(group.unit) && <Status>{String(group.numberOfPeople).padStart(2, '0')}명</Status>}
+                      </Flex>
+                    );
+                  })}
+
+                {props.volunteer?.map((group, index) => {
+                    return (
+                      <Flex key={index} justify="space-between" align="center">
+                        <Name>{group.name}</Name>
+                        {!isUndefined(group.unit) && (
+                          <Status>
+                            {String(group.unit).padStart(2, '0')}개소 <span>({String(group.numberOfPeople).padStart(2, '0')}명)</span>
+                          </Status>
+                        )}
+                        {isUndefined(group.unit) && <Status>{String(group.numberOfPeople).padStart(2, '0')}명</Status>}
+                      </Flex>
+                    );
+                  })}
+                  {props.hSaver?.map((group, index) => {
                     return (
                       <Flex key={index} justify="space-between" align="center">
                         <Name>{group.name}</Name>
@@ -97,67 +148,6 @@ const OrganizationItem = (props: Props) => {
 };
 
 export default OrganizationItem;
-
-OrganizationItem.defaultProps = {
-  TotalNumberOfVehicle: 0,
-  TotalNumberOfPeople: 0,
-  groups: [
-    {
-      name: '안전센터',
-      unit: 0,
-      numberOfPeople: 0,
-    },
-    {
-      name: '구조대',
-      unit: 0,
-      numberOfPeople: 0,
-    },
-    {
-      name: '지역대',
-      unit: 0,
-      numberOfPeople: 0,
-    },
-    {
-      name: '의소대',
-      unit: 2,
-      numberOfPeople: 90,
-    },
-    {
-      name: '생명지킴이',
-      numberOfPeople: 0,
-    },
-  ],
-  vehicles: [
-    {
-      name: '펌프차',
-      numberOfVehicles: 0,
-    },
-    {
-      name: '사다리',
-      numberOfVehicles: 0,
-    },
-    {
-      name: '물탱크',
-      numberOfVehicles: 0,
-    },
-    {
-      name: '화학차',
-      numberOfVehicles: 0,
-    },
-    {
-      name: '굴절차',
-      numberOfVehicles: 0,
-    },
-    {
-      name: '영상차',
-      numberOfVehicles: 0,
-    },
-    {
-      name: '기타',
-      numberOfVehicles: 0,
-    },
-  ],
-};
 
 const ContentWrapper = styled.div`
   display: flex;
