@@ -8,11 +8,13 @@ import theme from '@/theme/colors';
 import DetailItem from '@/features/Detail/DetailItem';
 import HistoryTable from '@/features/Detail/HistoryTable';
 import useDeviceType from '@/hooks/useDeviceType';
-import { DeviceType } from '@/types/types';
+import { ControlContentData, DeviceType, DisasterDetailInfo } from '@/types/types';
 import SwiperView from '@/components/common/SwiperView/SwiperView';
 import { shallowEqual, useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import { selectDisasterById } from '@/features/slice/test';
+import { useEffect, useRef, useState } from 'react';
+import axios from '@/components/common/api/axios';
 
 interface Props {
   histories: {
@@ -24,6 +26,42 @@ interface Props {
   }[];
 }
 
+interface TimeSeriesItem {
+  time: string;
+  description: string;
+}
+
+interface HistoryItem {
+  date: string;
+  timeSeries: TimeSeriesItem[];
+}
+
+const convertToHistoryFormat = (data: DisasterDetailInfo[]): Props => {
+  const groupedByDate: Record<string, { time: string; description: string; }[]> = {};
+
+  data.forEach(item => {
+    const dateKey = item.ctlProcDtime.substring(0, 8); // YYYYMMDD 형식
+    const formattedDate = `${dateKey.substring(0, 4)}-${dateKey.substring(4, 6)}-${dateKey.substring(6, 8)}T00:00:00`;
+    const formattedTime = `${formattedDate.substring(0, 10)}T${item.ctlProcDtime.substring(8, 10)}:${item.ctlProcDtime.substring(10, 12)}:${item.ctlProcDtime.substring(12, 14)}`;
+
+    if (!groupedByDate[formattedDate]) {
+      groupedByDate[formattedDate] = [];
+    }
+
+    groupedByDate[formattedDate].push({
+      time: formattedTime,
+      description: item.ctlDesc
+    });
+  });
+
+  const histories = Object.keys(groupedByDate).map(date => ({
+    date,
+    timeSeries: groupedByDate[date]
+  }));
+
+  return { histories };
+};
+
 //TODO 관제내용 상세보기 탭
 const ControlDetail = (props: Props) => {
   const router = useRouter();
@@ -31,7 +69,31 @@ const ControlDetail = (props: Props) => {
 
   const id = router.query.id as string;
 
-  const selectedData = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+  const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
+
+  const [controlContent, setControlContent] = useState<Props>();
+
+  useEffect(() => {
+    if (id) {
+      const fetchData = async () =>{
+        const data = await axios.get<ControlContentData>('/api/disaster_info/control/seq',{
+          params: {
+            dsrSeq : id
+          }
+        });
+        const controlContentList = data.data.result[0].disasterDetailInfo
+        const histories = convertToHistoryFormat(controlContentList);
+        setControlContent(histories);
+      }
+      fetchData()
+      apiIntervalRef.current =  setInterval(() => fetchData(), 60000);
+    }
+    return () => {
+      if (apiIntervalRef.current) {
+        clearInterval(apiIntervalRef.current);
+      }
+    };
+  }, [id]);
 
   return (
     <Layout>
@@ -40,7 +102,7 @@ const ControlDetail = (props: Props) => {
           <Menu status={"progress"} title="관제 내용" contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
         </MenuWrapper>
         <Children deviceType={deviceType}>
-          {props.histories?.map((history, index) => {
+          {controlContent?.histories?.map((history, index) => {
             return (
               <DetailItem key={index} title={dayjs(history.date).format('YYYY년 MM월 DD일')}>
                 <HistoryTable rows={history.timeSeries} />

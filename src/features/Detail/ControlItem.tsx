@@ -7,6 +7,7 @@ import { DeviceType } from '@/types/types';
 
 interface Props {
   deviceType: DeviceType;
+  controlContent:string;
 }
 
 //TODO 관제내용 탭
@@ -17,7 +18,7 @@ const ControlItem = (props: Props) => {
     <Stack spacing="8px">
       <Title>관제내용</Title>
       <ContentWrapper>
-        <Content>관제내용 터치시 전체보기 혹은 펼치기</Content>
+        <Content>{props?.controlContent || "관제내용 상세보기"}</Content>
         <StyledButton onClick={() => router.push(`/detail/${router.query.id}/control`)} deviceType={deviceType}>
           <Flex gap="4px" justify={deviceType === 'mobile' ? 'center' : 'flex-end'}  align="center">
             <Box pt="2px">더보기</Box>
