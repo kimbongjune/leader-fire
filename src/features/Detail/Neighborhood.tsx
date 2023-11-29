@@ -11,9 +11,6 @@ interface Props {
 //TODO 핸드폰 모드일 떄 표시되는 주변 정보/ 미터 제거
 const Neighborhood = (props: Props) => {
 
-  if(props.data.length == 0){
-    return
-  }
   return (
     <DetailItem title="재난위치 인근">
       <ContentWrapper>
