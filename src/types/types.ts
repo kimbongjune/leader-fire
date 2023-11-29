@@ -839,3 +839,632 @@ type CmDsrCallDtoResult = {
   chkYn: string | null
   viewYn: string | null
 }
+
+export interface BriefDisasterInfo {
+  result: BriefDisasterInfoResult[]
+  response: string
+  responseCode: number
+  responseMsg: string
+}
+
+export interface BriefDisasterInfoResult {
+  dspAggregateDtoList: DspAggregateDtoList
+  disasterDetailInfo: DisasterDetailInfo[]
+}
+
+export interface DspAggregateDtoList {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: DspAggregateDtoListResult
+}
+
+export interface DspAggregateDtoListResult {
+  briefHsaver: BriefHsaver[]
+  briefCenter: BriefCenter[]
+  briefCar: BriefCar[]
+  briefVolunteeFire: BriefVolunteeFire[]
+}
+
+export interface BriefHsaver {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: any
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface BriefCenter {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: any
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface BriefCar {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: any
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface BriefVolunteeFire {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: any
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface DisasterDetailInfo {
+  ctlSeq: number
+  procSituCd: string
+  ctlProcDtime: string
+  ctlDesc: string
+}
+
+export interface DisasterDetailInfo {
+  ctlSeq: number
+  procSituCd: string
+  ctlProcDtime: string
+  ctlDesc: string
+}
+
+export interface ControlContentData {
+  result: ControlContentDataResult[]
+  response: string
+  responseCode: number
+  responseMsg: string
+}
+
+export interface ControlContentDataResult {
+  disasterDetailInfo: DisasterDetailInfo[]
+}
+
+export interface MobilizeData {
+  result: MobilizeDataResult[]
+  response: string
+  responseCode: number
+  responseMsg: string
+}
+
+export interface MobilizeDataResult {
+  dspAggregateDtoList: DspAggregateDtoList
+}
+
+export interface DspAggregateDtoList {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: DspAggregateDtoListResult
+}
+
+export interface DspAggregateDtoListResult {
+  dispatchedB: DispatchedB[]
+  dispatchedA: DispatchedA[]
+  dispatchedD: DispatchedD[]
+  dispatchedC: DispatchedC[]
+  contingentList: ContingentList[]
+  centerListD: CenterListD[]
+  mobilizeA: MobilizeA[]
+  mobilizeB: MobilizeB[]
+  mobilizeC: MobilizeC[]
+  mobilizeD: MobilizeD[]
+  centerListC: CenterListC[]
+  arrivalA: ArrivalA[]
+  arrivalB: ArrivalB[]
+  arrivalC: ArrivalC[]
+  arrivalD: arrivalD[]
+  centerListB: CenterListB[]
+  centerListA: CenterListA[]
+  homecomingA: HomecomingA[]
+  homecomingB: HomecomingB[]
+  homecomingD: HomecomingD[]
+  homecomingC: HomecomingC[]
+}
+
+export interface DispatchedB {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface DispatchedA {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface DispatchedD {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface DispatchedC {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface ContingentList {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: any
+  teamSeoName: any
+  teamName: any
+  eleType1: any
+  eleType2: string
+  eleType3: any
+  eleType4?: string
+  eleType5: any
+  type1TeamCnt: any
+  aggregate: string
+}
+
+export interface CenterListD {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface MobilizeA {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface MobilizeB {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface MobilizeC {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface MobilizeD {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface CenterListC {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: string
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface ArrivalA {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: string
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: any
+  aggregate: string
+}
+
+export interface ArrivalB {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: string
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: any
+  aggregate: string
+}
+
+export interface ArrivalC {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: string
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: any
+  aggregate: string
+}
+
+export interface arrivalD {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: string
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: any
+  aggregate: string
+}
+
+export interface CenterListB {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: string
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface CenterListA {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: string
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface HomecomingA {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface HomecomingB {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: string
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: any
+  aggregate: string
+}
+
+export interface HomecomingD {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: any
+  eleType4: any
+  eleType5: any
+  type1TeamCnt: string
+  aggregate: string
+}
+
+export interface HomecomingC {
+  dsrSeq: string
+  teamClsCd: any
+  teamClsNm: string
+  teamSeoName: any
+  teamName: string
+  eleType1: any
+  eleType2: any
+  eleType3: string
+  eleType4: string
+  eleType5: any
+  type1TeamCnt: any
+  aggregate: string
+}
+
+export interface CarPostionData {
+  result: CarPostionDataResult[]
+  response: string
+  responseCode: number
+  responseMsg: string
+}
+
+export interface CarPostionDataResult {
+  dspCarMoveResultDtoList: DspCarMoveResultDtoList[]
+}
+
+export interface DspCarMoveResultDtoList {
+  dsrSeq: string
+  carId: string
+  avlGisX: number
+  avlGisY: number
+  carstatCd: string
+  radioCallsign: string
+  cdGrpName: string
+  targetlocBunziAddr: string
+  targetlocX: number
+  targetlocY: number
+  targetlocDspcarId: string
+  targetlocRoger: boolean
+  targetlocAcceptRoger: boolean
+}
+
+export interface FireFacilityData {
+  response: string
+  responseCode: number
+  responseMsg: string
+  totalCount: number
+  result: FireFacilityDataResult
+}
+
+export interface FireFacilityDataResult {
+  fightingPropertyList: FireFacilityFightingPropertyList
+  emergFireExtinguisherList: EmergFireExtinguisherList
+  hazardousSubstancList: HazardousSubstancList
+  firePlugList: FirePlugList
+}
+
+export interface FireFacilityFightingPropertyList {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: FireFacilityFightingPropertyListResult
+}
+
+export interface FireFacilityFightingPropertyListResult {
+  dataList: FireFacilityFightingPropertyListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+export interface FireFacilityFightingPropertyListResultList {
+  bild_sn: string
+  obj_nm: string
+  main_prpos_cd_nm: string
+  bunji_adress: string
+  doro_adress: string
+  dsprvn_tlphon: string
+  dytm_tlphon: string
+  night_tlphon: string
+  gis_x_5181: string
+  gis_y_5181: string
+  gis_x_4326: string
+  gis_y_4326: string
+  dist: string
+  keyword_yn: string
+}
+
+export interface EmergFireExtinguisherList {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: EmergFireExtinguisherListResult
+}
+
+export interface EmergFireExtinguisherListResult {
+  dataList: EmergFireExtinguisherListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+export interface EmergFireExtinguisherListResultList {
+  emerhyd_id: string
+  inst_equip_desc: string
+  bunji_adress: string
+  doro_adress: string
+  gis_x_5181: string
+  gis_y_5181: string
+  dist: string
+  stat_cd_nm: string
+  use_yn: string
+}
+
+
+export interface FireFacilityHazardousSubstancList {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: FireFacilityHazardousSubstancListResult
+}
+
+export interface FireFacilityHazardousSubstancListResult {
+  dataList: FireFacilityHazardousSubstancListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+export interface FireFacilityHazardousSubstancListResultList {
+  bild_sn: string
+  obj_nm: string
+  itlpc_buld_nm: string
+  itlpc_bunji_adress: string
+  itlpc_doro_adress: string
+  mnfctretc_sn: string
+  mnfctretc_se_no: string
+  mnfctretc_detail_se_cd_nm: string
+  bulddong_sn: string
+  floor_sn: string
+  dsprvn_tlphon: string
+  dytm_tlphon: string
+  night_tlphon: string
+  gis_x_5181: number
+  gis_y_5181: number
+  gis_x_4326: number
+  gis_y_4326: number
+  dist: number
+  keyword_yn: string
+}
+
+export interface FirePlugList {
+  response: string
+  responseCode: number
+  responseMsg: string
+  result: FirePlugListResult
+}
+
+export interface FirePlugListResult {
+  dataList: FirePlugListResultList[]
+  ret_cd: string
+  ret_msg: string
+  rec_cnt: number
+}
+
+export interface FirePlugListResultList {
+  hyd_id: string
+  form_cd_nm: string
+  adj_bldg: string
+  gis_x_5181: number
+  gis_y_5181: number
+  dist: number
+  pipe: number
+  use_yn: string
+}
