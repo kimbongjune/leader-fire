@@ -221,10 +221,10 @@ const GlobalFunctionHandler = () => {
 
     if (isLoggedIn && searchStartDate && searchEndDate) {
       // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
-      fetchDisasterInformation(dispatch, searchStartDate, searchEndDate, useInfo.wardId, useInfo.userId);
+      fetchDisasterInformation(dispatch, searchStartDate, searchEndDate, useInfo?.wardId, useInfo?.userId);
 
       // setInterval을 사용하여 주기적으로 API를 호출
-      const intervalId = setInterval(() => fetchDisasterInformation(dispatch, searchStartDate, searchEndDate, useInfo.wardId, useInfo.userId), 60000);
+      const intervalId = setInterval(() => fetchDisasterInformation(dispatch, searchStartDate, searchEndDate, useInfo?.wardId, useInfo?.userId), 60000);
 
       // 컴포넌트가 언마운트될 때 인터벌을 정리
       return () => clearInterval(intervalId);

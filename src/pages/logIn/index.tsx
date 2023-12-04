@@ -56,6 +56,7 @@ const LoginPage = () => {
 
     //TODO 모든 입력이 제대로 되었다면 서버에 로그인 요청 및 네이티브의 vpn 로그인 같이 진행
     try {
+      console.log(location)
       const response = await axios.post<UserInformation>('/api/user/login/auth', {
         userId: username,
         userPassword : password,
