@@ -1309,7 +1309,7 @@ export interface HomecomingC {
 }
 
 export interface CarPostionData {
-  result: CarPostionDataResult[]
+  result: CarPostionDataResult
   response: string
   responseCode: number
   responseMsg: string
@@ -1317,6 +1317,22 @@ export interface CarPostionData {
 
 export interface CarPostionDataResult {
   dspCarMoveResultDtoList: DspCarMoveResultDtoList[]
+  videoSharingList : VideoSharingData
+}
+
+export interface VideoSharingData{
+  result: VideoSharingList[]
+  response: string
+  responseCode: number
+  responseMsg: string
+}
+
+export interface VideoSharingList{
+  USR_TEL: string
+  VIDEO_DATE: string
+  DSR_SEQ: string
+  GPS_Y: string
+  GPS_X: string
 }
 
 export interface DspCarMoveResultDtoList {
@@ -1467,4 +1483,24 @@ export interface FirePlugListResultList {
   dist: number
   pipe: number
   use_yn: string
+}
+
+export interface UserDto {
+  sub: string
+  userId: string
+  userName: string
+  classCd: string
+  wardId: string
+  wardName: string
+  deviceTel: string
+  fcmToken: string
+  userPw: string
+  iat: number
+}
+
+export interface apiPostResponse {
+  response:string
+  responseCode:number
+  responseMsg:string
+  result:null
 }
