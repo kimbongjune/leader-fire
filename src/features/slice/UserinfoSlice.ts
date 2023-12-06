@@ -1,10 +1,10 @@
 // src/features/slice/myInfoSlice.ts
-import { UserInformation } from '@/types/types';
+import { UserDto, UserInformation } from '@/types/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 // Define a type for the slice state
 export interface MyInfoState {
-  userInfo:UserInformation;
+  userInfo:UserDto;
   mobilizationTotalCount: number;
   mobilizationAcceptCount: number;
   mobilizationDenyCount: number;
@@ -16,15 +16,17 @@ export interface MyInfoState {
   sendLocationFlag:boolean
 }
 
-const initialUserInfo: UserInformation = {
+const initialUserInfo: UserDto = {
+  sub : '',
   userId: '',
+  userPw : '',
   userName: '',
   classCd: '',
   wardId: '',
   wardName: '',
   deviceTel: '',
   fcmToken: '',
-  authUserPw: ''
+  iat : 0
 };
 
 // Define the initial state using that type
@@ -45,7 +47,7 @@ export const myInfoSlice = createSlice({
   name: 'myInfo',
   initialState,
   reducers: {
-    saveUserInformation: (state, action: PayloadAction<UserInformation>) => {
+    saveUserInformation: (state, action: PayloadAction<UserDto>) => {
       state.userInfo = action.payload;
     },
     saveMobilizationTotalCount: (state, action: PayloadAction<number>) => {

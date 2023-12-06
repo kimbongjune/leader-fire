@@ -14,13 +14,13 @@ import { useQueryParam } from 'use-query-params';
 import UserSettingModal from '@/components/common/Modal/UserSettingModal';
 import TokenRefreshModal from '@/components/common/Modal/TokenRefreshModal';
 import SearchDispatch from './SearchDispatch';
-import { DeviceType, DispatchItemType, UserInformation } from '@/types/types';
+import { DeviceType, DispatchItemType, UserDto } from '@/types/types';
 import { useRouter } from 'next/router';
 import { CountByType } from './HomeFilterItem';
 import { useDispatch } from 'react-redux';
 import { saveLogedInStatus, saveUserInformation } from '../slice/UserinfoSlice';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/app/store';
+import { RootState, persistor } from '@/app/store';
 
 interface Props {
   profileUrl?: string;
@@ -79,17 +79,19 @@ const HomeMenu = (props: Props) => {
   // 로그아웃 버튼 클릭 시 호출
   const handleLogoutButton = () => {
     onClose();
-    router.replace('/logIn');
+    persistor.purge();
     dispatch(saveLogedInStatus(false))
-    const emptyUserInfo:UserInformation = {
+    const emptyUserInfo:UserDto = {
+      sub : '',
       userId: '',
+      userPw : '',
       userName: '',
       classCd: '',
       wardId: '',
       wardName: '',
       deviceTel: '',
       fcmToken: '',
-      authUserPw: ''
+      iat : 0
     };
     dispatch(saveUserInformation(emptyUserInfo))
 
