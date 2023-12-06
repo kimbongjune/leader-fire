@@ -52,81 +52,82 @@ const NeighborhoodList = (props: Props) => {
     useEffect(() => {
       // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
         const fetchData = async () =>{
-            const neightBorHoodData = await axios.post<NeightBorHoodData>("/api/relate/all",{
-              "callTel": selectedDisaster?.callTell, //selectedDisaster?.callTell
-              "dsrClsCd": selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
-              "dsrKndCd": selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
-              "dsrSeq": id,//id
-              "gisX": selectedDisaster?.gisX,  //selectedDisaster?.gisX
-              "gisY": selectedDisaster?.gisY, //selectedDisaster?.gisY
-              "radius": "null"
-          });
-
+          const neightBorHoodData = await axios.get<NeightBorHoodData>("/api/relate/all",{
+            params : {
+              callTel: selectedDisaster?.callTell, //selectedDisaster?.callTell
+              dsrClsCd: selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
+              dsrKndCd: selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
+              dsrSeq: id,//id
+              gisX: selectedDisaster?.gisX,  //selectedDisaster?.gisX
+              gisY: selectedDisaster?.gisY, //selectedDisaster?.gisY
+              radius: "null"
+            }
+        });
+        if(neightBorHoodData.data.responseCode === 200){
           //협업대응 -> 1:의소전담대, 2:의소일반대, 3:생명지킴이
-        const collaborativeResponseList = neightBorHoodData.data.result.collaborativeResponseList?.result?.map(item => ({
-          ...item,
-          type: 'collaboration' as 'collaboration'
-        }));
+          const collaborativeResponseList = neightBorHoodData.data.result.collaborativeResponseList?.result?.map(item => ({
+            ...item,
+            type: 'collaboration' as 'collaboration'
+          }));
 
-         //인근주민 ->인근시설물관계자
-        const nearbyFacilityPersonnelList = neightBorHoodData.data.result.nearbyFacilityPersonnelList.result?.dataList?.map(item => ({
-          ...item,
-          type: 'residents' as 'residents'
-        }));
+          //인근주민 ->인근시설물관계자
+          const nearbyFacilityPersonnelList = neightBorHoodData.data.result.nearbyFacilityPersonnelList.result?.dataList?.map(item => ({
+            ...item,
+            type: 'residents' as 'residents'
+          }));
 
-        //인근주민 -> 소방등록정보
-        const nearbyOfficialsList = neightBorHoodData.data.result.nearbyOfficialsList.result?.dataList?.map(item => ({
-          ...item,
-          type: 'residents' as 'residents'
-        }));
+          //인근주민 -> 소방등록정보
+          const nearbyOfficialsList = neightBorHoodData.data.result.nearbyOfficialsList.result?.dataList?.map(item => ({
+            ...item,
+            type: 'residents' as 'residents'
+          }));
 
-        //인근주민 -> 보호자
-        const nearbyResidentsList = neightBorHoodData.data.result.nearbyResidentsList.result?.dataList?.map(item => ({
-          ...item,
-          type: 'residents' as 'residents'
-        }));
+          //인근주민 -> 보호자
+          const nearbyResidentsList = neightBorHoodData.data.result.nearbyResidentsList.result?.dataList?.map(item => ({
+            ...item,
+            type: 'residents' as 'residents'
+          }));
 
-        //인근시설 -> 대상물
-        const fightingPropertyList = neightBorHoodData.data.result.fightingPropertyList.result?.dataList?.map(item => ({
-          ...item,
-          type: 'facilities' as 'facilities'
-        }));
+          //인근시설 -> 대상물
+          const fightingPropertyList = neightBorHoodData.data.result.fightingPropertyList.result?.dataList?.map(item => ({
+            ...item,
+            type: 'facilities' as 'facilities'
+          }));
 
-        //인근시설 -> 위험물
-        const hazardousSubstancList = neightBorHoodData.data.result.hazardousSubstancList.result?.dataList?.map(item => ({
-          ...item,
-          type: 'facilities' as 'facilities'
-        }));
+          //인근시설 -> 위험물
+          const hazardousSubstancList = neightBorHoodData.data.result.hazardousSubstancList.result?.dataList?.map(item => ({
+            ...item,
+            type: 'facilities' as 'facilities'
+          }));
 
-        //인근시설 -> 유독물
-        const toxicFacilityList = neightBorHoodData.data.result.toxicFacilityList.result?.dataList?.map(item => ({
-          ...item,
-          type: 'facilities' as 'facilities',
-          bild_sn : new Date().getTime().toString()
-        }));
+          //인근시설 -> 유독물
+          const toxicFacilityList = neightBorHoodData.data.result.toxicFacilityList.result?.dataList?.map(item => ({
+            ...item,
+            type: 'facilities' as 'facilities',
+            bild_sn : new Date().getTime().toString()
+          }));
 
-        const nearbyBusinessesList = neightBorHoodData.data.result.nearbyBusinessesList.result?.dataList?.map(item => ({
-          ...item,
-          type: 'facilities' as 'facilities',
-        }));
-        
-        const combinedData:DispatchLists = {
-          collaborativeResponseList : collaborativeResponseList,
-          nearbyFacilityPersonnelList : nearbyFacilityPersonnelList,
-          nearbyOfficialsList : nearbyOfficialsList,
-          nearbyResidentsList : nearbyResidentsList,
-          fightingPropertyList : fightingPropertyList,
-          hazardousSubstancList : hazardousSubstancList,
-          toxicFacilityList : toxicFacilityList,
-          nearbyBusinessesList: nearbyBusinessesList
-        }
+          const nearbyBusinessesList = neightBorHoodData.data.result.nearbyBusinessesList.result?.dataList?.map(item => ({
+            ...item,
+            type: 'facilities' as 'facilities',
+          }));
+          
+          const combinedData:DispatchLists = {
+            collaborativeResponseList : collaborativeResponseList,
+            nearbyFacilityPersonnelList : nearbyFacilityPersonnelList,
+            nearbyOfficialsList : nearbyOfficialsList,
+            nearbyResidentsList : nearbyResidentsList,
+            fightingPropertyList : fightingPropertyList,
+            hazardousSubstancList : hazardousSubstancList,
+            toxicFacilityList : toxicFacilityList,
+            nearbyBusinessesList: nearbyBusinessesList
+          }
 
-        const data = {
-          dispatchLists : combinedData
-        }
-        setNeightborHoodData(data)
-        console.log(data)
-
+          const data = {
+            dispatchLists : combinedData
+          }
+          setNeightborHoodData(data)
+          }
         }
         fetchData()
         apiIntervalRef.current =  setInterval(() => fetchData(), 60000);
