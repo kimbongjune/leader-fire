@@ -218,7 +218,8 @@ const MiniMap = (props: Props) => {
     if (src === '비상소화장치') return (imgSrc = '/images/mapIcons/flag.svg');
     // 과거이력
     if (src === '과거이력') return (imgSrc = '/images/mapIcons/flag.svg');
-
+    // 내 위치
+    if (src === '내위치') return (imgSrc = '/images/icons/Ripple-3.1s-354px.gif');
     else imgSrc = '/images/mapIcons/flag.svg'
 
     return imgSrc;
@@ -235,7 +236,7 @@ const MiniMap = (props: Props) => {
         const position = new window.kakao.maps.LatLng(userLocationX, userLocationY);
         const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
         const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
-        const markerImage = createMarkerImage('/images/icons/Ripple-3.1s-354px.gif', imageSize, imageOption);
+        const markerImage = createMarkerImage('내위치', imageSize, imageOption);
         const marker = createMarker(position, markerImage);
   
         marker.setMap(null)
@@ -281,7 +282,7 @@ const MiniMap = (props: Props) => {
             const position = new window.kakao.maps.LatLng(locationX, locationY);
             const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
             const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
-            const markerImage = createMarkerImage('/images/icons/Ripple-3.1s-354px.gif', imageSize, imageOption);
+            const markerImage = createMarkerImage('내위치', imageSize, imageOption);
             const marker = createMarker(position, markerImage);
       
             marker.setMap(null)
@@ -297,7 +298,7 @@ const MiniMap = (props: Props) => {
           const position = new window.kakao.maps.LatLng(userLocationX, userLocationY);
           const imageSize = new window.kakao.maps.Size(24, 35); // 마커의 크기 설정
           const imageOption = { offset: new window.kakao.maps.Point(12, 35) }; // 마커의 옵션 설정
-          const markerImage = createMarkerImage('/images/icons/Ripple-3.1s-354px.gif', imageSize, imageOption);
+          const markerImage = createMarkerImage('내위치', imageSize, imageOption);
           const marker = createMarker(position, markerImage);
       
           marker.setMap(null)
@@ -335,25 +336,34 @@ const MiniMap = (props: Props) => {
       };
 
       window.kakao.maps.event.addListener(map, 'click', clickHandler);
-      
+      })
+    }
+    return () => {
+      kakaoMapScript.remove(); // 컴포넌트 언마운트 시 스크립트 제거
+      if (apiIntervalRef.current) {
+        clearInterval(apiIntervalRef.current);
+      }
+    };
+  }, []);
 
-      
+
+  useEffect(() =>{
     // 차량 위치 정보 API 호출 함수
     async function fetchLocations():Promise<markerData | null> {
       console.log("Fetching locations")
-      // 실제 API 호출 로직
-      // 예시로는 가상의 데이터 반환
       try {
-        const carPositionResult = await axios.get<CarPostionData>("/api/disaster_info/car/seq",{
+        const positionResult = await axios.get<CarPostionData>("/api/disaster_info/car/seq",{
           params: {
             dsrSeq : id//id
           }
         });
 
-        setAponintList(transformData(carPositionResult.data.result[0].dspCarMoveResultDtoList))
+        if(positionResult.data.responseCode === 200){
+          setAponintList(transformData(positionResult.data.result.dspCarMoveResultDtoList))
+        }
         
 
-        const carPosition = carPositionResult.data.result[0].dspCarMoveResultDtoList.map((item) => {
+        const carPosition = positionResult.data.result?.dspCarMoveResultDtoList?.map((item) => {
           const coordinate = convertCoordinateSystem(item.avlGisX, item.avlGisY)
           console.log(coordinate)
           return{
@@ -363,16 +373,31 @@ const MiniMap = (props: Props) => {
             type : item.cdGrpName
           }
         })
+
+        const videoPosition = positionResult.data.result?.videoSharingList?.result?.map((item) => {
+          return{
+            id :item.USR_TEL,
+            lat : item.GPS_Y,
+            lon : item.GPS_X,
+            type : "영상공유"
+          }
+        })
       
-        const carFireFacilityResult = await axios.post<FireFacilityData>("/api/fire_facility/all",{
-            "callTel": selectedDisaster?.callTell, //selectedDisaster?.callTell
-            "dsrClsCd": selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
-            "dsrKndCd": selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
-            "dsrSeq": id,//id
-            "gisX": selectedDisaster?.gisX,  //selectedDisaster?.gisX
-            "gisY": selectedDisaster?.gisY, //selectedDisaster?.gisY
-            "radius": "null"
+        const carFireFacilityResult = await axios.get<FireFacilityData>("/api/fire_facility/all",{
+            params :{
+              callTel: selectedDisaster?.callTell, //selectedDisaster?.callTell
+              dsrClsCd: selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
+              dsrKndCd: selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
+              dsrSeq: id,//id
+              gisX: selectedDisaster?.gisX,  //selectedDisaster?.gisX
+              gisY: selectedDisaster?.gisY, //selectedDisaster?.gisY
+              radius: "null"
+            }
         });
+
+        if(carFireFacilityResult.data.responseCode === 200){
+
+        }
         const emergancyFireExcuterList = carFireFacilityResult.data.result.emergFireExtinguisherList.result?.dataList?.map((item) =>{
           const coordinate = convertCoordinateSystem(parseInt(item.gis_x_5181), parseInt(item.gis_y_5181))
           return {
@@ -382,10 +407,6 @@ const MiniMap = (props: Props) => {
             type : "비상소화장치"
           }
         })
-
-        console.log("&",carFireFacilityResult)
-
-        console.log("@",emergancyFireExcuterList)
 
         const targetList = carFireFacilityResult.data.result.fightingPropertyList.result?.dataList?.map((item) =>{
           const coordinate = convertCoordinateSystem(parseInt(item.gis_x_5181), parseInt(item.gis_y_5181))
@@ -400,8 +421,6 @@ const MiniMap = (props: Props) => {
           }
         })
 
-        console.log("!",targetList)
-
         const hazardousList = carFireFacilityResult.data.result.hazardousSubstancList.result?.dataList?.map((item) =>{
           const coordinate = convertCoordinateSystem(item.gis_x_5181, item.gis_y_5181)
           return {
@@ -415,8 +434,6 @@ const MiniMap = (props: Props) => {
           }
         })
 
-        console.log("#",hazardousList)
-
         const firePlugList = carFireFacilityResult.data.result.firePlugList.result?.dataList?.map((item) =>{
           const coordinate = convertCoordinateSystem(item.gis_x_5181, item.gis_y_5181)
           return {
@@ -426,8 +443,6 @@ const MiniMap = (props: Props) => {
             type : item.form_cd_nm.includes("지상") ? "지상" : "지하",
           }
         })
-
-        console.log("^",firePlugList)
         
         const resultData = {
           car:carPosition,
@@ -435,10 +450,9 @@ const MiniMap = (props: Props) => {
           fireExtinguisher : emergancyFireExcuterList,
           target : targetList,
           dangerous: hazardousList,
-          video : []
+          video : videoPosition
         }
 
-        console.log("@@@@@@@",resultData)
         const markerCount:MarkerType[] = [
             {
               label: '소화전',
@@ -461,8 +475,6 @@ const MiniMap = (props: Props) => {
               count: hazardousList?.length | 0,
             },
           ];
-
-          console.log("@@@@@@@@@@@@@@@@@",markerCount)
         props.setMarkerCount(markerCount);
         return processMapData(resultData)
       } catch (error) {
@@ -510,15 +522,13 @@ const MiniMap = (props: Props) => {
 
     updateVehicleMarkers();
     apiIntervalRef.current = setInterval(updateVehicleMarkers, 60000);
-      })
-    }
-    return () => {
-      kakaoMapScript.remove(); // 컴포넌트 언마운트 시 스크립트 제거
+
+    return () =>{
       if (apiIntervalRef.current) {
         clearInterval(apiIntervalRef.current);
       }
-    };
-  }, []);
+    }
+  }, [id])
 
   function processMapData(data: locationData) {
     const processData = (items: Location[]) => items?.map(item => {
