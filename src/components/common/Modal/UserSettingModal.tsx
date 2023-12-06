@@ -7,11 +7,13 @@ import Call from '../../../../public/images/icons/call.svg';
 import theme from '@/theme/colors';
 import { useRef, useState } from 'react';
 import Switch from 'react-switch';
-import axios from '@/components/common/api/axios';
+import axios, {setAuthToken} from '@/components/common/api/axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import { useDispatch } from 'react-redux';
 import { saveSendLocationFlag, saveUserInformation } from '@/features/slice/UserinfoSlice';
+import { UserDto, apiPostResponse } from '@/types/types';
+import { jwtDecode } from 'jwt-decode'
 
 interface Props {
   isOpen: boolean;
@@ -21,13 +23,16 @@ interface Props {
 }
 
 const UserSettingModal = (props: Props) => {
-  const [checked, setChecked] = useState(false);
-
+  
   const dispatch = useDispatch()
 
-  const [phoneNumber, setPhoneNumber] = useState(props?.phoneNumber)
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+  
+  const sendLocationFlag = useSelector((state: RootState) => state.userReducer.sendLocationFlag);
 
-  const useInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+  const [phoneNumber, setPhoneNumber] = useState(userInfo.deviceTel || '');
+
+  const [checked, setChecked] = useState(sendLocationFlag);
 
   const phonNumberInput = useRef<HTMLInputElement>(null);
 
@@ -44,26 +49,35 @@ const UserSettingModal = (props: Props) => {
     }
   }
 
-  const handleAcceptButton = () => {
+  const handleAcceptButton = async () => {
 
     if (phoneNumber === null || phoneNumber ==="") {
       setPhoneError('전화번호를 입력해주세요.'); // 아이디 입력값이 없을 경우 오류 메시지
       phonNumberInput.current?.focus();
       return; // 입력값이 없으면 여기서 실행중단
     }
-    console.log("????????????")
-    axios.post(`/api/user/info/${useInfo.userId}`,{
-      "deviceTel": phoneNumber,
-      "fcmToken": useInfo.fcmToken,
-      "userId": useInfo.userId
-    }).then(response =>{
-      dispatch(saveUserInformation({...useInfo, deviceTel : phoneNumber}))
-      console.log(response)
-      props.onClick()
-    }).catch(error =>{
-      console.log(error)
-      props.onClick()
+    const userUpdateResponse = await axios.put<apiPostResponse>("/api/user/info", {
+      userId : userInfo.userId,
+      deviceTel : phoneNumber
     })
+
+    if(userUpdateResponse.data.responseCode === 200){
+      const fetchUserData = await axios.post("/api/user/login/auth",{
+          userId : userInfo.userId,
+          userPassword : userInfo.userPw
+      })
+      if(fetchUserData.data.responseCode === 200){
+        localStorage.setItem("token", fetchUserData.headers['authorization']);
+        setAuthToken(fetchUserData.headers['authorization'])
+      }
+      if (window.fireAgency && window.fireAgency.saveJwtToken) {
+        window.fireAgency.saveJwtToken(userInfo.userId, fetchUserData.headers['authorization']);
+      }
+      dispatch(saveUserInformation(jwtDecode<UserDto>(fetchUserData.headers['authorization'])))
+      props.onClick()
+    }else{
+      alert("유저 정보 갱신 실패")
+    }
 
   }
 
@@ -81,7 +95,7 @@ const UserSettingModal = (props: Props) => {
           <Stack w="100%" spacing="16px">
             <InputWrapper>
               <Call width="20px" height="20px" color={theme.colors.orange} />
-              <StyledInput ref={phonNumberInput} type="number" placeholder="전화번호 입력" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+              <StyledInput ref={phonNumberInput} type="text" placeholder="전화번호 입력" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
             </InputWrapper>
             <Flex justify="flex-end" gap="8px" pb="16px" borderBottom="1px solid #e9ecef">
             {phoneError && <FaildChangePhoneNumber>{phoneError}</FaildChangePhoneNumber>}

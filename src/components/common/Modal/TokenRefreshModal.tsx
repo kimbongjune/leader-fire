@@ -6,11 +6,13 @@ import Refresh from '../../../../public/images/icons/refresh.svg';
 import Call from '../../../../public/images/icons/call.svg';
 import theme from '@/theme/colors';
 import { useEffect, useState } from 'react';
-import axios from '@/components/common/api/axios';
+import axios, { setAuthToken } from '@/components/common/api/axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import { useDispatch } from 'react-redux';
 import { saveUserInformation } from '@/features/slice/UserinfoSlice';
+import { UserDto, apiPostResponse } from '@/types/types';
+import { jwtDecode } from 'jwt-decode';
 
 interface Props {
   isOpen: boolean;
@@ -23,7 +25,7 @@ const TokenRefreshModal = (props: Props) => {
   const [newToken, setNewToken] = useState("");
   const [tokent, setToken] = useState(props.existingToken)
 
-  const useInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
 
   const dispatch = useDispatch();
 
@@ -54,24 +56,30 @@ const TokenRefreshModal = (props: Props) => {
     }; 
   }, [])
 
-  const handleAcceptButton = () =>{
+  const handleAcceptButton = async () =>{
     console.log("????????????")
-    axios.post(`/api/user/info/${useInfo.userId}`,{
-      "deviceTel": useInfo.deviceTel,
-      "fcmToken": newToken,
-      "userId": useInfo.userId
-    }).then(response =>{
-      dispatch(saveUserInformation({...useInfo, fcmToken : newToken}))
-      setToken(newToken)
-      setNewToken("")
-      console.log(response)
-      props.onClick()
-    }).catch(error =>{
-      console.log(error)
-      props.onClick()
+    const userUpdateResponse = await axios.put<apiPostResponse>("/api/user/info", {
+      userId : userInfo.userId,
+      fcmToken : newToken
     })
     
-    //api를 이용해 토큰 갱신
+    if(userUpdateResponse.data.responseCode === 200){
+      const fetchUserData = await axios.post("/api/user/login/auth",{
+          userId : userInfo.userId,
+          userPassword : userInfo.userPw
+      })
+      if(fetchUserData.data.responseCode === 200){
+        localStorage.setItem("token", fetchUserData.headers['authorization']);
+        setAuthToken(fetchUserData.headers['authorization'])
+      }
+      if (window.fireAgency && window.fireAgency.saveJwtToken) {
+        window.fireAgency.saveJwtToken(userInfo.userId, fetchUserData.headers['authorization']);
+      }
+      dispatch(saveUserInformation(jwtDecode<UserDto>(fetchUserData.headers['authorization'])))
+      props.onClick()
+    }else{
+      alert("유저 정보 갱신 실패")
+    }
   }
   
 
