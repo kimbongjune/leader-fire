@@ -11,15 +11,15 @@ const Index = () => {
       window.fireAgency.getUserData();
     }
 
-    window.getSavedUserToken = (userdata:string) => {
-      console.log(userdata)
-      var user:userData = JSON.parse(userdata);
-      if(user !== null){
-        verifyToken(user)
-      }else{
-        router.replace('/logIn');
-      }
-    };
+    // window.getSavedUserToken = (userdata:string) => {
+    //   console.log(userdata)
+    //   var user:userData = JSON.parse(userdata);
+    //   if(user !== null){
+    //     verifyToken(user)
+    //   }else{
+    //     router.replace('/logIn');
+    //   }
+    // };
 
     const verifyToken = async (user:userData) => {
       //TODO 앱의 roomdb에 자동로그인 정보가 저장되어있는지 확인.
