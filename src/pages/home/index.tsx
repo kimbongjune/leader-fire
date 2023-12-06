@@ -1,21 +1,96 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from '@emotion/styled';
 import Layout from '@/components/common/Layout/Layout';
 import { Flex } from '@chakra-ui/react';
 import Home from '@/features/Home/Home';
 import HomeMenu from '@/features/Home/HomeMenu';
 import useDeviceType from '@/hooks/useDeviceType';
-import { DeviceType } from '@/types/types';
+import { DeviceType, UserDto, apiPostResponse } from '@/types/types';
 import { NextPageContext } from 'next';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
+import { jwtDecode } from 'jwt-decode'
+import { useDispatch } from 'react-redux';
+import axios,{setAuthToken} from "../../components/common/api/axios"
+import { saveLogedInStatus, saveUserInformation } from '@/features/slice/UserinfoSlice';
 
 //TODO 메인페이지
 const HomePage = () => {
   const deviceType = useDeviceType();
+  const dispatch = useDispatch();
+
+  const [userInfo, setUserInfo] = useState<UserDto>();
+
+  const parsingJwt = (token: string) => {
+    const userData = jwtDecode<UserDto>(token)
+    console.log(userData)
+    setUserInfo(userData)
+  }
+
+  const sendLocationFlag = useSelector((state: RootState) => state.userReducer.sendLocationFlag);
+
+  if(sendLocationFlag){
+    if (window.fireAgency && window.fireAgency.startLocationService) {
+      window.fireAgency.startLocationService();
+    }
+  }
+
+  window.updateToken = async (token: string) => {
+    console.log("token" , token, userInfo)
+    if(userInfo){
+      try{
+        const userUpdateResponse = await axios.put<apiPostResponse>("/api/user/info", {
+          fcmToken: token,
+          userId : userInfo.sub
+        })
+        if(userUpdateResponse.data.responseCode === 200){
+          console.log(userInfo)
+          const fetchUserData = await axios.post("/api/user/login/auth",{
+              userId : userInfo.userId,
+              userPassword : userInfo.userPw
+          })
+          if(fetchUserData.data.responseCode === 200){
+            localStorage.setItem("token", fetchUserData.headers['authorization']);
+            setAuthToken(fetchUserData.headers['authorization'])
+          }
+          if (window.fireAgency && window.fireAgency.saveJwtToken) {
+            window.fireAgency.saveJwtToken(userInfo.userId, fetchUserData.headers['authorization']);
+          }
+          dispatch(saveUserInformation(jwtDecode<UserDto>(fetchUserData.headers['authorization'])))
+        }else{
+          alert("유저 정보 갱신 실패")
+        }
+      }catch(error){
+        console.error(error)
+      }
+    }
+    
+  };
+  
+  useEffect(() => {
+
+    if (window.fireAgency && window.fireAgency.getUserData) {
+      window.fireAgency.getUserData();
+    }
+
+    if (window.fireAgency && window.fireAgency.requestGetToken) {
+      window.fireAgency.requestGetToken();
+    }
+
+    window.getSavedUserToken = (userdata:userData) => {
+      console.log(userdata)
+      if(userdata !== null){
+        dispatch(saveLogedInStatus(true))
+        parsingJwt(userdata.jwtToken)
+        localStorage.setItem("token", userdata.jwtToken);
+        setAuthToken(userdata.jwtToken)
+      }
+    };
+    
+  }, [dispatch]);
   
   const testData = useSelector((state: RootState) => state.disaster.disasterInformation);
-  console.log(testData)
+  console.log("@@@@@@@@@@@@@@@@@@@@@@",testData)
 
   if (!deviceType) return null;
 

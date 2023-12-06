@@ -7,7 +7,7 @@ import OrganizationItem from '@/features/Detail/OrganizationItem';
 import ReportItem from '@/features/Detail/ReportItem';
 import useDeviceType from '@/hooks/useDeviceType';
 import theme from '@/theme/colors';
-import {BriefDisasterInfo, DeviceType, DisasterDetailInfo} from '@/types/types';
+import {BriefDisasterInfo, DeviceType, DisasterDetailInfo, FireFacilityData} from '@/types/types';
 import { Box, Flex, Stack } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
@@ -26,6 +26,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import axios from "../../components/common/api/axios"
 import { selectDisasterById } from '@/features/slice/test';
 import { type } from 'os';
+import proj4 from 'proj4';
 
 type Groups = {
   name: string;
@@ -74,55 +75,153 @@ const DetailPage = () => {
   
   const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
 
+  const data = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
+  const epsg5181: string = '+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +units=m +no_defs';
+
+  const convertCoordinateSystem = (x:number, y:number):[number, number] => {
+    return proj4(epsg5181, 'EPSG:4326', [x,y]);
+  }
+
   useEffect(() => {
     if (id) {
       const fetchData = async () =>{
-        const data = await axios.get<BriefDisasterInfo>('/api/disaster_info/brief/seq',{
+        const briefData = await axios.get<BriefDisasterInfo>('/api/disaster_info/brief/seq',{
           params: {
             dsrSeq : id
           }
-        });
-        console.log(data.data.result[0].dspAggregateDtoList.result)
-        const TotalNumberOfVehicle = data.data.result[0].dspAggregateDtoList.result.briefCar?.reduce((sum, item) => {
-          const count = item.type1TeamCnt ? parseInt(item.type1TeamCnt, 10) : 0;
-          return sum + count;
-        }, 0);
-        setTotalNumberOfVehicle(TotalNumberOfVehicle)
+        })
+        if(briefData.data.responseCode === 200 && briefData.data.result.length > 0){
+          console.log(briefData.data)
+          if(briefData.data.result[0].dspAggregateDtoList && briefData.data.result[0].dspAggregateDtoList.result && briefData.data.result[0].dspAggregateDtoList.responseCode === 200){
+            const TotalNumberOfVehicle = briefData.data.result[0].dspAggregateDtoList.result.briefCar?.reduce((sum, item) => {
+              const count = item.type1TeamCnt ? parseInt(item.type1TeamCnt, 10) : 0;
+              return sum + count;
+            }, 0);
+            setTotalNumberOfVehicle(TotalNumberOfVehicle)
 
-        const group = data.data.result[0].dspAggregateDtoList.result.briefCenter?.map(item => ({
-            name: item.teamClsNm,
-            unit: parseInt(item.type1TeamCnt) || 0
-          }));
+            const group = briefData.data.result[0].dspAggregateDtoList.result.briefCenter?.map(item => ({
+              name: item.teamClsNm,
+              unit: parseInt(item.type1TeamCnt) || 0
+            }));
+  
+            setGroups(group)
+    
+            const volunteer = briefData.data.result[0].dspAggregateDtoList.result.briefVolunteeFire?.map(item =>({
+                name : item.teamClsNm,
+                numberOfPeople : parseInt(item.type1TeamCnt) || 0
+            }))
+    
+            setVolunteers(volunteer)
+    
+            const hSaver = briefData.data.result[0].dspAggregateDtoList.result.briefHsaver?.map(item =>({
+              name : item.teamClsNm,
+              numberOfPeople : parseInt(item.type1TeamCnt) || 0
+            }))
+    
+            seyHSaver(hSaver)
+    
+            const car = briefData.data.result[0].dspAggregateDtoList.result.briefCar?.map(item =>({
+              name : item.teamName,
+              numberOfVehicles : parseInt(item.type1TeamCnt) || 0
+            }))
+    
+            setVehicles(car)
+          }
 
-        setGroups(group)
+            if(briefData.data.result[0].disasterDetailInfo && briefData.data.result[0].disasterDetailInfo.length > 0){
+              const conterContentData = briefData.data.result[0].disasterDetailInfo[0].ctlDesc
+              setControlContent(conterContentData)
+            }
+          }
 
-        const volunteer = data.data.result[0].dspAggregateDtoList.result.briefVolunteeFire?.map(item =>({
-            name : item.teamClsNm,
-            numberOfPeople : parseInt(item.type1TeamCnt) || 0
-        }))
+          const carFireFacilityResult = await axios.get<FireFacilityData>("/api/fire_facility/all",{
+              params :{
+                callTel: data?.callTell, //selectedDisaster?.callTell
+                dsrClsCd: data?.dsrClsCd,  //selectedDisaster?.dsrClsCd
+                dsrKndCd: data?.dsrKndCd, //selectedDisaster?.dsrKndCd
+                dsrSeq: id,//id
+                gisX: data?.gisX,  //selectedDisaster?.gisX
+                gisY: data?.gisY, //selectedDisaster?.gisY
+                radius: "null"
+              }
+          });
 
-        setVolunteers(volunteer)
-
-        const hSaver = data.data.result[0].dspAggregateDtoList.result.briefHsaver?.map(item =>({
-          name : item.teamClsNm,
-          numberOfPeople : parseInt(item.type1TeamCnt) || 0
-        }))
-
-        seyHSaver(hSaver)
-
-        const car = data.data.result[0].dspAggregateDtoList.result.briefCar?.map(item =>({
-          name : item.teamName,
-          numberOfVehicles : parseInt(item.type1TeamCnt) || 0
-        }))
-
-        setVehicles(car)
-
-        const conterContentData = data.data.result[0].disasterDetailInfo[0].ctlDesc
-        setControlContent(conterContentData)
+            if(carFireFacilityResult.data.responseCode === 200){
+              const emergancyFireExcuterList = carFireFacilityResult.data.result.emergFireExtinguisherList.result?.dataList?.map((item) =>{
+                const coordinate = convertCoordinateSystem(parseInt(item.gis_x_5181), parseInt(item.gis_y_5181))
+                return {
+                  id : item.emerhyd_id,
+                  lat : coordinate[1].toString(),
+                  lon : coordinate[0].toString(),
+                  type : "비상소화장치"
+                }
+              })
+    
+              const targetList = carFireFacilityResult.data.result.fightingPropertyList.result?.dataList?.map((item) =>{
+                const coordinate = convertCoordinateSystem(parseInt(item.gis_x_5181), parseInt(item.gis_y_5181))
+                return {
+                  id : item.bild_sn,
+                  lat : coordinate[1].toString(),
+                  lon : coordinate[0].toString(),
+                  type : "대상물",
+                  build_sn : item.bild_sn,
+                  obj_nm : item.obj_nm,
+                  main_prpos_cd_nm :item.main_prpos_cd_nm
+                }
+              })
+    
+              const hazardousList = carFireFacilityResult.data.result.hazardousSubstancList.result?.dataList?.map((item) =>{
+                const coordinate = convertCoordinateSystem(item.gis_x_5181, item.gis_y_5181)
+                return {
+                  id : item.bild_sn,
+                  lat : coordinate[1].toString(),
+                  lon : coordinate[0].toString(),
+                  type : "위험물",
+                  build_sn : item.bild_sn,
+                  obj_nm : item.obj_nm,
+                  main_prpos_cd_nm :item.mnfctretc_detail_se_cd_nm
+                }
+              })
+    
+              const firePlugList = carFireFacilityResult.data.result.firePlugList.result?.dataList?.map((item) =>{
+                const coordinate = convertCoordinateSystem(item.gis_x_5181, item.gis_y_5181)
+                return {
+                  id : item.hyd_id,
+                  lat : coordinate[1].toString(),
+                  lon : coordinate[0].toString(),
+                  type : item.form_cd_nm.includes("지상") ? "지상" : "지하",
+                }
+              })
+    
+              const markerCount:MarkerType[] = [
+                  {
+                    label: '소화전',
+                    value: 'water',
+                    count: firePlugList?.length | 0,
+                  },
+                  {
+                    label: '비상소화장치',
+                    value: 'extinguisher',
+                    count: emergancyFireExcuterList?.length | 0,
+                  },
+                  {
+                    label: '대상물',
+                    value: 'target',
+                    count: targetList?.length | 0,
+                  },
+                  {
+                    label: '위험물',
+                    value: 'danger',
+                    count: hazardousList?.length | 0,
+                  },
+                ];
+                setMarkerCount(markerCount);
+            }
+          }
+        fetchData()
+        apiIntervalRef.current =  setInterval(() => fetchData(), 60000);
       }
-      fetchData()
-      apiIntervalRef.current =  setInterval(() => fetchData(), 60000);
-    }
     return () => {
       if (apiIntervalRef.current) {
         clearInterval(apiIntervalRef.current);
@@ -130,9 +229,7 @@ const DetailPage = () => {
     };
   }, [id]);
 
-  const data = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
-
-  if (!deviceType || !controlContent) return null;
+  if (!deviceType || !data) return null;
 
   return (
     <Layout>

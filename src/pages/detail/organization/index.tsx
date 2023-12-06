@@ -259,7 +259,8 @@ const OrganizationPage = () => {
           }
         });
 
-        const contingentList = data.data.result[0].dspAggregateDtoList.result.contingentList.map(item => {
+        if(data.data.responseCode === 200){
+          const contingentList = data.data.result[0].dspAggregateDtoList.result?.contingentList?.map(item => {
             return {
                 callingName: item.eleType2 || '', // eleType2 값이 없으면 빈 문자열
                 status: item.eleType4 || '-', // eleType4 값이 없으면 빈 문자열
@@ -268,7 +269,7 @@ const OrganizationPage = () => {
         });
 
         const total = {
-          vehicleCount : contingentList.length,
+          vehicleCount : contingentList?.length || 0,
           peopleCount : 0
         }
 
@@ -279,30 +280,30 @@ const OrganizationPage = () => {
 
         setVehicleData(contingentListResult)
 
-        const taskForceOrganizationAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList.result.centerListA)
-        const taskForceOrganizationAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList.result.centerListB)
-        const taskForceOrganizationAggregationByHsaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList.result.centerListC)
-        const taskForceOrganizationAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList.result.centerListD)
+        const taskForceOrganizationAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList?.result?.centerListA)
+        const taskForceOrganizationAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList?.result?.centerListB)
+        const taskForceOrganizationAggregationByHsaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList?.result?.centerListC)
+        const taskForceOrganizationAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList?.result?.centerListD)
 
-        const dispatchesAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList.result.dispatchedA)
-        const dispatchesAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList.result.dispatchedB)
-        const dispatchesAggregationByHSaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList.result.dispatchedC)
-        const dispatchesAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList.result.dispatchedD)
+        const dispatchesAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList?.result?.dispatchedA)
+        const dispatchesAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList?.result?.dispatchedB)
+        const dispatchesAggregationByHSaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList?.result?.dispatchedC)
+        const dispatchesAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList?.result?.dispatchedD)
 
-        const mobilizationAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList.result.mobilizeA)
-        const mobilizationAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList.result.mobilizeB)
-        const mobilizationAggregationByHSaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList.result.mobilizeC)
-        const mobilizationAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList.result.mobilizeD)
+        const mobilizationAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList?.result?.mobilizeA)
+        const mobilizationAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList?.result?.mobilizeB)
+        const mobilizationAggregationByHSaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList?.result?.mobilizeC)
+        const mobilizationAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList?.result?.mobilizeD)
 
-        const arrivalAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList.result.arrivalA)
-        const arrivalAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList.result.arrivalB)
-        const arrivalAggregationByHSaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList.result.arrivalC)
-        const arrivalAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList.result.arrivalD)
+        const arrivalAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList?.result?.arrivalA)
+        const arrivalAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList?.result?.arrivalB)
+        const arrivalAggregationByHSaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList?.result?.arrivalC)
+        const arrivalAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList?.result?.arrivalD)
 
-        const homComingAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList.result.homecomingA)
-        const homComingAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList.result.homecomingB)
-        const homComingAggregationByHSaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList.result.homecomingC)
-        const homComingAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList.result.homecomingD)
+        const homComingAggregationByCenter = organizationTableARowData(data.data.result[0].dspAggregateDtoList?.result?.homecomingA)
+        const homComingAggregationByVolunteer = organizationTableBRowData(data.data.result[0].dspAggregateDtoList?.result?.homecomingB)
+        const homComingAggregationByHSaver = organizationTableCRowData(data.data.result[0].dspAggregateDtoList?.result?.homecomingC)
+        const homComingAggregationByCar = organizationTableDRowData(data.data.result[0].dspAggregateDtoList?.result?.homecomingD)
 
         setTaskForceOrganization(combineOrganizationData(taskForceOrganizationAggregationByCenter, taskForceOrganizationAggregationByVolunteer, taskForceOrganizationAggregationByHsaver))
         setTaskForeceVehicle(taskForceOrganizationAggregationByCar)
@@ -321,6 +322,7 @@ const OrganizationPage = () => {
 
         console.log(taskForceOrganizationAggregationByCenter)
         console.log(dispatchesAggregationByCenter)
+        }
 
       }
       fetchData()

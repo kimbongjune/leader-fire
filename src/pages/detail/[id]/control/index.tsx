@@ -71,6 +71,8 @@ const ControlDetail = (props: Props) => {
 
   const selectedData = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
+  console.log(selectedData)
+
   const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
 
   const [controlContent, setControlContent] = useState<Props>();
@@ -83,10 +85,13 @@ const ControlDetail = (props: Props) => {
             dsrSeq : id
           }
         });
-        const controlContentList = data.data.result[0].disasterDetailInfo
-        const histories = convertToHistoryFormat(controlContentList);
-        console.log(histories)
-        setControlContent(histories);
+        if(data.data.responseCode === 200){
+          const controlContentList = data.data.result[0].disasterDetailInfo
+          const histories = convertToHistoryFormat(controlContentList);
+          console.log(histories)
+          setControlContent(histories);
+        }
+        
       }
       fetchData()
       apiIntervalRef.current =  setInterval(() => fetchData(), 60000);
@@ -102,7 +107,7 @@ const ControlDetail = (props: Props) => {
     <Layout>
       <Flex direction="column" height="100%">
         <MenuWrapper deviceType={deviceType}>
-          <Menu status={selectedData?.status} title={selectedData?.description} contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
+          <Menu status={selectedData?.status} title={`관제내용(${selectedData?.eventName})`} contentAlign="center" hasBackButton={false} onCloseButton={() => router.back()} />
         </MenuWrapper>
         <Children deviceType={deviceType}>
           {controlContent?.histories?.map((history, index) => {
