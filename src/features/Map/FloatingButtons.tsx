@@ -33,7 +33,7 @@ const FloatingButtons = (props: Props) => {
     <Container>
       <Flex alignItems="center" justifyContent="space-between" padding={deviceType !== 'tabletHorizontal' ? '16px' : '40px 32px 0'}>
       {/* <Flex direction={props.direction} alignItems="center" justifyContent="space-between"> */}
-        <Flex gap="8px" alignItems="center" justifyContent="space-between" w={deviceType === 'mobile' ? '100%' : '50%'}>
+        <Flex gap="8px" alignItems="center" justifyContent="center" w={deviceType === 'mobile' ? '100%' : '50%'}>
           <Button deviceType={deviceType} colorType="green" status={props.isClickRescuePosition} onClick={() => props.changeStatus('rescuePosition')}>
             <Flex gap="2px">
               <IconWrapper width="16px" height="16px" color={props.isClickRescuePosition ? theme.colors.green : theme.colors.gray5}>
