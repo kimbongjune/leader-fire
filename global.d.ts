@@ -15,9 +15,10 @@ interface Window {
       runVideoCamera?: () => void;
       runGallery?: () => void;
       getLastLocation?: () => string;
+      saveJwtToken?: (id:String, token:string) => string;
     };
     updateToken?:(token:string) => void;
-    getSavedUserToken?:(userdata:string) => void;
+    getSavedUserToken?:(userdata:userData) => void;
     updateLocation?:(latitude:number, longitude:number) => void;
     setGpsStatus?:(satelliteCount:number, dbHzAverage:number) => void;
     handleFileData?:(mimeType:string, base64EncoedFile:string) => void;
