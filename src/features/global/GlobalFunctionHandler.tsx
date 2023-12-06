@@ -22,58 +22,88 @@ const mapDsrKndCd = (code: string): string => {
 };
 
 const mapDsrClsCd = (code: string): string => {
-  const mapping: { [key: string]: string } = {
-      '0040007': '산악사고',
-      '0040008': '수난사고',
-      '0040009': '교통사고',
-      '0040010': '기계사고',
-      '0040011': 'E/V사고',
-      '0040012': '추락사고',
-      '0040044': '시건개방',
-      '0040045': '기타안전사고',
-      '0040066': '민원출동',
-      '0040067': '동물구조',
-      '0060004': '훈련출동',
-      '0060005': '응원출동',
-      '0060013': '지원출동(풍수해)',
-      '0060014': '지원출동(배수)',
-      '0060015': '지원출동(급수)',
-      '0060021': '지원출동(행사지원)',
-      '0060022': '지원출동(근접배치)',
-      '0060028': '순찰출동',
-      '0060029': '상황출동',
-      '0060030': '화재확인출동',
-      '0060037': '예방경계',
-      '0060044': '대민지원',
-      '0060072': '자살',
-      '0060078': '약물중독',
-      '0060170': '화상',
-      '0060200': '업무운행',
-      '0060204': '부상',
-      '0060205': '질병',
-      '0060206': '임산부',
-      '0060211': '행려병자',
-      '0060212': '기타출동',
-      '0060218': '실종자',
-      '0500026': '심정지',
-      '0790052': '고층건물(3층이상,아파트)',
-      '0790158': '기타화재',
-      '1710210': '대형화재(시장,공장)',
-      '1710211': '일반화재(주택)',
-      '1710595': 'U안심폰대상자',
-      '1710619': '질병외',
-      '1710620': '사고부상',
-      '1710621': '구급기타',
-      '1710665': '산불',
-      '1710676': '일반화재(차량)',
-      '1710677': '흉통',
-      '1710678': '아나필락시스',
-      '1710679': '응급신경증상(뇌졸중)',
-      '1712101': '기타화재(속보설비)',
-      '3200001': '벌집제거',
-      // 추가적인 매핑이 필요한 경우 여기에 추가
-  };
-  return mapping[code] || '알 수 없음';
+    switch (code) {
+        case "0040067": return "동물구조";
+        case "0790052": return "고층건물(3층이상,아파트)";
+        case "0790158": return "기타화재";
+        case "1710210": return "대형화재(시장,공장)";
+        case "1710211": return "일반화재(주택)";
+        case "1710212": return "지하화재";
+        case "1710213": return "특수화재(선박,위험물)";
+        case "1710665": return "산불";
+        case "0040006": return "붕괴사고";
+        case "0040007": return "산악사고";
+        case "0040008": return "수난사고";
+        case "0040009": return "교통사고";
+        case "0040010": return "기계사고";
+        case "0040011": return "E/V사고";
+        case "0040012": return "추락사고";
+        case "0040013": return "약물사고";
+        case "0040017": return "폭발사고";
+        case "0040022": return "항공구조(항공사고)";
+        case "0040023": return "항공구조(훈련상황)";
+        case "0040024": return "항공구조(수색구조)";
+        case "0040031": return "자연재해";
+        case "0040044": return "시건개방";
+        case "0040045": return "기타안전사고";
+        case "3200001": return "벌집제거";
+        case "0060039": return "구급예약";
+        case "0060078": return "약물중독";
+        case "0060079": return "가스중독";
+        case "0060081": return "무선페이징";
+        case "0060170": return "화상";
+        case "0060204": return "부상";
+        case "0060205": return "질병";
+        case "0060206": return "임산부";
+        case "0060211": return "행려병자";
+        case "1710595": return "U안심폰대상자";
+        case "1710619": return "질병외";
+        case "1710620": return "사고부상";
+        case "1710621": return "구급기타";
+        case "0040032": return "산사태";
+        case "0040063": return "지원출동(전기)";
+        case "0040064": return "지원출동(가스)";
+        case "0040065": return "지원출동(환경)";
+        case "0040066": return "민원출동";
+        case "0060004": return "훈련출동";
+        case "0060005": return "응원출동";
+        case "0060012": return "지원출동(재해)";
+        case "0060013": return "지원출동(풍수해)";
+        case "0060014": return "지원출동(배수)";
+        case "0060015": return "지원출동(급수)";
+        case "0060016": return "지원출동(청소)";
+        case "0060017": return "지원출동(한해)";
+        case "0060018": return "지원출동(기타)";
+        case "0060019": return "지원출동(경호)";
+        case "0060020": return "지원출동(데모시위)";
+        case "0060021": return "지원출동(행사지원)";
+        case "0060022": return "지원출동(근접배치)";
+        case "0060023": return "지원출동(행락철)";
+        case "0060024": return "지원출동(추석)";
+        case "0060025": return "지원출동(설)";
+        case "0060026": return "지원출동(도로세척)";
+        case "0060027": return "지원출동(가옥정리)";
+        case "0060028": return "순찰출동";
+        case "0060029": return "상황출동";
+        case "0060037": return "예방경계";
+        case "0060044": return "대민지원";
+        case "0060200": return "업무운행";
+        case "0060212": return "기타출동";
+        case "1710676": return "일반화재(차량)";
+        case "0060072": return "자살";
+        case "0060218": return "실종자";
+        case "1712101": return "기타화재(속보설비)";
+        case "1712102": return "사회적약자시설(요양원,장애인시설)";
+        case "0500026": return "심정지";
+        case "0062301": return "구급차소독";
+        case "0042301": return "화학사고";
+        case "1712301": return "전기차화재";
+        case "0060030": return "화재확인출동";
+        case "1710677": return "흉통";
+        case "1710678": return "아나필락시스";
+        case "1710679": return "응급신경증상(뇌졸중)";
+        default: return "알 수 없는 코드";
+    }
 };
 
 const mapProcCd = (code: string): string => {
@@ -98,13 +128,12 @@ const mapProcCd = (code: string): string => {
 //TODO 글로벌 함수
 const fetchDisasterInformation = async (dispatch: AppDispatch, disasterStartTime:string, disasterEndTime:string, jurisWardId:string, userId:string) => {
 
-  console.log(disasterStartTime, disasterEndTime)
   try {
 
     const response = await axios.get('/api/disaster_info/all',{
       params: {
-        disasterStartTime : disasterStartTime,
-        disasterEndTime : disasterEndTime,
+        disasterStartTime : "2023-12-06 09:00:00",
+        disasterEndTime : "2023-12-07 00:08:00",
         jurisWardId : jurisWardId,
         userId : userId
       }
@@ -187,9 +216,10 @@ const fetchDisasterInformation = async (dispatch: AppDispatch, disasterStartTime
     });
 };
     console.log("동원 api 콜")
-    console.log(data)
-    
-    dispatch(setDisasterInformation(transformApiResponse(data)));
+    console.log(response.data)
+    if(response.data.responseCode === 200){
+      dispatch(setDisasterInformation(transformApiResponse(response.data)));
+    }
   } catch (error) {
     console.error('API 호출 실패:', error);
   }
@@ -204,22 +234,23 @@ const GlobalFunctionHandler = () => {
   const searchStartDate = useSelector((state: RootState) => state.disaster.searchStartDate);
   const searchEndDate = useSelector((state: RootState) => state.disaster.searchEndDate);
 
-  console.log(isLoggedIn , searchStartDate,searchEndDate)
+  console.log(isLoggedIn , searchStartDate,searchEndDate, useInfo)
   useEffect(() => {
 
     window.setGpsStatus = (satelliteCount: number, dbHzAverage: number) => {
-      console.log(`satelliteCount is ${satelliteCount} dbHzAverage is ${dbHzAverage}`)
+      //console.log(`satelliteCount is ${satelliteCount} dbHzAverage is ${dbHzAverage}`)
       dispatch(saveGpsStatusSatelliteCount(satelliteCount));
       dispatch(saveGpsStatusDbHzAverage(dbHzAverage));
     };
 
     window.updateLocation = (latitude: number, longitude: number) => {
-        console.log(`location latitude=${latitude} longitude=${longitude}`)
+        //console.log(`location latitude=${latitude} longitude=${longitude}`)
         dispatch(saveUserLocationX(latitude));
         dispatch(saveUserLocationY(longitude));
     };
 
     if (isLoggedIn && searchStartDate && searchEndDate) {
+      console.log("useInfo",useInfo)
       // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
       fetchDisasterInformation(dispatch, searchStartDate, searchEndDate, useInfo?.wardId, useInfo?.userId);
 
