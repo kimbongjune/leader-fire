@@ -40,46 +40,49 @@ const HistoryList = (props: Props) => {
   useEffect(() => {
     // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
       const fetchData = async () =>{
-          const historyData = await axios.post<HistoryData>("/api/past_history/all",{
-            "callTel": selectedDisaster?.callTell, //selectedDisaster?.callTell
-            "dsrClsCd": selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
-            "dsrKndCd": selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
-            "dsrSeq": id,//id
-            "gisX": selectedDisaster?.gisX,  //selectedDisaster?.gisX
-            "gisY": selectedDisaster?.gisY, //selectedDisaster?.gisY
-            "radius": "null"
+          const historyData = await axios.get<HistoryData>("/api/past_history/all",{
+            params : {
+              callTel: selectedDisaster?.callTell, //selectedDisaster?.callTell
+              dsrClsCd: selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
+              dsrKndCd: selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
+              dsrSeq: id,//id
+              gisX: selectedDisaster?.gisX,  //selectedDisaster?.gisX
+              gisY: selectedDisaster?.gisY, //selectedDisaster?.gisY
+              radius: "null"
+            }
         });
 
-        const reportHistoryList = historyData.data.result.reportHistoryList?.result?.dataList?.map(item => ({
-          ...item,
-          type: 'report' as 'report'
-        }));
-
-        const rescueHistoryList = historyData.data.result.rescueHistoryList?.result?.dataList?.map(item => ({
-          ...item,
-          type: 'rescue' as 'rescue'
-        }));
-        const firstAidHistoryList = historyData.data.result.firstAidHistoryList?.result?.dataList?.map(item => ({
-          ...item,
-          type: 'patient' as 'patient'
-        }));
-        const dispatchHistoryList = historyData.data.result.dispatchHistoryList?.result?.dataList?.map(item => ({
-          ...item,
-          type: 'mobilize' as 'mobilize'
-        }));
-        console.log(firstAidHistoryList)
-        const combinedData = [
-          ...reportHistoryList || [],
-          ...rescueHistoryList || [],
-          ...firstAidHistoryList || [],
-          ...dispatchHistoryList || []
-        ];
-        const data = {
-          reportNumber : historyData.data.totalCount,
-          dispatchLists : combinedData
+        if(historyData.data.responseCode === 200){
+          const reportHistoryList = historyData.data.result.reportHistoryList?.result?.dataList?.map(item => ({
+            ...item,
+            type: 'report' as 'report'
+          }));
+  
+          const rescueHistoryList = historyData.data.result.rescueHistoryList?.result?.dataList?.map(item => ({
+            ...item,
+            type: 'rescue' as 'rescue'
+          }));
+          const firstAidHistoryList = historyData.data.result.firstAidHistoryList?.result?.dataList?.map(item => ({
+            ...item,
+            type: 'patient' as 'patient'
+          }));
+          const dispatchHistoryList = historyData.data.result.dispatchHistoryList?.result?.dataList?.map(item => ({
+            ...item,
+            type: 'mobilize' as 'mobilize'
+          }));
+          console.log(firstAidHistoryList)
+          const combinedData = [
+            ...reportHistoryList || [],
+            ...rescueHistoryList || [],
+            ...firstAidHistoryList || [],
+            ...dispatchHistoryList || []
+          ];
+          const data = {
+            reportNumber : historyData.data.totalCount,
+            dispatchLists : combinedData
+          }
+          setHistoryData(data)
         }
-        setHistoryData(data)
-        console.log(data)
       }
       fetchData()
       apiIntervalRef.current =  setInterval(() => fetchData(), 60000);
