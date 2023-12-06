@@ -93,8 +93,8 @@ const ShareVehicleModal = (props: Props) => {
   return (
     <ModalLayout isOpen={true} onClose={() => {}}>
       <Wrapper>
-        <Title>도착지를 공유할 차량을 선택하세요</Title>
-        <Content>
+        <Title>{props.vehicleData.length > 0 ? "도착지를 공유할 차량을 선택하세요" : "출동차량이 없습니다."}</Title>
+        {props.vehicleData.length > 0 && <Content>
           <Header>
             <Checkbox variant="orangeCheckbox" isChecked={isCheckAll} onChange={e => onClickCheckAll(e)}>
               모두선택
@@ -111,10 +111,11 @@ const ShareVehicleModal = (props: Props) => {
               </Body>
             );
           })}
-        </Content>
+        </Content>}
         <Flex gap="16px">
           <Button onClick={() => props.onCloseModal(false)}>취소하기</Button>
-          <Button onClick={onClickSendingButton}>전송하기</Button>
+          {props.vehicleData.length > 0 &&
+          <Button onClick={onClickSendingButton}>전송하기</Button>}
         </Flex>
       </Wrapper>
     </ModalLayout>
