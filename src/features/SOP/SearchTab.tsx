@@ -12,6 +12,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { DeviceType } from '@/types/types';
 import { Link } from 'react-scroll';
 import { useRouter } from 'next/router';
+import { shallowEqual, useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { selectDisasterById } from '../slice/test';
 
 interface Props {
   search?: string | null;
@@ -26,7 +29,8 @@ interface Props {
 }
 
 const SearchTab = (props: Props) => {
-  const route = useRouter();
+  const router = useRouter();
+
   const { searchOccurrences, deviceType } = props;
   const [index, setIndex] = useQueryParam('index', withDefault(NumberParam, -1));
 
