@@ -19,12 +19,9 @@ const HomePage = () => {
   const deviceType = useDeviceType();
   const dispatch = useDispatch();
 
-  const [userInfo, setUserInfo] = useState<UserDto>();
-
-  const parsingJwt = (token: string) => {
+  const parsingJwt = async (token: string) => {
     const userData = jwtDecode<UserDto>(token)
-    console.log(userData)
-    setUserInfo(userData)
+    return userData
   }
 
   const sendLocationFlag = useSelector((state: RootState) => state.userReducer.sendLocationFlag);
@@ -35,12 +32,52 @@ const HomePage = () => {
     }
   }
 
-  window.updateToken = async (token: string) => {
-    console.log("token" , token, userInfo)
-    if(userInfo){
+  // window.updateToken = async (token: string) => {
+  //   console.log("token" , token, userInfo)
+  //   if(userInfo){
+  //     try{
+  //       const userUpdateResponse = await axios.put<apiPostResponse>("/api/user/info", {
+  //         fcmToken: token,
+  //         userId : userInfo.sub
+  //       })
+  //       if(userUpdateResponse.data.responseCode === 200){
+  //         console.log(userInfo)
+  //         const fetchUserData = await axios.post("/api/user/login/auth",{
+  //             userId : userInfo.userId,
+  //             userPassword : userInfo.userPw
+  //         })
+  //         if(fetchUserData.data.responseCode === 200){
+  //           localStorage.setItem("token", fetchUserData.headers['authorization']);
+  //           setAuthToken(fetchUserData.headers['authorization'])
+  //         }
+  //         if (window.fireAgency && window.fireAgency.saveJwtToken) {
+  //           window.fireAgency.saveJwtToken(userInfo.userId, fetchUserData.headers['authorization']);
+  //         }
+  //         dispatch(saveUserInformation(jwtDecode<UserDto>(fetchUserData.headers['authorization'])))
+  //         console.log(jwtDecode<UserDto>(fetchUserData.headers['authorization']))
+  //       }else{
+  //         alert("유저 정보 갱신 실패")
+  //       }
+  //     }catch(error){
+  //       console.error(error)
+  //     }
+  //   }
+    
+  // };
+
+  window.getSavedUserToken = async (userdata:userData) => {
+    console.log("@@@@@@@@@@@@@@@@@",userdata)
+    if(userdata !== null){
+      dispatch(saveLogedInStatus(true))
+      const userInfo = await parsingJwt(userdata.jwtToken.replace("Bearer ", ""))
+
+      console.log("@@@@@@@@@@@@@@@@@", userInfo)
+      localStorage.setItem("token", userdata.jwtToken);
+      setAuthToken(userdata.jwtToken)
+
       try{
         const userUpdateResponse = await axios.put<apiPostResponse>("/api/user/info", {
-          fcmToken: token,
+          fcmToken: userInfo.fcmToken,
           userId : userInfo.sub
         })
         if(userUpdateResponse.data.responseCode === 200){
@@ -57,6 +94,7 @@ const HomePage = () => {
             window.fireAgency.saveJwtToken(userInfo.userId, fetchUserData.headers['authorization']);
           }
           dispatch(saveUserInformation(jwtDecode<UserDto>(fetchUserData.headers['authorization'])))
+          console.log(jwtDecode<UserDto>(fetchUserData.headers['authorization']))
         }else{
           alert("유저 정보 갱신 실패")
         }
@@ -64,7 +102,6 @@ const HomePage = () => {
         console.error(error)
       }
     }
-    
   };
   
   useEffect(() => {
@@ -73,20 +110,6 @@ const HomePage = () => {
       window.fireAgency.getUserData();
     }
 
-    if (window.fireAgency && window.fireAgency.requestGetToken) {
-      window.fireAgency.requestGetToken();
-    }
-
-    window.getSavedUserToken = (userdata:userData) => {
-      console.log(userdata)
-      if(userdata !== null){
-        dispatch(saveLogedInStatus(true))
-        parsingJwt(userdata.jwtToken)
-        localStorage.setItem("token", userdata.jwtToken);
-        setAuthToken(userdata.jwtToken)
-      }
-    };
-    
   }, [dispatch]);
   
   const testData = useSelector((state: RootState) => state.disaster.disasterInformation);

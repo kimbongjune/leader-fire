@@ -6,6 +6,10 @@ import theme from '@/theme/colors';
 import { DispatchVehicleDataType } from './VehicleStatus';
 import proj4 from 'proj4';
 import axios from "../../components/common/api/axios"
+import Axios from 'axios';
+import { CommanderAppintResponseDto, KakaoRestApiResponse } from '@/types/types';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
 
 interface Props {
   vehicleData: DispatchVehicleDataType[];
@@ -26,7 +30,9 @@ const ShareVehicleModal = (props: Props) => {
   const checkboxItemStatus = props.vehicleData?.map(item => false);
   const [checkItemList, setCheckItemList] = useState(checkboxItemStatus);
   const [checkedCarIds, setCheckedCarIds] = useState<string[]>([]);
-
+  
+  const useInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+  
   const onClickCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
       // 모든 차량의 carId를 checkedCarIds에 추가
@@ -51,40 +57,53 @@ const ShareVehicleModal = (props: Props) => {
     if (checkedCarIds.length > 0) {
       console.log(checkedCarIds); // 선택된 차량의 carId를 콘솔에 출력
 
-      const apiKey = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY;
-      console.log(apiKey)
+      const apiKey = process.env.NEXT_PUBLIC_KAKAOMAP_RESTAPI_KEY;
+      console.log(props.position.La, props.position.Ma)
 
-      // const address = await axios.get("https://dapi.kakao.com/v2/local/geo/coord2address.json",{
-      //   data:{
-      //     x : props.position.La,
-      //     y : props.position.Ma
-      //   },
-      //   headers : {'Authorization': `KakaoAK ${apiKey}`}
-      // })
+      const address = await Axios.get<KakaoRestApiResponse>("https://dapi.kakao.com/v2/local/geo/coord2address.json",{
+        params:{
+          x : props.position.La,
+          y : props.position.Ma
+        },
+        headers:{
+          Authorization : `KakaoAK ${apiKey}`
+        },
+      })
 
-      // console.log(address)
-      console.log(convertCoordinateSystem(props.position.La, props.position.Ma))
-      // const data = {
-      //   dsrSeq : props.dsrSeq,
-      //   targetCarList :checkedCarIds,
-      //   targetlocBunziAddr : 
-      console.log(checkedCarIds)
-      const data = {
-        dsrSeq : props.dsrSeq,
-        targetCarList : checkedCarIds.map(id => ({ targetlocDspcarId: Number(id) })),
-        targetlocBunziAddr: "김해시 주촌면 서부로 1638번안길 14-10",
-        targetlocDspcarId: 4800000372,
-        targetlocId: 202311090002,
-        targetlocRoadAddr: "경남 통영시 한산면 추봉로 280",
-        targetlocRoger: true,
-        targetlocUserid: "2gang5",
-        targetlocX: 350582.75,
-        targetlocY: 153972.42
+      console.log(address)
+      if(address.status === 200){
+        if(address.data.meta.total_count > 0){
+          const bunjiAddress = address.data.documents[0].address.address_name
+          const roadAddress = address.data.documents[0].road_address?.address_name || ""
+
+          const convertCoordinate = convertCoordinateSystem(props.position.La, props.position.Ma)
+          console.log(convertCoordinate)
+          console.log(bunjiAddress)
+          console.log(roadAddress)
+
+          const data = {
+            dsrSeq : props.dsrSeq,
+            targetCarList : checkedCarIds.map(id => ({ targetlocDspcarId: Number(id) })),
+            targetlocBunziAddr: bunjiAddress,
+            targetlocRoadAddr: roadAddress,
+            targetlocUserid: useInfo.userId,
+            targetlocX: convertCoordinate[0],
+            targetlocY: convertCoordinate[1]
+          }
+          const result = await axios.post<CommanderAppintResponseDto>("/api/commander_appoint/seq",data)
+
+          if(result.data.responseCode === 200){
+            alert('전송에 성공하였습니다.');
+            props.onCloseModal(false);
+          }else{
+            alert('전송에 실패하였습니다.');
+            props.onCloseModal(false);
+          }
+        }else{
+          alert("주소를 찾을 수 없습니다.")
+          props.onCloseModal(false);
+        }
       }
-      const result = await axios.post("/api/commander_appoint/seq",data)
-      console.log(result)
-      await alert('전송에 성공하였습니다.');
-      props.onCloseModal(false);
     } else {
       alert('전송할 차량을 선택하세요');
     }

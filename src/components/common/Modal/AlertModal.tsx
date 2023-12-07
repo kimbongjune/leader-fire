@@ -10,13 +10,15 @@ interface Props {
   hasRead: boolean;
   setHasRead: Dispatch<SetStateAction<boolean>>;
   disasterNumber : string[];
+  userId: string
 }
 
 //TODO 신규재난 안내 팝업, 한번에 여러개일 경우 ~~외 1건 총 2건 재난 발생, 확인버튼 클릭시 재난번호 리스트로 API 발송
 const AlertModal = (props: Props) => {
+  console.log(props)
   const onClickCloseModal = () => {
     //TODO axios로 재난번호에 대해 수신 확인 전송
-    props.setHasRead(false);
+    props.setHasRead(true);
     console.log("disasternumber is ",props.disasterNumber)
   };
 

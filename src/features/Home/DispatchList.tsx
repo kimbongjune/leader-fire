@@ -26,6 +26,10 @@ const DispatchList = (props: Props) => {
   const router = useRouter();
   const type = router.query.type;
 
+  console.log(props.dispatchLists)
+
+  const useInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
   // 리스트 필터링
   const filteredList = useMemo(() => {
     if (type === undefined) return props.dispatchLists;
@@ -62,7 +66,7 @@ const DispatchList = (props: Props) => {
           </Stack>
         )}
       </Wrapper>
-      {hasRead && <AlertModal hasRead={hasUnread} setHasRead={setHasRead} disasterNumber={unreadDsrSeqs} />}
+      {!hasRead && <AlertModal userId={useInfo.userId} hasRead={hasUnread} setHasRead={setHasRead} disasterNumber={unreadDsrSeqs} />}
     </>
   );
 };

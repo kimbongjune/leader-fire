@@ -249,7 +249,7 @@ const GlobalFunctionHandler = () => {
         dispatch(saveUserLocationY(longitude));
     };
 
-    if (isLoggedIn && searchStartDate && searchEndDate) {
+    if (isLoggedIn && searchStartDate && searchEndDate && useInfo.wardId) {
       console.log("useInfo",useInfo)
       // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
       fetchDisasterInformation(dispatch, searchStartDate, searchEndDate, useInfo?.wardId, useInfo?.userId);
@@ -260,7 +260,7 @@ const GlobalFunctionHandler = () => {
       // 컴포넌트가 언마운트될 때 인터벌을 정리
       return () => clearInterval(intervalId);
     }
-  }, [dispatch, isLoggedIn, searchStartDate, searchEndDate]);
+  }, [dispatch, isLoggedIn, searchStartDate, searchEndDate, useInfo.wardId]);
 
   return null;
 };
