@@ -209,8 +209,8 @@ const fetchDisasterInformation = async (dispatch: AppDispatch, disasterStartTime
             dFstRegSeq : callData.dFstRegSeq,
             callTell : callData.callTel,
             description : callData.callContent,
-            isNew : callData.chkYn?.trim() == 'Y' ? false : true,
-            hasRead : callData.viewYn?.trim() == 'Y' ? false : true,
+            isNew : callData.viewYn == null ? true : false,
+            hasRead : callData.chkYn == null ? false : true,
             created : callData.regDtime,
         };
     });
@@ -260,7 +260,7 @@ const GlobalFunctionHandler = () => {
       // 컴포넌트가 언마운트될 때 인터벌을 정리
       return () => clearInterval(intervalId);
     }
-  }, [dispatch, isLoggedIn, searchStartDate, searchEndDate, useInfo.wardId]);
+  }, [dispatch, isLoggedIn, searchStartDate, searchEndDate, useInfo?.wardId]);
 
   return null;
 };

@@ -373,7 +373,7 @@ const Map = (props: Props) => {
       try {
         const positionResult = await axios.get<CarPostionData>("/api/disaster_info/car/seq",{
           params: {
-            dsrSeq : "XX4809448605"//id
+            dsrSeq : id//id
           }
         });
 

@@ -185,7 +185,7 @@ const SearchDispatch = (props: Props) => {
                   <Text>긴급출동</Text>
                 </Flex>
                 <NumberOfEmergencyDispatches>
-                  <span>{props.NumberOfEmergencyDispatches}</span> 건
+                  <span>{props.NumberOfEmergencyDispatches | 0}</span> 건
                 </NumberOfEmergencyDispatches>
               </Flex>
               <Status>{count}</Status>
@@ -211,7 +211,7 @@ const SearchDispatch = (props: Props) => {
               <Text>긴급출동</Text>
             </Flex>
             <NumberOfEmergencyDispatches>
-              <span>{props.NumberOfEmergencyDispatches}</span> 건
+              <span>{props.NumberOfEmergencyDispatches | 0}</span> 건
             </NumberOfEmergencyDispatches>
           </EmergencyDispatch>
         </Stack>
@@ -233,9 +233,6 @@ const SearchDispatch = (props: Props) => {
 
 export default SearchDispatch;
 
-SearchDispatch.defaultProps = {
-  NumberOfEmergencyDispatches: 5,
-};
 
 const Wrapper = styled.div<{ deviceType?: DeviceType }>`
   padding: 16px;

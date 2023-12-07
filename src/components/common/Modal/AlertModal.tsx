@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { Flex } from '@chakra-ui/react';
 import theme from '@/theme/colors';
 import axios from "../../../components/common/api/axios"
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import { apiPostResponse } from '@/types/types';
 
 interface Props {
   hasRead: boolean;
@@ -16,10 +19,24 @@ interface Props {
 //TODO 신규재난 안내 팝업, 한번에 여러개일 경우 ~~외 1건 총 2건 재난 발생, 확인버튼 클릭시 재난번호 리스트로 API 발송
 const AlertModal = (props: Props) => {
   console.log(props)
-  const onClickCloseModal = () => {
+
+  const useInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
+  const onClickCloseModal = async () => {
     //TODO axios로 재난번호에 대해 수신 확인 전송
-    props.setHasRead(true);
-    console.log("disasternumber is ",props.disasterNumber)
+
+    const requestData = {
+      dsrSeqList: props.disasterNumber.map(dsrSeq => ({ dsrSeq })),
+      userId: useInfo.userId
+    };
+
+    const disasterCheckResponse = await axios.put<apiPostResponse>("/api/disaster_info/check_call",requestData)
+    if(disasterCheckResponse.data.responseCode == 200){
+      props.setHasRead(false);
+    }else{
+      console.log("disasterCheckResponse call failed")
+      props.setHasRead(false);
+    }
   };
 
   return (

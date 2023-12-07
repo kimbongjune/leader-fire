@@ -146,7 +146,7 @@ const VehicleStatus = (props: Props) => {
         <Wrapper deviceType={deviceType}>
           <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(6)}>
             <ItemTitle>귀소중편성불가</ItemTitle>
-            <IconWrapper width="24px" height="24px" color={theme.colors.gray1}>
+            <IconWrapper width="24px" height="24px" color={theme.colors.gray5}>
               {toggle[6] ? <ArrowUp /> : <ArrowDown />}
             </IconWrapper>
           </Flex>

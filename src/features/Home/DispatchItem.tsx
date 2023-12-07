@@ -5,12 +5,15 @@ import Clock from '../../../public/images/icons/clock.svg';
 import RightArrow from '../../../public/images/icons/arrow-right.svg';
 import { useRouter } from 'next/router';
 import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
-import { DeviceType } from '@/types/types';
+import { DeviceType, apiPostResponse } from '@/types/types';
 import theme from '@/theme/colors';
 import { useDispatch } from 'react-redux';
 import { setSubDisasterInformation } from '../../features/slice/disasterSlice';
 import { useEffect } from 'react';
 import { getPassedTime } from '@/utils/getPassedTime';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import axios from "../../components/common/api/axios"
 
 interface Props {
   jurisWardId:string;
@@ -40,11 +43,24 @@ const DispatchItem = (props: Props) => {
   const { deviceType } = props;
   const router = useRouter();
 
-  const moveDetailPage = () => {
+  const useInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
+  const moveDetailPage = async () => {
     console.log("move page")
-    
-    dispatch(setSubDisasterInformation(props))
-    router.push(`/detail/${props.dsrSeq}`)
+
+    const viewResult = await axios.put<apiPostResponse>("/api/disaster_info/check_res",{
+      userId : useInfo.userId,
+      dsrSeq : props.dsrSeq
+    })
+
+    if(viewResult.data.responseCode === 200) {
+      dispatch(setSubDisasterInformation(props))
+      router.push(`/detail/${props.dsrSeq}`)
+    }else{
+      console.log("viewResult call failed")
+      dispatch(setSubDisasterInformation(props))
+      router.push(`/detail/${props.dsrSeq}`)
+    }
   }
 
   return (

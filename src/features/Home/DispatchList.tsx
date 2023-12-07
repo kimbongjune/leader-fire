@@ -10,7 +10,6 @@ import HomeFilter from './HomeFilter';
 import { CountByType } from './HomeFilterItem';
 import { useRouter } from 'next/router';
 import AlertModal from '@/components/common/Modal/AlertModal';
-import axios from "../../components/common/api/axios"
 import { RootState } from '../../app/store';
 import { useSelector } from 'react-redux';
 
@@ -42,8 +41,13 @@ const DispatchList = (props: Props) => {
   }, [props.dispatchLists]);
 
   const hasUnread = useMemo(() => unreadDsrSeqs?.length > 0, [unreadDsrSeqs]);
+
+  console.log(hasUnread)
+  console.log(unreadDsrSeqs.length)
   
   const [hasRead, setHasRead] = useState(hasUnread);
+
+  console.log(hasRead)
 
   // 이벤트 타입별 카운팅
   const countByType: CountByType = props.dispatchLists?.reduce(
@@ -66,7 +70,7 @@ const DispatchList = (props: Props) => {
           </Stack>
         )}
       </Wrapper>
-      {!hasRead && <AlertModal userId={useInfo.userId} hasRead={hasUnread} setHasRead={setHasRead} disasterNumber={unreadDsrSeqs} />}
+      {hasRead && unreadDsrSeqs?.length > 0 && <AlertModal userId={useInfo.userId} hasRead={hasUnread} setHasRead={setHasRead} disasterNumber={unreadDsrSeqs} />}
     </>
   );
 };
