@@ -23,11 +23,11 @@ const Calendar = (props: Props) => {
 
   return (
     <CalendarWrapper className="calendar-container" height={props.height}>
-      <DateDisplay className="calendar-date">{props.date && dayjs(props.date).format('YYYY년 MM월 DD일')}</DateDisplay>
+      {/* <DateDisplay className="calendar-date">{props.date && dayjs(props.date).format('YYYY년 MM월 DD일')}</DateDisplay>
       <IconWrapper width="20px" height="20px" color="#343A40">
         <ArrowDropDownIcon />
-      </IconWrapper>
-      <input id="calendar-input" required type="date" onChange={handleDateChange} value={props.date} max={maxDate} min={minDate}/>
+      </IconWrapper> */}
+      <input id="calendar-input" type="date" onChange={handleDateChange} value={props.date} max={maxDate} min={minDate}/>
     </CalendarWrapper>
   );
 };
