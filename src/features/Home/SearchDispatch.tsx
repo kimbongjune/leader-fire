@@ -40,6 +40,9 @@ const SearchDispatch = (props: Props) => {
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState(new Date().toLocaleTimeString('it-IT').substring(0, 5));
 
+  const searchStartDate = useSelector((state: RootState) => state.disaster.searchStartDate);
+  const searchEndDate = useSelector((state: RootState) => state.disaster.searchEndDate);
+
   const [date, setDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'))
 
   useEffect(() => {
@@ -71,8 +74,12 @@ const SearchDispatch = (props: Props) => {
     // 콘솔에 출력
     console.log("설정된 시작 시간:", formatDateAndTime(start));
     console.log("설정된 종료 시간:", formatDateAndTime(end));
-    dispatch(setSearchStartDate(formatDateAndTime(start)+":00"))
-    dispatch(setSearchEndDate(formatDateAndTime(end)+":00"))
+    if(!searchStartDate){
+      dispatch(setSearchStartDate(formatDateAndTime(start)+":00"))
+    }
+    if(!searchEndDate){
+      dispatch(setSearchEndDate(formatDateAndTime(end)+":00"))
+    }
   };
 
   const handleSearchCrear = () =>{
