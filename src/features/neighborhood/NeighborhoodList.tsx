@@ -50,6 +50,9 @@ const NeighborhoodList = (props: Props) => {
   const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
 
     useEffect(() => {
+      if(!selectedDisaster?.callTell || selectedDisaster?.callTell == null){
+        return;
+      }
       // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
         const fetchData = async () =>{
           const neightBorHoodData = await axios.get<NeightBorHoodData>("/api/relate/all",{
