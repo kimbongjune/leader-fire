@@ -32,7 +32,7 @@ const ReportItem = (props: Props) => {
       if (window.fireAgency && window.fireAgency.openThirdPartyMapApplication) {
         console.log(data?.gisX, data?.gisY)
         if(data.gisX && data.gisY){
-          window.fireAgency.openThirdPartyMapApplication(mapType, data.gisX.toString(), data.gisY.toString(), data.lawAddr);
+          window.fireAgency.openThirdPartyMapApplication(mapType, data.gisY.toString(), data.gisX.toString(), data.lawAddr);
         }else{
           return alert("재난 좌표 정보가 없습니다.")
         }
