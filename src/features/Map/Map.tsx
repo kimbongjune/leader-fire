@@ -934,7 +934,7 @@ const Map = (props: Props) => {
         <VehicleStatus  data={aponintList}/>
         <Wrapper deviceType={deviceType}>
           <MapWrapper deviceType={deviceType} ref={mapContainer}>
-            <FloatingButtons vihicleMarkerCount={carMarkers.length} videoMarkerCount={videoMarker.length} isClickRescuePosition={isRescuePositionActive} isClickVideo={isVideoActive} changeStatus={changeStatus} isClickVehicle={isVehicleActive} hasSkyButton={hasSky} setHasSky={setHasSky}/>
+            <FloatingButtons vihicleMarkerCount={carMarkers.length | 0} videoMarkerCount={videoMarker.length | 0} isClickRescuePosition={isRescuePositionActive} isClickVideo={isVideoActive} changeStatus={changeStatus} isClickVehicle={isVehicleActive} hasSkyButton={hasSky} setHasSky={setHasSky}/>
             <Stack spacing="16px" position={deviceType === 'tabletHorizontal' ? 'fixed' : 'fixed'} left={deviceType === 'tabletHorizontal' ? '331px' : '16px'} bottom={deviceType === 'tabletHorizontal' ? '120px' : '97px'} zIndex={10}>
             <GpsWarper isActive={isReceivingGPS}>
               <IconWrapper width="24px" height="24px" color={theme.colors.gray}>

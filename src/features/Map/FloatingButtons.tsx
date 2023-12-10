@@ -60,7 +60,7 @@ const FloatingButtons = (props: Props) => {
               </IconWrapper>
               <ButtonText deviceType={deviceType}>영상공유</ButtonText>
             </Flex>
-            <Count>{props.videoMarkerCount}</Count>
+            <Count>{props.videoMarkerCount | 0}</Count>
           </Button>
         </Flex>
         {deviceType !== 'mobile' && props.hasSkyButton != null && props.setHasSky != undefined && (

@@ -888,7 +888,7 @@ const MiniMap = (props: Props) => {
   return (
     <MapWrapper ref={mapContainer}>
       <FloatingButtonWrapper>
-        <FloatingButtons vihicleMarkerCount={carMarkers.length} videoMarkerCount={videoMarker.length} isClickRescuePosition={isRescuePositionActive} isClickVideo={isVideoActive} changeStatus={changeStatus} isClickVehicle={isVehicleActive} />
+        <FloatingButtons vihicleMarkerCount={carMarkers.length | 0} videoMarkerCount={videoMarker.length | 0} isClickRescuePosition={isRescuePositionActive} isClickVideo={isVideoActive} changeStatus={changeStatus} isClickVehicle={isVehicleActive} />
       </FloatingButtonWrapper>
       <Stack spacing="8px" position="absolute" left="16px" bottom="16px" zIndex={10}>
         <GpsWarper isActive={isReceivingGPS}>
