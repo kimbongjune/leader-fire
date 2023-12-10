@@ -37,19 +37,19 @@ const UserSettingModal = (props: Props) => {
   const phonNumberInput = useRef<HTMLInputElement>(null);
 
   const [phoneError, setPhoneError] = useState('');
-  
-  dispatch(saveSendLocationFlag(checked))
-  if(checked){
-    if (window.fireAgency && window.fireAgency.startLocationService) {
-        window.fireAgency.startLocationService();
-    }
-  }else{
-    if (window.fireAgency && window.fireAgency.stopLocationService) {
-      window.fireAgency.stopLocationService();
-    }
-  }
 
   const handleAcceptButton = async () => {
+
+    dispatch(saveSendLocationFlag(checked))
+    if(checked){
+      if (window.fireAgency && window.fireAgency.startLocationService) {
+          window.fireAgency.startLocationService();
+      }
+    }else{
+      if (window.fireAgency && window.fireAgency.stopLocationService) {
+        window.fireAgency.stopLocationService();
+      }
+    }
 
     if (phoneNumber === null || phoneNumber ==="") {
       setPhoneError('전화번호를 입력해주세요.'); // 아이디 입력값이 없을 경우 오류 메시지
