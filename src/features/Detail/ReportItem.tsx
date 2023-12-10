@@ -55,7 +55,7 @@ const ReportItem = (props: Props) => {
       <TabBar>
         <Flex justify="space-between" gap="24px" align="center">
           <Flex gap="12px" align="center" width="fit-content">
-          <a href={props.callTell ? `tel:${props.callTell}` : undefined}>
+          <a href={props.callTell && props.callTell?.trim() != "" ? `tel:${props.callTell}` : undefined}>
               <Image src="/images/icons/call.png" width={36} height={36} alt="통화 아이콘" />
           </a>
             <Image src="/images/icons/naverMap.png" width={36} height={36} alt="네이버지도 아이콘" onClick={() => openThirdPartyMapApplication("naver")}/>

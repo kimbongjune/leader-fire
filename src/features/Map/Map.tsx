@@ -285,7 +285,7 @@ const Map = (props: Props) => {
     kakaoMapScript.onload = () => {
       window.kakao.maps.load(() => {
         const options = {
-          center: gis_x_4326 && gis_y_4326 ? new window.kakao.maps.LatLng(gis_y_4326, gis_x_4326) : new window.kakao.maps.LatLng(props.latitude, props.longitude),
+          center: gis_x_4326 && gis_y_4326 ? new window.kakao.maps.LatLng(gis_y_4326, gis_x_4326) : new window.kakao.maps.LatLng(selectedDisaster?.gisX, selectedDisaster?.gisY),
           level: 3,
         };
         if(gis_x_4326 && gis_y_4326) {
@@ -337,7 +337,7 @@ const Map = (props: Props) => {
         setRescueMarker(
           [
             {
-              location: new window.kakao.maps.LatLng(props.latitude, props.longitude),
+              location: new window.kakao.maps.LatLng(selectedDisaster?.gisX, selectedDisaster?.gisY),
               type: '긴급구조',
               id :"2"
             }
