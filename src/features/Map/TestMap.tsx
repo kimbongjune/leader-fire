@@ -264,7 +264,7 @@ const MiniMap = (props: Props) => {
 
     kakaoMapScript.onload = () => {
       window.kakao.maps.load(() => {
-        const location = convertCoordinateSystem(selectedDisaster?.gisY!!, selectedDisaster?.gisX!!)
+        const location = convertCoordinateSystem(selectedDisaster?.gisX!!, selectedDisaster?.gisY!!)
         const options = {
           center: new window.kakao.maps.LatLng(location[1], location[0]),
           level: 3,
