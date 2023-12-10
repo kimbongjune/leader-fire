@@ -132,6 +132,8 @@ const Map = (props: Props) => {
 
   const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
+  console.log(selectedDisaster)
+
   const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
   const isWaterActive = useSelector((state: RootState) => state.disaster.isWaterMarkerActive);
   const isExtinguisherActive = useSelector((state: RootState) => state.disaster.isExtinguisherMarkerActive);
