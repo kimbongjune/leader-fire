@@ -132,8 +132,8 @@ const fetchDisasterInformation = async (dispatch: AppDispatch, disasterStartTime
 
     const response = await axios.get('/api/disaster_info/all',{
       params: {
-        disasterStartTime : "2023-12-06 09:00:00",
-        disasterEndTime : "2023-12-07 00:08:00",
+        disasterStartTime : disasterStartTime,
+        disasterEndTime : disasterEndTime,
         jurisWardId : jurisWardId,
         userId : userId
       }
