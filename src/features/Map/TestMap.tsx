@@ -265,7 +265,7 @@ const MiniMap = (props: Props) => {
     kakaoMapScript.onload = () => {
       window.kakao.maps.load(() => {
         const options = {
-          center: new window.kakao.maps.LatLng(selectedDisaster?.gisX, selectedDisaster?.gisY),
+          center: new window.kakao.maps.LatLng(selectedDisaster?.gisY, selectedDisaster?.gisX),
           level: 3,
         };
         const map = new window.kakao.maps.Map(mapContainer.current, options);
@@ -315,7 +315,7 @@ const MiniMap = (props: Props) => {
         setRescueMarker(
           [
             {
-              location: new window.kakao.maps.LatLng(selectedDisaster?.gisX, selectedDisaster?.gisY),
+              location: new window.kakao.maps.LatLng(selectedDisaster?.gisY, selectedDisaster?.gisX),
               type: '긴급구조',
               id :"2"
             }
