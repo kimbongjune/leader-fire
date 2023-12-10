@@ -286,7 +286,7 @@ const Map = (props: Props) => {
 
     kakaoMapScript.onload = () => {
       window.kakao.maps.load(() => {
-        const location = convertCoordinateSystem(selectedDisaster?.gisX!!, selectedDisaster?.gisY!!)
+        const location = convertCoordinateSystem(selectedDisaster?.gisY!!, selectedDisaster?.gisX!!)
         const options = {
           center: gis_x_4326 && gis_y_4326 ? new window.kakao.maps.LatLng(gis_y_4326, gis_x_4326) : new window.kakao.maps.LatLng(location[0], location[1]),
           level: 3,
