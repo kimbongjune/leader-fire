@@ -9,9 +9,9 @@ import { useRouter } from 'next/router';
 import { DeviceType } from '@/types/types';
 import { selectDisasterById } from '../../../features/slice/test';
 import { useSelector, shallowEqual  } from 'react-redux';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RootState } from '@/app/store';
-
+import axios from '@/components/common/api/axios';
 
 //TODO 과거이력 페이지
 const HistoryComponent = () => {
@@ -19,9 +19,24 @@ const HistoryComponent = () => {
   const router = useRouter();
   const id = router.query.id as string;
 
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
   const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
 
   //const selectedDisaster = useSelector((state: RootState) => state.disaster.subDisasterInformation);
+
+  useEffect(() =>{
+    const sendClickStream = async () =>{
+      if(userInfo){
+        const clickStreamResponse = await axios.post("/api/menu_log/enter",{
+          menuId : "3120",
+          userId : userInfo.userId
+        })
+        console.log(clickStreamResponse.data)
+      }
+    }
+    sendClickStream()
+  }, [userInfo])
   
   if (!selectedDisaster) return null
   if (!deviceType) return null;

@@ -13,6 +13,9 @@ import useDeviceType from '@/hooks/useDeviceType';
 import { RootState } from '../../../app/store';
 import { shallowEqual, useSelector } from 'react-redux';
 import { selectDisasterById } from '@/features/slice/test';
+import axios from '@/components/common/api/axios';
+import { useEffect } from 'react';
+
 
 //TODO 모바일 채팅 페이지
 const ChatPage = () => {
@@ -21,7 +24,22 @@ const ChatPage = () => {
 
   const id = router.query.id as string
 
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
   const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
+  useEffect(() =>{
+    const sendClickStream = async () =>{
+      if(userInfo){
+        const clickStreamResponse = await axios.post("/api/menu_log/enter",{
+          menuId : "3140",
+          userId : userInfo.userId
+        })
+        console.log(clickStreamResponse.data)
+      }
+    }
+    sendClickStream()
+  }, [userInfo])
 
   if (!deviceType) return null;
 

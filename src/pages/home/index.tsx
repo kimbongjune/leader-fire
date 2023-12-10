@@ -19,8 +19,11 @@ const HomePage = () => {
   const deviceType = useDeviceType();
   const dispatch = useDispatch();
 
+  const [userInfo, setUserInfo] = useState<UserDto>()
+
   const parsingJwt = async (token: string) => {
     const userData = jwtDecode<UserDto>(token)
+    setUserInfo(userData)
     return userData
   }
 
@@ -111,6 +114,19 @@ const HomePage = () => {
     }
 
   }, [dispatch]);
+
+  useEffect(() =>{
+    const sendClickStream = async () =>{
+      if(userInfo){
+        const clickStreamResponse = await axios.post("/api/menu_log/enter",{
+          menuId : "3100",
+          userId : userInfo.userId
+        })
+        console.log(clickStreamResponse.data)
+      }
+    }
+    sendClickStream()
+  }, [userInfo])
   
   const testData = useSelector((state: RootState) => state.disaster.disasterInformation);
   console.log("@@@@@@@@@@@@@@@@@@@@@@",testData)

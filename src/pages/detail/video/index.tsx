@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import Layout from '@/components/common/Layout/Layout';
 import { Box, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
@@ -12,6 +12,7 @@ import { IncidentType } from '@/types/types';
 import { shallowEqual, useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import { selectDisasterById } from '@/features/slice/test';
+import axios from '@/components/common/api/axios';
 
 interface Props {
   status: IncidentType;
@@ -24,7 +25,22 @@ const VideoPage = (props: Props) => {
 
   const id = router.query.id as string
 
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
   const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
+  useEffect(() =>{
+    const sendClickStream = async () =>{
+      if(userInfo){
+        const clickStreamResponse = await axios.post("/api/menu_log/enter",{
+          menuId : "3150",
+          userId : userInfo.userId
+        })
+        console.log(clickStreamResponse.data)
+      }
+    }
+    sendClickStream()
+  }, [userInfo])
 
   if (!deviceType) return null;
 

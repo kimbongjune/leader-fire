@@ -174,6 +174,8 @@ const Map = (props: Props) => {
   const gpsStatusSatelliteCount = useSelector((state: RootState) => state.userReducer.gpsStatusSatelliteCount);
   const gpsStatusDbHzAverage = useSelector((state: RootState) => state.userReducer.gpsStatusDbHzAverage);
 
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
   const [isReceivingGPS, setIsReceivingGPS] = useState(true);
 
   const userLocationX = useSelector((state: RootState) => state.userReducer.userLocationX);
@@ -887,6 +889,19 @@ const Map = (props: Props) => {
       if (isTargerActive) marker.setMap(mapInstance.current);
     });
   },[targetMarker])
+
+  useEffect(() =>{
+    const sendClickStream = async () =>{
+      if(userInfo){
+        const clickStreamResponse = await axios.post("/api/menu_log/enter",{
+          menuId : "3110",
+          userId : userInfo.userId
+        })
+        console.log(clickStreamResponse.data)
+      }
+    }
+    sendClickStream()
+  }, [userInfo])
 
   function createMarker(position: any, image: any) {
     var marker = new window.kakao.maps.Marker({

@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import styled from '@emotion/styled';
 import theme from '@/theme/colors';
 import Layout from '@/components/common/Layout/Layout';
@@ -11,6 +11,7 @@ import { DeviceType } from '@/types/types';
 import { RootState } from '../../../app/store';
 import { shallowEqual, useSelector } from 'react-redux';
 import { selectDisasterById } from '@/features/slice/test';
+import axios from '@/components/common/api/axios';
 
 interface Props {
   title: string;
@@ -24,7 +25,22 @@ const Neighborhood = (props: Props) => {
   const id = router.query.id as string;
   const deviceType = useDeviceType();
 
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
   const selectedDisaster = useSelector((state: RootState) => selectDisasterById(state, id), shallowEqual);
+
+  useEffect(() =>{
+    const sendClickStream = async () =>{
+      if(userInfo){
+        const clickStreamResponse = await axios.post("/api/menu_log/enter",{
+          menuId : "3130",
+          userId : userInfo.userId
+        })
+        console.log(clickStreamResponse.data)
+      }
+    }
+    sendClickStream()
+  }, [userInfo])
 
   if (!deviceType) return null;
 

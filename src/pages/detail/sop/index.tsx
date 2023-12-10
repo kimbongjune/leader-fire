@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import Layout from '@/components/common/Layout/Layout';
 import { Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
@@ -6,10 +6,28 @@ import useDeviceType from '@/hooks/useDeviceType';
 import { DeviceType } from '@/types/types';
 import SOPContainer from '@/features/SOP/SOPContainer';
 import { NextPageContext } from 'next';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
+import axios from '@/components/common/api/axios';
 
 //TODO SOP 페이지 pdf 로직 작성
 const SOPPage = () => {
   const deviceType = useDeviceType();
+
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
+  useEffect(() =>{
+    const sendClickStream = async () =>{
+      if(userInfo){
+        const clickStreamResponse = await axios.post("/api/menu_log/enter",{
+          menuId : "3160",
+          userId : userInfo.userId
+        })
+        console.log(clickStreamResponse.data)
+      }
+    }
+    sendClickStream()
+  }, [userInfo])
 
   if (!deviceType) return null;
 

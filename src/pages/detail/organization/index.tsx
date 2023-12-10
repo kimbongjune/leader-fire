@@ -17,6 +17,8 @@ import theme from '@/theme/colors';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useEffect, useRef, useState } from 'react';
 import axios from '@/components/common/api/axios';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
 
 type VehicleDataItem = {
   type: string;
@@ -236,6 +238,8 @@ const OrganizationPage = () => {
 
   const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
 
+  const userInfo = useSelector((state: RootState) => state.userReducer.userInfo);
+
   const [vehicleData, setVehicleData] = useState<VehicleStatusTableDataType>()
 
   const [taskForceOrganization, setTaskForceOrganization] = useState<OrganizationTableDataType>()
@@ -335,6 +339,19 @@ const OrganizationPage = () => {
       }
     };
   }, [id]);
+
+  useEffect(() =>{
+    const sendClickStream = async () =>{
+      if(userInfo){
+        const clickStreamResponse = await axios.post("/api/menu_log/enter",{
+          menuId : "3170",
+          userId : userInfo.userId
+        })
+        console.log(clickStreamResponse.data)
+      }
+    }
+    sendClickStream()
+  }, [userInfo])
 
   if (!deviceType ) return null;
 
