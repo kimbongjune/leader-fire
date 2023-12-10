@@ -255,7 +255,7 @@ const Map = (props: Props) => {
 
   const requestLocation = () =>{
     if (userLocationX && userLocationY) {
-        const position = new window.kakao.maps.LatLng(userLocationX, userLocationY);
+        const position = new window.kakao.maps.LatLng(userLocationY, userLocationX);
         const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
         const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
         const markerImage = createMarkerImage('내위치', imageSize, imageOption);
@@ -286,8 +286,9 @@ const Map = (props: Props) => {
 
     kakaoMapScript.onload = () => {
       window.kakao.maps.load(() => {
+        const location = convertCoordinateSystem(selectedDisaster?.gisX!!, selectedDisaster?.gisY!!)
         const options = {
-          center: gis_x_4326 && gis_y_4326 ? new window.kakao.maps.LatLng(gis_y_4326, gis_x_4326) : new window.kakao.maps.LatLng(selectedDisaster?.gisY, selectedDisaster?.gisX),
+          center: gis_x_4326 && gis_y_4326 ? new window.kakao.maps.LatLng(gis_y_4326, gis_x_4326) : new window.kakao.maps.LatLng(location[0], location[1]),
           level: 3,
         };
         if(gis_x_4326 && gis_y_4326) {
@@ -320,7 +321,7 @@ const Map = (props: Props) => {
       
         if (userLocationX && userLocationY) {
           console.log("?????")
-          const position = new window.kakao.maps.LatLng(userLocationX, userLocationY);
+          const position = new window.kakao.maps.LatLng(userLocationY, userLocationX);
           const imageSize = new window.kakao.maps.Size(24, 35); // 마커의 크기 설정
           const imageOption = { offset: new window.kakao.maps.Point(12, 35) }; // 마커의 옵션 설정
           const markerImage = createMarkerImage('내위치', imageSize, imageOption);
@@ -339,7 +340,7 @@ const Map = (props: Props) => {
         setRescueMarker(
           [
             {
-              location: new window.kakao.maps.LatLng(selectedDisaster?.gisY, selectedDisaster?.gisX),
+              location: new window.kakao.maps.LatLng(location[0], location[1]),
               type: '긴급구조',
               id :"2"
             }

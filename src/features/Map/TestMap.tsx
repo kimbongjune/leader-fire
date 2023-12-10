@@ -233,7 +233,7 @@ const MiniMap = (props: Props) => {
 
   const requestLocation = () =>{
     if (userLocationX && userLocationY) {
-        const position = new window.kakao.maps.LatLng(userLocationX, userLocationY);
+        const position = new window.kakao.maps.LatLng(userLocationY, userLocationX);
         const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
         const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
         const markerImage = createMarkerImage('내위치', imageSize, imageOption);
@@ -264,8 +264,9 @@ const MiniMap = (props: Props) => {
 
     kakaoMapScript.onload = () => {
       window.kakao.maps.load(() => {
+        const location = convertCoordinateSystem(selectedDisaster?.gisX!!, selectedDisaster?.gisY!!)
         const options = {
-          center: new window.kakao.maps.LatLng(selectedDisaster?.gisY, selectedDisaster?.gisX),
+          center: new window.kakao.maps.LatLng(location[0], location[1]),
           level: 3,
         };
         const map = new window.kakao.maps.Map(mapContainer.current, options);
@@ -295,7 +296,7 @@ const MiniMap = (props: Props) => {
       
         if (userLocationX && userLocationY) {
           console.log("?????")
-          const position = new window.kakao.maps.LatLng(userLocationX, userLocationY);
+          const position = new window.kakao.maps.LatLng(userLocationY, userLocationX);
           const imageSize = new window.kakao.maps.Size(24, 35); // 마커의 크기 설정
           const imageOption = { offset: new window.kakao.maps.Point(12, 35) }; // 마커의 옵션 설정
           const markerImage = createMarkerImage('내위치', imageSize, imageOption);
@@ -315,7 +316,7 @@ const MiniMap = (props: Props) => {
         setRescueMarker(
           [
             {
-              location: new window.kakao.maps.LatLng(selectedDisaster?.gisY, selectedDisaster?.gisX),
+              location: new window.kakao.maps.LatLng(location[0], location[1]),
               type: '긴급구조',
               id :"2"
             }
