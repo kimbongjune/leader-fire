@@ -239,6 +239,7 @@ const MiniMap = (props: Props) => {
         const markerImage = createMarkerImage('내위치', imageSize, imageOption);
         const marker = createMarker(position, markerImage);
   
+        mapInstance.current.setCenter(position);
         marker.setMap(null)
   
         // 새로운 마커를 지도에 추가하고, 참조를 업데이트합니다.

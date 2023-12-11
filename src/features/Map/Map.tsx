@@ -255,12 +255,13 @@ const Map = (props: Props) => {
 
   const requestLocation = () =>{
     if (userLocationX && userLocationY) {
-      console.log(userLocationX, userLocationY)
         const position = new window.kakao.maps.LatLng(userLocationY, userLocationX);
         const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
         const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
         const markerImage = createMarkerImage('내위치', imageSize, imageOption);
         const marker = createMarker(position, markerImage);
+
+        mapInstance.current.setCenter(position);
   
         marker.setMap(null)
   
