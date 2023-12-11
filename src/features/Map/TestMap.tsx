@@ -257,94 +257,97 @@ const MiniMap = (props: Props) => {
   }, [isWaterActive, isExtinguisherActive, isTargerActive, isDangerActive, dispatch]);
 
   useEffect(() => {
-    const kakaoMapScript = document.createElement('script');
-    kakaoMapScript.async = false;
-    kakaoMapScript.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services,clusterer,drawing&autoload=false`;
-    document.head.appendChild(kakaoMapScript);
+    if(selectedDisaster){
 
-    kakaoMapScript.onload = () => {
-      window.kakao.maps.load(() => {
-        const location = convertCoordinateSystem(selectedDisaster?.gisX!!, selectedDisaster?.gisY!!)
-        const options = {
-          center: new window.kakao.maps.LatLng(location[1], location[0]),
-          level: 3,
-        };
-        const map = new window.kakao.maps.Map(mapContainer.current, options);
+      const kakaoMapScript = document.createElement('script');
+      kakaoMapScript.async = false;
+      kakaoMapScript.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services,clusterer,drawing&autoload=false`;
+      document.head.appendChild(kakaoMapScript);
 
-        mapInstance.current = map
+      kakaoMapScript.onload = () => {
+        window.kakao.maps.load(() => {
+          const location = convertCoordinateSystem(selectedDisaster.gisX, selectedDisaster.gisY)
+          const options = {
+            center: new window.kakao.maps.LatLng(location[1], location[0]),
+            level: 3,
+          };
+          const map = new window.kakao.maps.Map(mapContainer.current, options);
 
-        dispatch(setIsRescuePositionActive(true))
+          mapInstance.current = map
 
-        if (window.fireAgency && window.fireAgency.getLastLocation) {
-          const location = window.fireAgency.getLastLocation();
-          console.log("location", location)
-          if(location != ""){
-            const [locationX, locationY] = location.split(" ")
-            const position = new window.kakao.maps.LatLng(locationX, locationY);
-            const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
-            const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
+          dispatch(setIsRescuePositionActive(true))
+
+          if (window.fireAgency && window.fireAgency.getLastLocation) {
+            const location = window.fireAgency.getLastLocation();
+            console.log("location", location)
+            if(location != ""){
+              const [locationX, locationY] = location.split(" ")
+              const position = new window.kakao.maps.LatLng(locationX, locationY);
+              const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
+              const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
+              const markerImage = createMarkerImage('내위치', imageSize, imageOption);
+              const marker = createMarker(position, markerImage);
+        
+              marker.setMap(null)
+        
+              // 새로운 마커를 지도에 추가하고, 참조를 업데이트합니다.
+              marker.setMap(mapInstance.current);
+              userLocationMarker.current = marker;
+            }
+          }
+        
+          if (userLocationX && userLocationY) {
+            console.log("?????")
+            const position = new window.kakao.maps.LatLng(userLocationY, userLocationX);
+            const imageSize = new window.kakao.maps.Size(24, 35); // 마커의 크기 설정
+            const imageOption = { offset: new window.kakao.maps.Point(12, 35) }; // 마커의 옵션 설정
             const markerImage = createMarkerImage('내위치', imageSize, imageOption);
             const marker = createMarker(position, markerImage);
-      
+        
             marker.setMap(null)
-      
+        
             // 새로운 마커를 지도에 추가하고, 참조를 업데이트합니다.
             marker.setMap(mapInstance.current);
             userLocationMarker.current = marker;
+            // 여기서 마커 생성 로직을 실행
+          } else {
+            console.log("사용자 위치가 유효하지 않습니다.");
           }
-        }
-      
-        if (userLocationX && userLocationY) {
-          console.log("?????")
-          const position = new window.kakao.maps.LatLng(userLocationY, userLocationX);
-          const imageSize = new window.kakao.maps.Size(24, 35); // 마커의 크기 설정
-          const imageOption = { offset: new window.kakao.maps.Point(12, 35) }; // 마커의 옵션 설정
-          const markerImage = createMarkerImage('내위치', imageSize, imageOption);
-          const marker = createMarker(position, markerImage);
-      
-          marker.setMap(null)
-      
-          // 새로운 마커를 지도에 추가하고, 참조를 업데이트합니다.
-          marker.setMap(mapInstance.current);
-          userLocationMarker.current = marker;
-          // 여기서 마커 생성 로직을 실행
-        } else {
-          console.log("사용자 위치가 유효하지 않습니다.");
-        }
 
 
-        setRescueMarker(
-          [
-            {
-              location: new window.kakao.maps.LatLng(location[1], location[0]),
-              type: '긴급구조',
-              id :"2"
-            }
-          ]
-        )
+          setRescueMarker(
+            [
+              {
+                location: new window.kakao.maps.LatLng(location[1], location[0]),
+                type: '긴급구조',
+                id :"2"
+              }
+            ]
+          )
 
-      const clickHandler = (mouseEvent:any) => {
-        console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",mouseEvent)
-        // 클릭한 위도, 경도 정보를 가져옵니다 
-        const latlng = mouseEvent.latLng; 
+        const clickHandler = (mouseEvent:any) => {
+          console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",mouseEvent)
+          // 클릭한 위도, 경도 정보를 가져옵니다 
+          const latlng = mouseEvent.latLng; 
 
-        setPosition(latlng)
+          setPosition(latlng)
+            
+          var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
+          message += '경도는 ' + latlng.getLng() + ' 입니다';
           
-        var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
-        message += '경도는 ' + latlng.getLng() + ' 입니다';
-        
-        console.log(message)
-      };
+          console.log(message)
+        };
 
-      window.kakao.maps.event.addListener(map, 'click', clickHandler);
-      })
-    }
-    return () => {
-      kakaoMapScript.remove(); // 컴포넌트 언마운트 시 스크립트 제거
-      if (apiIntervalRef.current) {
-        clearInterval(apiIntervalRef.current);
+        window.kakao.maps.event.addListener(map, 'click', clickHandler);
+        })
       }
-    };
+      return () => {
+        kakaoMapScript.remove(); // 컴포넌트 언마운트 시 스크립트 제거
+        if (apiIntervalRef.current) {
+          clearInterval(apiIntervalRef.current);
+        }
+      };
+    }
   }, []);
 
 
