@@ -286,7 +286,10 @@ const Map = (props: Props) => {
 
       kakaoMapScript.onload = () => {
         window.kakao.maps.load(() => {
-          const location = convertCoordinateSystem(selectedDisaster!!.gisX, selectedDisaster!!.gisY)
+          if(!selectedDisaster){
+            return;
+          }
+          const location = convertCoordinateSystem(selectedDisaster.gisX, selectedDisaster.gisY)
           console.log(selectedDisaster!!.gisX)
           const options = {
             center: gis_x_4326 && gis_y_4326 ? new window.kakao.maps.LatLng(gis_y_4326, gis_x_4326) : new window.kakao.maps.LatLng(location[1], location[0]),
@@ -371,7 +374,7 @@ const Map = (props: Props) => {
           clearInterval(apiIntervalRef.current);
         }
       };
-  }, []);
+  }, [selectedDisaster]);
 
   useEffect(() =>{
     async function fetchLocations():Promise<markerData | null> {
