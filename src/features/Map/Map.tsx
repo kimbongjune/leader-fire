@@ -279,7 +279,6 @@ const Map = (props: Props) => {
   }, [isWaterActive, isExtinguisherActive, isTargerActive, isDangerActive, dispatch]);
 
   useEffect(() => {
-    if(selectedDisaster){
       const kakaoMapScript = document.createElement('script');
       kakaoMapScript.async = false;
       kakaoMapScript.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services,clusterer,drawing&autoload=false`;
@@ -287,8 +286,8 @@ const Map = (props: Props) => {
 
       kakaoMapScript.onload = () => {
         window.kakao.maps.load(() => {
-          const location = convertCoordinateSystem(selectedDisaster.gisX, selectedDisaster.gisY)
-          console.log(selectedDisaster.gisX)
+          const location = convertCoordinateSystem(selectedDisaster!!.gisX, selectedDisaster!!.gisY)
+          console.log(selectedDisaster!!.gisX)
           const options = {
             center: gis_x_4326 && gis_y_4326 ? new window.kakao.maps.LatLng(gis_y_4326, gis_x_4326) : new window.kakao.maps.LatLng(location[1], location[0]),
             level: 3,
@@ -372,7 +371,6 @@ const Map = (props: Props) => {
           clearInterval(apiIntervalRef.current);
         }
       };
-    }
   }, []);
 
   useEffect(() =>{
@@ -921,6 +919,10 @@ const Map = (props: Props) => {
 
   if(id === undefined){
     return null;
+  }
+
+  if(!selectedDisaster){
+    return null
   }
 
   return (

@@ -257,8 +257,6 @@ const MiniMap = (props: Props) => {
   }, [isWaterActive, isExtinguisherActive, isTargerActive, isDangerActive, dispatch]);
 
   useEffect(() => {
-    if(selectedDisaster){
-
       const kakaoMapScript = document.createElement('script');
       kakaoMapScript.async = false;
       kakaoMapScript.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services,clusterer,drawing&autoload=false`;
@@ -266,7 +264,7 @@ const MiniMap = (props: Props) => {
 
       kakaoMapScript.onload = () => {
         window.kakao.maps.load(() => {
-          const location = convertCoordinateSystem(selectedDisaster.gisX, selectedDisaster.gisY)
+          const location = convertCoordinateSystem(selectedDisaster!!.gisX, selectedDisaster!!.gisY)
           const options = {
             center: new window.kakao.maps.LatLng(location[1], location[0]),
             level: 3,
@@ -347,7 +345,6 @@ const MiniMap = (props: Props) => {
           clearInterval(apiIntervalRef.current);
         }
       };
-    }
   }, []);
 
 
@@ -887,6 +884,10 @@ const MiniMap = (props: Props) => {
     });
 
     return marker;
+  }
+
+  if(!selectedDisaster){
+    return null
   }
 
   return (
