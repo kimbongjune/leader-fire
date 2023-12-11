@@ -255,6 +255,7 @@ const Map = (props: Props) => {
 
   const requestLocation = () =>{
     if (userLocationX && userLocationY) {
+      console.log(userLocationX, userLocationY)
         const position = new window.kakao.maps.LatLng(userLocationY, userLocationX);
         const imageSize = new window.kakao.maps.Size(100, 100); // 마커의 크기 설정
         const imageOption = { offset: new window.kakao.maps.Point(100/2, 100/2) }; // 마커의 옵션 설정
@@ -321,24 +322,6 @@ const Map = (props: Props) => {
               marker.setMap(mapInstance.current);
               userLocationMarker.current = marker;
             }
-          }
-        
-          if (userLocationX && userLocationY) {
-            console.log("?????")
-            const position = new window.kakao.maps.LatLng(userLocationY, userLocationX);
-            const imageSize = new window.kakao.maps.Size(24, 35); // 마커의 크기 설정
-            const imageOption = { offset: new window.kakao.maps.Point(12, 35) }; // 마커의 옵션 설정
-            const markerImage = createMarkerImage('내위치', imageSize, imageOption);
-            const marker = createMarker(position, markerImage);
-        
-            marker.setMap(null)
-        
-            // 새로운 마커를 지도에 추가하고, 참조를 업데이트합니다.
-            marker.setMap(mapInstance.current);
-            userLocationMarker.current = marker;
-            // 여기서 마커 생성 로직을 실행
-          } else {
-            console.log("사용자 위치가 유효하지 않습니다.");
           }
 
           setRescueMarker(
@@ -438,7 +421,7 @@ const Map = (props: Props) => {
         })
 
         const targetList = carFireFacilityResult.data.result.fightingPropertyList.result?.dataList?.map((item) =>{
-          const coordinate = convertCoordinateSystem(parseInt(item.gis_x_5181), parseInt(item.gis_y_5181))
+          const coordinate = convertCoordinateSystem(parseFloat(item.gis_x_5181), parseFloat(item.gis_y_5181))
           return {
             id : item.bild_sn,
             lat : coordinate[1].toString(),
