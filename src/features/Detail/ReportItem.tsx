@@ -41,7 +41,12 @@ const ReportItem = (props: Props) => {
         const location = convertCoordinateSystem(data.gisX, data.gisY)
         console.log(location)
         if(data.gisX && data.gisY){
-          window.fireAgency.openThirdPartyMapApplication(mapType, location[0].toString(), location[1].toString(), data.lawAddr);
+          if(mapType == 'onenavi'){
+            window.fireAgency.openThirdPartyMapApplication(mapType, location[1].toString(), location[0].toString(), data.lawAddr);
+          }else{
+            window.fireAgency.openThirdPartyMapApplication(mapType, location[0].toString(), location[1].toString(), data.lawAddr);
+          }
+         
         }else{
           return alert("재난 좌표 정보가 없습니다.")
         }
