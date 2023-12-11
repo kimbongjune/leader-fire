@@ -392,7 +392,7 @@ const Map = (props: Props) => {
           setAponintList(transformData(positionResult.data.result.dspCarMoveResultDtoList))
         }
         
-        const carPosition = positionResult.data.result?.dspCarMoveResultDtoList?.map((item) => {
+        const carPosition = positionResult.data.result?.dspCarMoveResultDtoList?.filter(s => s.avlGisX > 0).map((item) => {
           const coordinate = convertCoordinateSystem(item.avlGisX, item.avlGisY)
           console.log(item.avlGisX)
           return{

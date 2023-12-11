@@ -367,7 +367,7 @@ const MiniMap = (props: Props) => {
         }
         
 
-        const carPosition = positionResult.data.result?.dspCarMoveResultDtoList?.map((item) => {
+        const carPosition = positionResult.data.result?.dspCarMoveResultDtoList?.filter(s => s.avlGisX > 0).map((item) => {
           const coordinate = convertCoordinateSystem(item.avlGisX, item.avlGisY)
           console.log(coordinate)
           return{
