@@ -8,11 +8,18 @@ import theme from '@/theme/colors';
 import { shallowEqual, useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import { selectDisasterById } from '../slice/test';
+import proj4 from 'proj4';
 
 interface Props {
   description: string;
   deviceType: DeviceType;
   callTell:string;
+}
+
+const epsg5181: string = '+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +units=m +no_defs';
+
+const convertCoordinateSystem = (x:number, y:number):[number, number] => {
+  return proj4(epsg5181, 'EPSG:4326', [x,y]);
 }
 
 //TODO 신고내용 간략 표시 탭
@@ -31,8 +38,10 @@ const ReportItem = (props: Props) => {
     if(data){
       if (window.fireAgency && window.fireAgency.openThirdPartyMapApplication) {
         console.log(data?.gisX, data?.gisY)
+        const location = convertCoordinateSystem(data.gisX, data.gisY)
+        console.log(location)
         if(data.gisX && data.gisY){
-          window.fireAgency.openThirdPartyMapApplication(mapType, data.gisY.toString(), data.gisX.toString(), data.lawAddr);
+          window.fireAgency.openThirdPartyMapApplication(mapType, location[0].toString(), location[1].toString(), data.lawAddr);
         }else{
           return alert("재난 좌표 정보가 없습니다.")
         }
