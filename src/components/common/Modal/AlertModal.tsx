@@ -16,7 +16,7 @@ interface Props {
   userId: string
 }
 
-//TODO 신규재난 안내 팝업, 한번에 여러개일 경우 ~~외 1건 총 2건 재난 발생, 확인버튼 클릭시 재난번호 리스트로 API 발송
+//TODO 팝업 클릭하면 RootState에 데이터 갱신(DispatchItem.tsx와 동일하게)
 const AlertModal = (props: Props) => {
   console.log(props)
 
