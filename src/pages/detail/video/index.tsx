@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React,{useEffect, memo, FC} from 'react';
 import Layout from '@/components/common/Layout/Layout';
 import { Box, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
@@ -17,6 +17,14 @@ import axios from '@/components/common/api/axios';
 interface Props {
   status: IncidentType;
 }
+
+interface IframeComponentProps {
+  src: string;
+}
+
+const IframeComponent: FC<IframeComponentProps> = memo(({ src }) => {
+  return <iframe allow='camera; microphone' src={src} width="100%" height="100%"></iframe>;
+});
 
 //TODO 영상공유페이지
 const VideoPage = (props: Props) => {
@@ -55,7 +63,7 @@ const VideoPage = (props: Props) => {
             hasCloseButtonWithoutString={false}
             onClickBackButton={() => router.back()}
             onCloseButton={() => router.back()}
-            timestamp={deviceType === 'mobile' ? '' : '2023 10 20 23:09'}
+            timestamp={deviceType === 'mobile' ? '' : selectedDisaster?.created!!}
             contentAlign="space-between"
           />
         </MenuWrapper>
@@ -63,7 +71,8 @@ const VideoPage = (props: Props) => {
           <AddressTab address={selectedDisaster?.lawAddr}/>
         </AddressTabWrapper>
         <Children deviceType={deviceType}>
-        <iframe allow='camera; microphone' src={`https://info.gnfire.go.kr/ERSS_P/video2.do?dsr_seq=${selectedDisaster?.dsrSeq}`} width="100%" height="100%"></iframe>
+          {/* <iframe key={1} allow='camera; microphone' src={`https://info.gnfire.go.kr/ERSS_P/video2.do?dsr_seq=${selectedDisaster?.dsrSeq}`} width="100%" height="100%"></iframe> */}
+          <IframeComponent src={`https://info.gnfire.go.kr/ERSS_P/video2.do?dsr_seq=${selectedDisaster?.dsrSeq}`} />
         </Children>
       </Flex>
     </Layout>
