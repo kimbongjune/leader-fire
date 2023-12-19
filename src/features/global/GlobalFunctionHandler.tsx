@@ -198,7 +198,7 @@ const fetchDisasterInformation = async (dispatch: AppDispatch, disasterStartTime
             dsrClsCd: callData.dsrClsCd,
             dsrSeq : callData.dsrSeq,
             status : status,
-            reportCount : 6,
+            reportCount : callData.sameCall? callData.sameCall : 0,
             eventName : mapDsrClsCd(callData.dsrClsCd),
             type : type,
             lawAddr : callData.lawAddr,
