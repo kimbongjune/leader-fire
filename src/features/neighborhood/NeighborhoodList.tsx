@@ -37,6 +37,15 @@ export type NeighborhoodType = {
   created: string;
 };
 
+const kndCdMappingTable = (kndCd:string):string =>{
+  switch(kndCd){
+    case "0040001" :return 'P00301'
+    case "0040002" :return 'P00302'
+    case "0040003" :return 'P00303'
+    default : return 'P00304'
+  }
+}
+
 //TODO 연관인근 아이템 리스트
 const NeighborhoodList = (props: Props) => {
   const deviceType = useDeviceType();
@@ -59,7 +68,7 @@ const NeighborhoodList = (props: Props) => {
             params : {
               callTel: selectedDisaster?.callTell, //selectedDisaster?.callTell
               dsrClsCd: selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
-              dsrKndCd: selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
+              dsrKndCd: kndCdMappingTable(selectedDisaster?.dsrKndCd), //selectedDisaster?.dsrKndCd
               dsrSeq: id,//id
               gisX: selectedDisaster?.gisX,  //selectedDisaster?.gisX
               gisY: selectedDisaster?.gisY, //selectedDisaster?.gisY
@@ -67,6 +76,7 @@ const NeighborhoodList = (props: Props) => {
             }
         });
         if(neightBorHoodData.data.responseCode === 200){
+          console.log(neightBorHoodData)
           //협업대응 -> 1:의소전담대, 2:의소일반대, 3:생명지킴이
           const collaborativeResponseList = neightBorHoodData.data.result.collaborativeResponseList?.result?.map(item => ({
             ...item,
@@ -139,7 +149,7 @@ const NeighborhoodList = (props: Props) => {
           clearInterval(apiIntervalRef.current);
         }
       };
-    }, []);
+    }, [selectedDisaster && selectedDisaster.callTell]);
     
   const countItemsByType = (data:ModDispatchLists | undefined) => {
     // 결과 객체 초기화
@@ -153,12 +163,13 @@ const NeighborhoodList = (props: Props) => {
     if (data && data.dispatchLists) {
       // 각 타입별로 개수 세기
       counts.collaboration = data.dispatchLists.collaborativeResponseList?.length | 0;
-      counts.residents = data.dispatchLists.nearbyFacilityPersonnelList?.length | 0
-                       + data.dispatchLists.nearbyOfficialsList?.length | 0
-                       + data.dispatchLists.nearbyResidentsList?.length | 0
-      counts.facilities = data.dispatchLists.fightingPropertyList?.length | 0
-                        + data.dispatchLists.hazardousSubstancList?.length | 0
-                        + data.dispatchLists.toxicFacilityList?.length | 0
+      counts.residents = (data.dispatchLists.nearbyFacilityPersonnelList?.length | 0)
+                       + (data.dispatchLists.nearbyOfficialsList?.length | 0)
+                       + (data.dispatchLists.nearbyResidentsList?.length | 0)
+      counts.facilities = (data.dispatchLists.fightingPropertyList?.length | 0)
+                        + (data.dispatchLists.hazardousSubstancList?.length | 0)
+                        + (data.dispatchLists.toxicFacilityList?.length | 0)
+                        + (data.dispatchLists.nearbyBusinessesList?.length | 0)
     }
   
     return counts;
