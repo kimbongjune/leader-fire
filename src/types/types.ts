@@ -835,7 +835,7 @@ type CmDsrCallDtoResult = {
   regDtime: string
   callContent: string
   callTel: string
-  sameCall: number
+  sameCall: number | null
   chkYn: string | null
   viewYn: string | null
 }
