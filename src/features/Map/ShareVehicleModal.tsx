@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import ModalLayout from '@/components/common/Modal/ModalLayout';
 import { Checkbox, Flex } from '@chakra-ui/react';
 import theme from '@/theme/colors';
-import { DispatchVehicleDataType } from './VehicleStatus';
+import { DispatchVehicleDataType, DispatchVehicleDataType2 } from './VehicleStatus';
 import proj4 from 'proj4';
 import axios from "../../components/common/api/axios"
 import Axios from 'axios';
@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 
 interface Props {
-  vehicleData: DispatchVehicleDataType[];
+  vehicleData: DispatchVehicleDataType2[];
   onCloseModal: React.Dispatch<React.SetStateAction<boolean>>;
   position: { La: number; Ma: number };
   dsrSeq : string

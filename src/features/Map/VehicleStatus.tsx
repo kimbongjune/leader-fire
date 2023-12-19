@@ -18,8 +18,15 @@ export interface DispatchVehicleDataType {
   carId?:string
 }
 
+export interface DispatchVehicleDataType2 {
+  status: '출동보고' | '현장도착' | "활동중" | "귀소" | "상태없음";
+  name: string;
+  transmissionStatus: "미확인" | "승인" | "미승인" | "상태 미정";
+  carId?:string
+}
+
 interface Props {
-  data: DispatchVehicleDataType[];
+  data: DispatchVehicleDataType2[];
 }
 
 const VehicleStatus = (props: Props) => {
@@ -41,7 +48,7 @@ const VehicleStatus = (props: Props) => {
 
         <Wrapper deviceType={deviceType}>
           <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(0)}>
-            <ItemTitle>업무운행</ItemTitle>
+            <ItemTitle>출동보고</ItemTitle>
             <IconWrapper width="24px" height="24px" color={theme.colors.orange}>
               {toggle[0] ? <ArrowUp /> : <ArrowDown />}
             </IconWrapper>
@@ -49,7 +56,7 @@ const VehicleStatus = (props: Props) => {
           {toggle[0] && (
             <>
               {props.data
-                ?.filter(data => data.status === '업무운행')
+                ?.filter(data => data.status === '출동보고')
                 ?.map((data, index) => {
                   return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
                 })}
@@ -59,7 +66,7 @@ const VehicleStatus = (props: Props) => {
 
         <Wrapper deviceType={deviceType}>
           <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(1)}>
-            <ItemTitle>본소출동대기</ItemTitle>
+            <ItemTitle>현장도착</ItemTitle>
             <IconWrapper width="24px" height="24px" color={theme.colors.blue}>
               {toggle[1] ? <ArrowUp /> : <ArrowDown />}
             </IconWrapper>
@@ -67,7 +74,7 @@ const VehicleStatus = (props: Props) => {
           {toggle[1] && (
             <>
               {props.data
-                ?.filter(data => data.status === '본소출동대기')
+                ?.filter(data => data.status === '현장도착')
                 ?.map((data, index) => {
                   return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
                 })}
@@ -77,7 +84,7 @@ const VehicleStatus = (props: Props) => {
 
         <Wrapper deviceType={deviceType}>
           <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(2)}>
-            <ItemTitle>본소출동불가능대기</ItemTitle>
+            <ItemTitle>활동중</ItemTitle>
             <IconWrapper width="24px" height="24px" color={theme.colors.red}>
               {toggle[2] ? <ArrowUp /> : <ArrowDown />}
             </IconWrapper>
@@ -85,7 +92,7 @@ const VehicleStatus = (props: Props) => {
           {toggle[2] && (
             <>
               {props.data
-                ?.filter(data => data.status === '본소출동불가능대기')
+                ?.filter(data => data.status === '활동중')
                 ?.map((data, index) => {
                   return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
                 })}
@@ -94,7 +101,7 @@ const VehicleStatus = (props: Props) => {
         </Wrapper>
         <Wrapper deviceType={deviceType}>
           <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(3)}>
-            <ItemTitle>편성중</ItemTitle>
+            <ItemTitle>귀소</ItemTitle>
             <IconWrapper width="24px" height="24px" color={theme.colors.yellow}>
               {toggle[3] ? <ArrowUp /> : <ArrowDown />}
             </IconWrapper>
@@ -102,7 +109,7 @@ const VehicleStatus = (props: Props) => {
           {toggle[3] && (
             <>
               {props.data
-                ?.filter(data => data.status === '편성중')
+                ?.filter(data => data.status === '귀소')
                 ?.map((data, index) => {
                   return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
                 })}
@@ -111,7 +118,7 @@ const VehicleStatus = (props: Props) => {
         </Wrapper>
         <Wrapper deviceType={deviceType}>
           <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(4)}>
-            <ItemTitle>출동중</ItemTitle>
+            <ItemTitle>상태없음</ItemTitle>
             <IconWrapper width="24px" height="24px" color={theme.colors.green}>
               {toggle[4] ? <ArrowUp /> : <ArrowDown />}
             </IconWrapper>
@@ -119,126 +126,7 @@ const VehicleStatus = (props: Props) => {
           {toggle[4] && (
             <>
               {props.data
-                ?.filter(data => data.status === '출동중')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-            </>
-          )}
-        </Wrapper>
-        <Wrapper deviceType={deviceType}>
-          <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(5)}>
-            <ItemTitle>귀소중편성가</ItemTitle>
-            <IconWrapper width="24px" height="24px" color={theme.colors.purple}>
-              {toggle[5] ? <ArrowUp /> : <ArrowDown />}
-            </IconWrapper>
-          </Flex>
-          {toggle[5] && (
-            <>
-              {props.data
-                ?.filter(data => data.status === '귀소중편성가')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-            </>
-          )}
-        </Wrapper>
-        <Wrapper deviceType={deviceType}>
-          <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(6)}>
-            <ItemTitle>귀소중편성불가</ItemTitle>
-            <IconWrapper width="24px" height="24px" color={theme.colors.gray5}>
-              {toggle[6] ? <ArrowUp /> : <ArrowDown />}
-            </IconWrapper>
-          </Flex>
-          {toggle[6] && (
-            <>
-              {props.data
-                ?.filter(data => data.status === '귀소중편성불가')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-            </>
-          )}
-        </Wrapper>
-        <Wrapper deviceType={deviceType}>
-          <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(7)}>
-            <ItemTitle>이동대기중</ItemTitle>
-            <IconWrapper width="24px" height="24px" color={theme.colors.orange}>
-              {toggle[7] ? <ArrowUp /> : <ArrowDown />}
-            </IconWrapper>
-          </Flex>
-          {toggle[7] && (
-            <>
-              {props.data
-                ?.filter(data => data.status === '이동대기중')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-            </>
-          )}
-        </Wrapper>
-        <Wrapper deviceType={deviceType}>
-          <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(8)}>
-            <ItemTitle>고장수리중</ItemTitle>
-            <IconWrapper width="24px" height="24px" color={theme.colors.blue}>
-              {toggle[8] ? <ArrowUp /> : <ArrowDown />}
-            </IconWrapper>
-          </Flex>
-          {toggle[8] && (
-            <>
-              {props.data
-                ?.filter(data => data.status === '고장수리중')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-            </>
-          )}
-        </Wrapper>
-        <Wrapper deviceType={deviceType}>
-          <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(9)}>
-            <ItemTitle>기타편성가능</ItemTitle>
-            <IconWrapper width="24px" height="24px" color={theme.colors.red}>
-              {toggle[9] ? <ArrowUp /> : <ArrowDown />}
-            </IconWrapper>
-          </Flex>
-          {toggle[9] && (
-            <>
-              {props.data
-                ?.filter(data => data.status === '기타편성가능')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-            </>
-          )}
-        </Wrapper>
-        <Wrapper deviceType={deviceType}>
-          <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(10)}>
-            <ItemTitle>기타편성불가능</ItemTitle>
-            <IconWrapper width="24px" height="24px" color={theme.colors.yellow}>
-              {toggle[10] ? <ArrowUp /> : <ArrowDown />}
-            </IconWrapper>
-          </Flex>
-          {toggle[10] && (
-            <>
-              {props.data
-                ?.filter(data => data.status === '기타편성불가능')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-            </>
-          )}
-        </Wrapper>
-        <Wrapper deviceType={deviceType}>
-          <Flex justifyContent="space-between" alignItems="center" onClick={() => toggleSection(11)}>
-            <ItemTitle>활동중</ItemTitle>
-            <IconWrapper width="24px" height="24px" color={theme.colors.green}>
-              {toggle[11] ? <ArrowUp /> : <ArrowDown />}
-            </IconWrapper>
-          </Flex>
-          {toggle[11] && (
-            <>
-              {props.data
-                ?.filter(data => data.status === '활동중')
+                ?.filter(data => data.status === '상태없음')
                 ?.map((data, index) => {
                   return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
                 })}
@@ -253,70 +141,34 @@ const VehicleStatus = (props: Props) => {
     <Container deviceType={deviceType}>
       <Title deviceType={deviceType}>출동차량</Title>
       <Wrapper deviceType={deviceType}>
-      {/* {props.data
-                ?.filter(data => data.status === '업무운행')
+      {props.data
+                ?.filter(data => data.status === '출동보고')
                 ?.map((data, index) => {
                   return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
                 })}
 
       {props.data
-                ?.filter(data => data.status === '본소출동대기')
+                ?.filter(data => data.status === '현장도착')
                 ?.map((data, index) => {
                   return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
                 })}
 
         {props.data
-                ?.filter(data => data.status === '본소출동불가능대기')
+                ?.filter(data => data.status === '활동중')
                 ?.map((data, index) => {
                   return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
                 })}
                 
             {props.data
-              ?.filter(data => data.status === '편성중')
+              ?.filter(data => data.status === '귀소')
               ?.map((data, index) => {
                 return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
               })}
       {props.data
-                ?.filter(data => data.status === '출동중')
+                ?.filter(data => data.status === '상태없음')
                 ?.map((data, index) => {
                   return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
                 })}
-      {props.data
-          ?.filter(data => data.status === '귀소중편성가')
-          ?.map((data, index) => {
-            return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-          })}
-
-      {props.data
-                ?.filter(data => data.status === '귀소중편성불가')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-      {props.data
-                ?.filter(data => data.status === '이동대기중')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-      {props.data
-                ?.filter(data => data.status === '고장수리중')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-      {props.data
-                ?.filter(data => data.status === '기타편성가능')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-      {props.data
-                ?.filter(data => data.status === '기타편성불가능')
-                ?.map((data, index) => {
-                  return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-                })}
-      {props.data
-          ?.filter(data => data.status === '활동중')
-          ?.map((data, index) => {
-            return <VehicleStatusItem key={index} status={data.status} name={data.name} transmissionStatus={data.transmissionStatus} />;
-          })} */}
       </Wrapper>
     </Container>
   );
