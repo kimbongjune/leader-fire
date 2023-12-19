@@ -9,6 +9,7 @@ import { getPassedTime } from '@/utils/getPassedTime';
 import { ReactNode } from 'react';
 import { IncidentType } from '@/types/types';
 import StatusBadge from '../../common/Badge/StatusBadge';
+import { useRouter } from 'next/router';
 
 interface Props {
   hasBackButton?: boolean;
@@ -26,9 +27,11 @@ interface Props {
 
 //TODO 상부 재난종별, 발생시간, 경과 표시 탭
 const Menu = (props: Props) => {
+  const router = useRouter()
   return (
     <Wrapper className="menu-container">
-      {props.hasBackButton && <LeftArrow className="back-button" width="24px" height="24px" onClick={props.onClickBackButton} />}
+      {/* {props.hasBackButton && <LeftArrow className="back-button" width="24px" height="24px" onClick={props.onClickBackButton} />} */}
+      {props.hasBackButton && <LeftArrow className="back-button" width="24px" height="24px" onClick={() => router.replace("/home")} />}
       <Flex className="title" p="0 8px" flex={1} align="center" gap={props.contentGap} justify={props.contentAlign}>
         <Flex align="center" gap="8px">
           {props.title}
