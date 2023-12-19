@@ -385,7 +385,7 @@ const OrganizationPage = () => {
                   <DetailItemWrapperForTitle>
                     <DetailItem title="소방서별 출동대 집계 (60초마다 갱신, #2)">
                       <Stack spacing="12px">
-                        <OrganizationTable data={taskForceOrganization} columnNames={['구분', '차량수', '인원수']}  deviceType={deviceType} />
+                        <OrganizationTable data={taskForceOrganization} columnNames={['구분', '차량수']}  deviceType={deviceType} />
                         <VehicleTable rowData={taskForeceVehicle} deviceType={deviceType} />
                       </Stack>
                     </DetailItem>
@@ -394,7 +394,7 @@ const OrganizationPage = () => {
                 <SwiperSlide>
                   <DetailItemWrapperForTitle>
                     <DetailItem title="출동대 편성 집계 (60초마다 갱신, #3)">
-                      <OrganizationTable  data={dispathcesOrganization} columnNames={['구분', '차량수', '인원수']} deviceType={deviceType} />
+                      <OrganizationTable  data={dispathcesOrganization} columnNames={['구분', '차량수']} deviceType={deviceType} />
                       <VehicleTable rowData={dispathcesVehicle} deviceType={deviceType} />
                     </DetailItem>
                   </DetailItemWrapperForTitle>
@@ -402,7 +402,7 @@ const OrganizationPage = () => {
                 <SwiperSlide>
                   <DetailItemWrapperForTitle minW="343px">
                     <DetailItem title="출동 집계 (60초마다 갱신, #4)">
-                      <OrganizationTable  data={mobilizationOrganization} columnNames={['구분', '출동', '인원수']} deviceType={deviceType} />
+                      <OrganizationTable  data={mobilizationOrganization} columnNames={['구분', '출동']} deviceType={deviceType} />
                       <VehicleTable rowData={mobilizationVehicle} deviceType={deviceType} />
                     </DetailItem>
                   </DetailItemWrapperForTitle>
@@ -410,7 +410,7 @@ const OrganizationPage = () => {
                 <SwiperSlide>
                   <DetailItemWrapperForTitle minW={deviceType === 'mobile' && '343px'}>
                     <DetailItem title="현장도착 집계 (60초마다 갱신, #5)">
-                      <OrganizationTable  data={arrivalOrganization} columnNames={['구분', '현장도착', '인원수']} deviceType={deviceType} />
+                      <OrganizationTable  data={arrivalOrganization} columnNames={['구분', '현장도착']} deviceType={deviceType} />
                       <VehicleTable rowData={ariivalVehicle} deviceType={deviceType} />
                     </DetailItem>
                   </DetailItemWrapperForTitle>
@@ -418,7 +418,7 @@ const OrganizationPage = () => {
                 <SwiperSlide>
                   <DetailItemWrapperForTitle minW={deviceType === 'mobile' && '343px'}>
                     <DetailItem title="귀소 집계 (60초마다 갱신, #6)">
-                      <OrganizationTable  data={homeComingOrganization} columnNames={['구분', '귀소', '인원수']} deviceType={deviceType} />
+                      <OrganizationTable  data={homeComingOrganization} columnNames={['구분', '귀소']} deviceType={deviceType} />
                       <VehicleTable rowData={homeComingVehicle} deviceType={deviceType} />
                     </DetailItem>
                   </DetailItemWrapperForTitle>
@@ -452,14 +452,14 @@ const OrganizationPage = () => {
                     <DetailItem title="소방서별 출동대 집계 (60초마다 갱신, #2)">
                       {deviceType === 'tabletVertical' && (
                         <Stack spacing="12px">
-                          <OrganizationTable  data={taskForceOrganization} columnNames={['구분', '차량수', '인원수']} deviceType={deviceType} />
+                          <OrganizationTable  data={taskForceOrganization} columnNames={['구분', '차량수']} deviceType={deviceType} />
                           <VehicleTable rowData={taskForeceVehicle} deviceType={deviceType} />
                         </Stack>
                       )}
                       {deviceType === 'tabletHorizontal' && (
                         <Flex gap="16px">
                           <Box flex={1}>
-                            <OrganizationTable  data={taskForceOrganization} columnNames={['구분', '차량수', '인원수']} deviceType={deviceType} />
+                            <OrganizationTable  data={taskForceOrganization} columnNames={['구분', '차량수']} deviceType={deviceType} />
                           </Box>
                           <Box flex={1}>
                             <VehicleTable rowData={taskForeceVehicle} deviceType={deviceType} />
@@ -474,14 +474,14 @@ const OrganizationPage = () => {
                     <DetailItem title="출동대 편성 집계 (60초마다 갱신, #3)">
                       {deviceType === 'tabletVertical' && (
                         <Stack spacing="12px">
-                          <OrganizationTable data={dispathcesOrganization} columnNames={['구분', '차량수', '인원수']} deviceType={deviceType} />
+                          <OrganizationTable data={dispathcesOrganization} columnNames={['구분', '차량수']} deviceType={deviceType} />
                           <VehicleTable rowData={dispathcesVehicle} deviceType={deviceType} />
                         </Stack>
                       )}
                       {deviceType === 'tabletHorizontal' && (
                         <Flex gap="16px">
                           <Box flex={1}>
-                            <OrganizationTable data={dispathcesOrganization} columnNames={['구분', '차량수', '인원수']} deviceType={deviceType} />
+                            <OrganizationTable data={dispathcesOrganization} columnNames={['구분', '차량수']} deviceType={deviceType} />
                           </Box>
                           <Box flex={1}>
                             <VehicleTable rowData={dispathcesVehicle} deviceType={deviceType} />
@@ -496,14 +496,14 @@ const OrganizationPage = () => {
                     <DetailItem title="출동 집계 (60초마다 갱신, #4)">
                       {deviceType === 'tabletVertical' && (
                         <Stack spacing="12px">
-                          <OrganizationTable data={mobilizationOrganization} columnNames={['구분', '출동', '인원수']} deviceType={deviceType} />
+                          <OrganizationTable data={mobilizationOrganization} columnNames={['구분', '출동']} deviceType={deviceType} />
                           <VehicleTable rowData={mobilizationVehicle} deviceType={deviceType} />
                         </Stack>
                       )}
                       {deviceType === 'tabletHorizontal' && (
                         <Flex gap="16px">
                           <Box flex={1}>
-                            <OrganizationTable data={mobilizationOrganization} columnNames={['구분', '출동', '인원수']} deviceType={deviceType} />
+                            <OrganizationTable data={mobilizationOrganization} columnNames={['구분', '출동']} deviceType={deviceType} />
                           </Box>
                           <Box flex={1}>
                             <VehicleTable rowData={mobilizationVehicle} deviceType={deviceType} />
@@ -518,14 +518,14 @@ const OrganizationPage = () => {
                     <DetailItem title="현장도착 집계 (60초마다 갱신, #5)">
                       {deviceType === 'tabletVertical' && (
                         <Stack spacing="12px">
-                          <OrganizationTable data={arrivalOrganization} columnNames={['구분', '현장도착', '인원수']} deviceType={deviceType} />
+                          <OrganizationTable data={arrivalOrganization} columnNames={['구분', '현장도착']} deviceType={deviceType} />
                           <VehicleTable rowData={ariivalVehicle} deviceType={deviceType} />
                         </Stack>
                       )}
                       {deviceType === 'tabletHorizontal' && (
                         <Flex gap="16px">
                           <Box flex={1}>
-                            <OrganizationTable data={arrivalOrganization} columnNames={['구분', '현장도착', '인원수']} deviceType={deviceType} />
+                            <OrganizationTable data={arrivalOrganization} columnNames={['구분', '현장도착']} deviceType={deviceType} />
                           </Box>
                           <Box flex={1}>
                             <VehicleTable rowData={ariivalVehicle} deviceType={deviceType} />
@@ -540,14 +540,14 @@ const OrganizationPage = () => {
                     <DetailItem title="귀소 집계 (60초마다 갱신, #6)">
                       {deviceType === 'tabletVertical' && (
                         <Stack spacing="12px">
-                          <OrganizationTable data={homeComingOrganization} columnNames={['구분', '귀소', '인원수']} deviceType={deviceType} />
+                          <OrganizationTable data={homeComingOrganization} columnNames={['구분', '귀소']} deviceType={deviceType} />
                           <VehicleTable rowData={homeComingVehicle} deviceType={deviceType} />
                         </Stack>
                       )}
                       {deviceType === 'tabletHorizontal' && (
                         <Flex gap="16px">
                           <Box flex={1}>
-                            <OrganizationTable data={homeComingOrganization} columnNames={['구분', '귀소', '인원수']} deviceType={deviceType} />
+                            <OrganizationTable data={homeComingOrganization} columnNames={['구분', '귀소']} deviceType={deviceType} />
                           </Box>
                           <Box flex={1}>
                             <VehicleTable rowData={homeComingVehicle} deviceType={deviceType} />
