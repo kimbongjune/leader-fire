@@ -13,6 +13,7 @@ interface Props {
 
 const NeighborhoodFilter = (props: Props) => {
   const { deviceType } = props;
+  console.log(props)
 
   return (
     <Wrapper deviceType={deviceType}>

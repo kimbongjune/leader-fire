@@ -17,6 +17,7 @@ interface Props {
 //TODO 인근시설 하위페이지
 const TabletFacility = (props: Props) => {
   const { deviceType } = props;
+  console.log(props)
   return (
     <>
       {/* 인근 대상물 */}
