@@ -36,7 +36,7 @@ const TabletPage = (props: Props) => {
           <AddressTab address={selectedDisaster?.lawAddr} />
         </AddressTabWrapper>
         <Children>
-        <iframe src={`https://view2.gnfire.go.kr:8887/chat/${selectedDisaster?.dsrSeq}/0/1?gubun=4`} width="100%" height="100%"></iframe>
+        <iframe src={`https://view2.gnfire.go.kr:8887/chat/${selectedDisaster?.dsrSeq}/0/0?gubun=4`} width="100%" height="100%"></iframe>
         </Children>
       </Flex>
     </Layout>
