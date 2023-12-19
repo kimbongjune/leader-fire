@@ -20,10 +20,10 @@ const HistoryFilterItem = (props: Props) => {
   return (
     <Wrapper onClick={props.onClick} isSelected={selectedType === props.filterName} type={props.filterName} deviceType={deviceType}>
       <Text deviceType={deviceType}>
-        {props.filterName === 'report' && '신고'}
-        {props.filterName === 'rescue' && '구조'}
-        {props.filterName === 'patient' && '환자'}
-        {props.filterName === 'mobilize' && '출동'}
+        {props.filterName === 'report' && '신고이력'}
+        {props.filterName === 'rescue' && '구조이력'}
+        {props.filterName === 'patient' && '환자이력'}
+        {props.filterName === 'mobilize' && '인근출동'}
       </Text>
       <Number isSelected={selectedType === props.filterName} type={props.filterName} deviceType={deviceType}>
         {props.filterName === 'report' && `${props.countByType['report']}건`}
