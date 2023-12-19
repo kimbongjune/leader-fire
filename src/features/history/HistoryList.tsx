@@ -24,6 +24,14 @@ interface Props {
   reportNumber: number;
 }
 
+const kndCdMappingTable = (kndCd:string):string =>{
+  switch(kndCd){
+    case "0040001" :return 'P00301'
+    case "0040002" :return 'P00302'
+    case "0040003" :return 'P00303'
+    default : return 'P00304'
+  }
+}
 
 //TODO 과거이력 아이템 클릭시 표출 페이지, 신고자 바뀌면 다시?
 const HistoryList = (props: Props) => {
@@ -38,13 +46,16 @@ const HistoryList = (props: Props) => {
   const apiIntervalRef = useRef<NodeJS.Timer | null>(null);
 
   useEffect(() => {
+    if(selectedDisaster?.callTell == null || selectedDisaster?.callTell == ""){
+      return;
+    }
     // 컴포넌트가 마운트될 때 첫 번째 API 호출을 수행
       const fetchData = async () =>{
           const historyData = await axios.get<HistoryData>("/api/past_history/all",{
             params : {
               callTel: selectedDisaster?.callTell, //selectedDisaster?.callTell
               dsrClsCd: selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
-              dsrKndCd: selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
+              dsrKndCd: kndCdMappingTable(selectedDisaster?.dsrKndCd || ""), //selectedDisaster?.dsrKndCd
               dsrSeq: id,//id
               gisX: selectedDisaster?.gisX,  //selectedDisaster?.gisX
               gisY: selectedDisaster?.gisY, //selectedDisaster?.gisY
