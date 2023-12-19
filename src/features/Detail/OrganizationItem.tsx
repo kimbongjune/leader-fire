@@ -59,7 +59,8 @@ const OrganizationItem = (props: Props) => {
             <Content>
               <PersonnelStatus>
                 <Flex gap="4px" align="center">
-                  총<span>{String(props.TotalNumberOfVehicle || 0).padStart(3, '0')}</span>대 / <span>{String(totalPeople || 0).padStart(3, '0')}</span> 명
+                  총<span>{String(props.TotalNumberOfVehicle || 0).padStart(3, '0')}</span>
+                  {/* 대 / <span>{String(totalPeople || 0).padStart(3, '0')}</span> 명 */}
                 </Flex>
               </PersonnelStatus>
             </Content>

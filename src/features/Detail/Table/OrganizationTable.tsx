@@ -26,7 +26,7 @@ export interface OrganizationTableDataType {
 interface Props {
   data: OrganizationTableDataType;
   deviceType: DeviceType;
-  columnNames?: [string, string, string];
+  columnNames?: [string, string, string?];
   rowDataValueFormat?: [string, string];
 }
 
@@ -63,10 +63,10 @@ const OrganizationTable = (props: Props) => {
                           {item.vehicleCount > 0 ? item.vehicleCount : '-'}
                           {item.vehicleCount > 0 && props.rowDataValueFormat?.[0]}
                         </TableData>
-                        <TableData flex={1}>
+                        {/* <TableData flex={1}>
                           {item.peopleCount > 0 ? item.peopleCount : '-'}
                           {item.peopleCount > 0 && props.rowDataValueFormat?.[1]}
-                        </TableData>
+                        </TableData> */}
                       </TableDataWrapper>
                     )}
                     {item.type === '소계' && (
@@ -76,10 +76,10 @@ const OrganizationTable = (props: Props) => {
                           {item.vehicleCount > 0 ? item.vehicleCount : '-'}
                           {item.vehicleCount > 0 && props.rowDataValueFormat?.[0]}
                         </TableData>
-                        <TableData flex={1}>
+                        {/* <TableData flex={1}>
                           {item.peopleCount > 0 ? item.peopleCount : '-'}
                           {item.peopleCount > 0 && props.rowDataValueFormat?.[1]}
-                        </TableData>
+                        </TableData> */}
                       </TableDataWrapper>
                       )}
                     </Flex>
@@ -92,9 +92,9 @@ const OrganizationTable = (props: Props) => {
         <TotalRow>
           <TableData>소계</TableData>
           {'vehicleCount' in props.data.total && <TableData>{props.data.total.vehicleCount}{props.rowDataValueFormat?.[0]}</TableData>}
-          {'peopleCount' in props.data.total && <TableData>{props.data.total.peopleCount}{props.rowDataValueFormat?.[1]}</TableData>}
+          {/* {'peopleCount' in props.data.total && <TableData>{props.data.total.peopleCount}{props.rowDataValueFormat?.[1]}</TableData>} */}
           {'vehicleInUseCount' in props.data.total && <TableData>{props.data.total.vehicleInUseCount}{props.rowDataValueFormat?.[0]}</TableData>}
-          {'vehicleOrganizationCount' in props.data.total && <TableData>{props.data.total.vehicleOrganizationCount}{props.rowDataValueFormat?.[1]}</TableData>}
+          {/* {'vehicleOrganizationCount' in props.data.total && <TableData>{props.data.total.vehicleOrganizationCount}{props.rowDataValueFormat?.[1]}</TableData>} */}
         </TotalRow>
       </TableBody>
     </Table>
@@ -106,7 +106,7 @@ export default OrganizationTable;
 OrganizationTable.defaultProps = {
   data: OrganizationTableData,
   columnNames: ['구분', '차량수', '인원수'],
-  rowDataValueFormat: ['대', '명'],
+  rowDataValueFormat: ['대'],
 };
 
 const Table = styled.table<{ deviceType: DeviceType }>`
