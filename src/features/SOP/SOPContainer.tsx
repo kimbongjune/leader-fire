@@ -274,7 +274,7 @@ const SOPContainer = (props: Props) => {
     updateSize();
   
     return () => window.removeEventListener('resize', updateSize);
-  }, [pdfContainerRef.current]);
+  }, [pdfContainerRef.current, deviceType]);
 
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
