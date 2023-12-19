@@ -18,7 +18,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { setIsDangerMarkerActive, setIsExtinguisherMarkerActive, setIsTargetMarkerActive, setIsWaterMarkerActive,setIsRescuePositionActive, setIsVehicleActive, setIsVideoActive } from '../../features/slice/disasterSlice';
 import axios from '@/components/common/api/axios';
 import ShareVehicleModal from './ShareVehicleModal';
-import { DispatchVehicleDataType } from './VehicleStatus';
+import { DispatchVehicleDataType, DispatchVehicleDataType2 } from './VehicleStatus';
 import { MarkerType } from './ObjectPosition';
 import proj4 from 'proj4';
 import { selectDisasterById } from '../slice/test';
@@ -109,6 +109,43 @@ const transformData = (data:DspCarMoveResultDtoList[]):DispatchVehicleDataType[]
 });
 };
 
+const transformData2 = (data:DspCarMoveResultDtoList[]):DispatchVehicleDataType2[] => {
+  const statusMap: { [key: string]: DispatchVehicleDataType2['status'] } = {
+    "0140040": "출동보고" as "출동보고",
+    "1710243": "출동보고" as "출동보고",
+    "0140041": "현장도착" as "현장도착",
+    "0140021": "활동중" as "활동중",
+    "0140055": "활동중" as "활동중",
+    "0140042": "활동중" as "활동중",
+    "0140043": "귀소" as "귀소",
+    "0140044": "귀소" as "귀소",
+  };
+
+  return data.map(item => {
+    const status = statusMap[item.carstatCd] || '상태없음';
+    let transmissionStatus: DispatchVehicleDataType2['transmissionStatus'] = '미확인';
+    if (item.targetlocRoger) {
+        transmissionStatus = item.targetlocAcceptRoger ? '승인' : '미승인';
+    }
+
+    return {
+        status,
+        name: item.radioCallsign,
+        transmissionStatus,
+        carId : item.carId
+    };
+});
+};
+
+const kndCdMappingTable = (kndCd:string):string =>{
+  switch(kndCd){
+    case "0040001" :return 'P00301'
+    case "0040002" :return 'P00302'
+    case "0040003" :return 'P00303'
+    default : return 'P00304'
+  }
+}
+
 //TODO 지도(태블릿 미니맵), 소화전, 비상소화장치, 대상물, 위험물 표시, 롱클릭 시 오버레이와 마커 표시(마커는 한건만)
 const MiniMap = (props: Props) => {
   const dispatch = useDispatch()
@@ -171,7 +208,7 @@ const MiniMap = (props: Props) => {
   const userLocationMarker = useRef<any>(null);
   const [rescueMarker, setRescueMarker] = useState<Markers[]>([])
 
-  const [aponintList, setAponintList] = useState<DispatchVehicleDataType[]>([])
+  const [aponintList, setAponintList] = useState<DispatchVehicleDataType2[]>([])
 
   const userLocationX = useSelector((state: RootState) => state.userReducer.userLocationX);
   const userLocationY = useSelector((state: RootState) => state.userReducer.userLocationY);
@@ -346,7 +383,8 @@ const MiniMap = (props: Props) => {
         });
 
         if(positionResult.data.responseCode === 200){
-          setAponintList(transformData(positionResult.data.result.dspCarMoveResultDtoList))
+          setAponintList(transformData2(positionResult.data.result.dspCarMoveResultDtoList))
+          //setAponintList(transformData(positionResult.data.result.dspCarMoveResultDtoList.filter(s => s.avlGisX > 0)))
         }
         
 
@@ -374,7 +412,7 @@ const MiniMap = (props: Props) => {
             params :{
               callTel: selectedDisaster?.callTell, //selectedDisaster?.callTell
               dsrClsCd: selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
-              dsrKndCd: selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
+              dsrKndCd: kndCdMappingTable(selectedDisaster?.dsrKndCd || ""), //selectedDisaster?.dsrKndCd
               dsrSeq: id,//id
               gisX: selectedDisaster?.gisX,  //selectedDisaster?.gisX
               gisY: selectedDisaster?.gisY, //selectedDisaster?.gisY
@@ -471,40 +509,42 @@ const MiniMap = (props: Props) => {
     }
 
     const updateVehicleMarkers = () => {
-      fetchLocations().then(location => {
-        if(!location){
+      if(id){
+        fetchLocations().then(location => {
+          if(!location){
+            return;
+          }
+          vehicleMarkers.current.forEach(marker => marker.setMap(null));
+          vehicleMarkers.current = []; // 마커 배열 초기화
+
+          videoMarkers.current.forEach(marker => marker.setMap(null));
+          videoMarkers.current = []; // 마커 배열 초기화
+
+          dangerousMarkers.current.forEach(marker => marker.setMap(null));
+          dangerousMarkers.current = []; // 마커 배열 초기화
+
+          fireExtinguisherMarkers.current.forEach(marker => marker.setMap(null));
+          fireExtinguisherMarkers.current = []; // 마커 배열 초기화
+
+          hydrantMarkers.current.forEach(marker => marker.setMap(null));
+          hydrantMarkers.current = []; // 마커 배열 초기화
+
+          targetMarkers.current.forEach(marker => marker.setMap(null));
+          targetMarkers.current = []; // 마커 배열 초기화
+
+          dangerousMarkers.current.forEach(marker => marker.setMap(null));
+          dangerousMarkers.current = []; // 마커 배열 초기화
+
+          setCarMarkers(location?.car)
+          setVideoMarker(location?.video)
+          setDangerousMarker(location?.dangerous)
+          setFireExtinguisherMarker(location?.fireExtinguisher)
+          setHydrantMarker(location?.hydrant)
+          setTargetMarker(location?.target)
+        }).catch(error => {
           return;
-        }
-        vehicleMarkers.current.forEach(marker => marker.setMap(null));
-        vehicleMarkers.current = []; // 마커 배열 초기화
-
-        videoMarkers.current.forEach(marker => marker.setMap(null));
-        videoMarkers.current = []; // 마커 배열 초기화
-
-        dangerousMarkers.current.forEach(marker => marker.setMap(null));
-        dangerousMarkers.current = []; // 마커 배열 초기화
-
-        fireExtinguisherMarkers.current.forEach(marker => marker.setMap(null));
-        fireExtinguisherMarkers.current = []; // 마커 배열 초기화
-
-        hydrantMarkers.current.forEach(marker => marker.setMap(null));
-        hydrantMarkers.current = []; // 마커 배열 초기화
-
-        targetMarkers.current.forEach(marker => marker.setMap(null));
-        targetMarkers.current = []; // 마커 배열 초기화
-
-        dangerousMarkers.current.forEach(marker => marker.setMap(null));
-        dangerousMarkers.current = []; // 마커 배열 초기화
-
-        setCarMarkers(location?.car)
-        setVideoMarker(location?.video)
-        setDangerousMarker(location?.dangerous)
-        setFireExtinguisherMarker(location?.fireExtinguisher)
-        setHydrantMarker(location?.hydrant)
-        setTargetMarker(location?.target)
-      }).catch(error => {
-        return;
-      });
+        });
+      }
     };
 
     updateVehicleMarkers();
@@ -545,48 +585,81 @@ const MiniMap = (props: Props) => {
   }
 
   const toggleCarMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();  
     vehicleMarkers.current.forEach((marker) => {
       marker.setMap(isVehicleActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
+    if(isVehicleActive && vehicleMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleRescueMarkers = () => {
     rescueMarkers?.current?.setMap(isRescuePositionActive ? mapInstance.current : null);
+    if(isRescuePositionActive){
+      mapInstance.current.setCenter(rescueMarkers?.current?.getPosition());
+    }
     rescueCircles?.current?.setMap(isRescuePositionActive ? mapInstance.current : null);
   };
 
   const toggleVideoMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();  
     videoMarkers.current.forEach((marker) => {
       marker.setMap(isVideoActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
+    if(isVideoActive && videoMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleDangerMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();  
     dangerousMarkers.current.forEach((marker) => {
       marker.setMap(isDangerActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
     dangerOverlays.current?.setMap(null)
     dangerOverlays.current = null
+    if(isDangerActive && dangerousMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleWarterMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();
     hydrantMarkers.current.forEach((marker) => {
       marker.setMap(isWaterActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
+    if(isWaterActive && hydrantMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleExtinguisherMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();
     fireExtinguisherMarkers.current.forEach((marker) => {
       marker.setMap(isExtinguisherActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
+    if(isExtinguisherActive && fireExtinguisherMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleTargerMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();
     targetMarkers.current.forEach((marker) => {
       marker.setMap(isTargerActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
     targetOverlays.current?.setMap(null)
     targetOverlays.current = null
+    if(isTargerActive && targetMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   useEffect(() => {

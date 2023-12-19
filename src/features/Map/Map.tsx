@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import Navbar from '@/components/common/Navbar/Navbar';
 import DrawerButtons from './DrawerButtons';
 import FloatingButtons from './FloatingButtons';
-import VehicleStatus, { DispatchVehicleDataType } from './VehicleStatus';
+import VehicleStatus, { DispatchVehicleDataType, DispatchVehicleDataType2 } from './VehicleStatus';
 import ShareVehicleModal from './ShareVehicleModal';
 import { KakaoUtil, Position } from './kakaoUtil';
 import useDeviceType from '@/hooks/useDeviceType';
@@ -111,6 +111,42 @@ const transformData = (data:DspCarMoveResultDtoList[]):DispatchVehicleDataType[]
 });
 };
 
+const transformData2 = (data:DspCarMoveResultDtoList[]):DispatchVehicleDataType2[] => {
+  const statusMap: { [key: string]: DispatchVehicleDataType2['status'] } = {
+    "0140040": "출동보고" as "출동보고",
+    "1710243": "출동보고" as "출동보고",
+    "0140041": "현장도착" as "현장도착",
+    "0140021": "활동중" as "활동중",
+    "0140055": "활동중" as "활동중",
+    "0140042": "활동중" as "활동중",
+    "0140043": "귀소" as "귀소",
+    "0140044": "귀소" as "귀소",
+  };
+
+  return data.map(item => {
+    const status = statusMap[item.carstatCd] || '상태없음';
+    let transmissionStatus: DispatchVehicleDataType2['transmissionStatus'] = '미확인';
+    if (item.targetlocRoger) {
+        transmissionStatus = item.targetlocAcceptRoger ? '승인' : '미승인';
+    }
+
+    return {
+        status,
+        name: item.radioCallsign,
+        transmissionStatus,
+        carId : item.carId
+    };
+});
+};
+
+const kndCdMappingTable = (kndCd:string):string =>{
+  switch(kndCd){
+    case "0040001" :return 'P00301'
+    case "0040002" :return 'P00302'
+    case "0040003" :return 'P00303'
+    default : return 'P00304'
+  }
+}
 
 //TODO 지도(핸드폰 or 태블릿 크게보기), 소화전, 비상소화장치, 대상물, 위험물 표시/ 미터, 피난약자, 과거이력 제거, 롱클릭 시 오버레이와 마커 표시(마커는 한건만)
 //TODO 지도 화면의 버튼이 미니맵의 버튼과 다름 개수, 이름 뭐로 맞춰야하는지
@@ -171,7 +207,7 @@ const Map = (props: Props) => {
 
   const [rescueMarker, setRescueMarker] = useState<Markers[]>([])
 
-  const [aponintList, setAponintList] = useState<DispatchVehicleDataType[]>([])
+  const [aponintList, setAponintList] = useState<DispatchVehicleDataType2[]>([])
 
   const gpsStatusSatelliteCount = useSelector((state: RootState) => state.userReducer.gpsStatusSatelliteCount);
   const gpsStatusDbHzAverage = useSelector((state: RootState) => state.userReducer.gpsStatusDbHzAverage);
@@ -374,7 +410,8 @@ const Map = (props: Props) => {
         console.log(positionResult.data)
 
         if(positionResult.data.responseCode === 200){
-          setAponintList(transformData(positionResult.data.result.dspCarMoveResultDtoList))
+          setAponintList(transformData2(positionResult.data.result.dspCarMoveResultDtoList))
+          //setAponintList(transformData(positionResult.data.result.dspCarMoveResultDtoList.filter(s => s.avlGisX > 0)))
         }
         
         const carPosition = positionResult.data.result?.dspCarMoveResultDtoList?.filter(s => s.avlGisX > 0).map((item) => {
@@ -401,7 +438,7 @@ const Map = (props: Props) => {
             params :{
               callTel: selectedDisaster?.callTell, //selectedDisaster?.callTell
               dsrClsCd: selectedDisaster?.dsrClsCd,  //selectedDisaster?.dsrClsCd
-              dsrKndCd: selectedDisaster?.dsrKndCd, //selectedDisaster?.dsrKndCd
+              dsrKndCd: kndCdMappingTable(selectedDisaster?.dsrKndCd || ""), //selectedDisaster?.dsrKndCd
               dsrSeq: id,//id
               gisX: selectedDisaster?.gisX,  //selectedDisaster?.gisX
               gisY: selectedDisaster?.gisY, //selectedDisaster?.gisY
@@ -558,48 +595,81 @@ const Map = (props: Props) => {
   };
 
   const toggleCarMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();  
     vehicleMarkers.current.forEach((marker) => {
       marker.setMap(isVehicleActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
+    if(isVehicleActive && vehicleMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleRescueMarkers = () => {
     rescueMarkers?.current?.setMap(isRescuePositionActive ? mapInstance.current : null);
+    if(isRescuePositionActive){
+      mapInstance.current.setCenter(rescueMarkers?.current?.getPosition());
+    }
     rescueCircles?.current?.setMap(isRescuePositionActive ? mapInstance.current : null);
   };
 
   const toggleVideoMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();  
     videoMarkers.current.forEach((marker) => {
       marker.setMap(isVideoActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
+    if(isVideoActive && videoMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleDangerMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();  
     dangerousMarkers.current.forEach((marker) => {
       marker.setMap(isDangerActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
     dangerOverlays.current?.setMap(null)
     dangerOverlays.current = null
+    if(isDangerActive && dangerousMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleWarterMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();
     hydrantMarkers.current.forEach((marker) => {
       marker.setMap(isWaterActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
+    if(isWaterActive && hydrantMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleExtinguisherMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();
     fireExtinguisherMarkers.current.forEach((marker) => {
       marker.setMap(isExtinguisherActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
+    if(isExtinguisherActive && fireExtinguisherMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   const toggleTargerMarkers = () => {
+    const bounds = new window.kakao.maps.LatLngBounds();
     targetMarkers.current.forEach((marker) => {
       marker.setMap(isTargerActive ? mapInstance.current : null);
+      bounds.extend(marker.getPosition());
     });
     targetOverlays.current?.setMap(null)
     targetOverlays.current = null
+    if(isTargerActive && targetMarkers.current.length > 0){
+      mapInstance.current?.setBounds(bounds);
+    }
   };
 
   useEffect(() => {
