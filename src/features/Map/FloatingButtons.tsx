@@ -53,7 +53,7 @@ const FloatingButtons = (props: Props) => {
             <Count>{props.vihicleMarkerCount}</Count>
           </Button>
 
-          <Button deviceType={deviceType} colorType="blue" status={props.isClickVideo} onClick={() => props.changeStatus('video')}>
+          {/* <Button deviceType={deviceType} colorType="blue" status={props.isClickVideo} onClick={() => props.changeStatus('video')}>
             <Flex gap="2px">
               <IconWrapper width="16px" height="16px" color={props.isClickVideo ? theme.colors.blue : theme.colors.gray5}>
                 <Video />
@@ -61,7 +61,7 @@ const FloatingButtons = (props: Props) => {
               <ButtonText deviceType={deviceType}>영상공유</ButtonText>
             </Flex>
             <Count>{props.videoMarkerCount | 0}</Count>
-          </Button>
+          </Button> */}
         </Flex>
         {deviceType !== 'mobile' && props.hasSkyButton != null && props.setHasSky != undefined && (
           <SkyButton hasSky={props.hasSkyButton} onClick={() => props.setHasSky && props.setHasSky(!props.hasSkyButton)}>
