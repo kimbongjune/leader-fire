@@ -51,6 +51,17 @@ type Vehicles = {
   numberOfVehicles: number;
 }[];
 
+const mapDsrKndCd = (code: string): string => {
+  const mapping: { [key: string]: string } = {
+      '0040001': '화재',
+      '0040002': '구조',
+      '0040003': '구급',
+      '13306': '기타',
+      // 추가적인 매핑이 필요한 경우 여기에 추가
+  };
+  return mapping[code] || '알 수 없음';
+};
+
 //TODO 상세 페이지, 상세정보 조회(폴링)
 const DetailPage = () => {
   const router = useRouter();
@@ -139,7 +150,7 @@ const DetailPage = () => {
               params :{
                 callTel: data?.callTell, //selectedDisaster?.callTell
                 dsrClsCd: data?.dsrClsCd,  //selectedDisaster?.dsrClsCd
-                dsrKndCd: data?.dsrKndCd, //selectedDisaster?.dsrKndCd
+                dsrKndCd: mapDsrKndCd(data?.dsrKndCd || ""), //selectedDisaster?.dsrKndCd
                 dsrSeq: id,//id
                 gisX: data?.gisX,  //selectedDisaster?.gisX
                 gisY: data?.gisY, //selectedDisaster?.gisY
