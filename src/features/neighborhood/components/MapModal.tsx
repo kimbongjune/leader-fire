@@ -15,6 +15,7 @@ interface Props {
 
 const MapModal = (props: Props) => {
   const router = useRouter();
+  console.log(router.query)
   return (
     <ModalLayout isOpen={true} onClose={() => props.setIsMapModalOpen(false)} padding="32px 16px 16px" borderRadius="12px">
       <ModalContent>
@@ -26,7 +27,7 @@ const MapModal = (props: Props) => {
           <Button color={theme.colors.gray5} onClick={() => props.setIsMapModalOpen(false)}>
             취소
           </Button>
-          <Button color={theme.colors.orange} onClick={() => router.push(`/detail/map?gis_x=${props.gis_x_4326}&gis_y=${props.gis_y_4326}`)}>
+          <Button color={theme.colors.orange} onClick={() => router.push(`/detail/map?gis_x=${props.gis_x_4326}&gis_y=${props.gis_y_4326}&id=${router.query.id}`)}>
             확인
           </Button>
         </Flex>
