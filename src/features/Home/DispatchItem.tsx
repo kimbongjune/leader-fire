@@ -8,7 +8,7 @@ import IconWrapper from '@/components/common/IconWrapper/IconWrapper';
 import { DeviceType, apiPostResponse } from '@/types/types';
 import theme from '@/theme/colors';
 import { useDispatch } from 'react-redux';
-import { setSubDisasterInformation } from '../../features/slice/disasterSlice';
+import { setSubDisasterInformation, setDisasterInformation } from '../../features/slice/disasterSlice';
 import { useEffect } from 'react';
 import { getPassedTime } from '@/utils/getPassedTime';
 import { useSelector } from 'react-redux';
@@ -45,6 +45,8 @@ const DispatchItem = (props: Props) => {
 
   const useInfo = useSelector((state: RootState) => state.userReducer.userInfo);
 
+  const testData = useSelector((state: RootState) => state.disaster.disasterInformation);
+
   const moveDetailPage = async () => {
     console.log("move page")
 
@@ -55,6 +57,10 @@ const DispatchItem = (props: Props) => {
 
     if(viewResult.data.responseCode === 200) {
       dispatch(setSubDisasterInformation(props))
+      const updatedTestData = testData.map(item => 
+        item.dsrSeq === props.dsrSeq ? { ...item, isNew: false } : item
+      );
+      dispatch(setDisasterInformation(updatedTestData));
       router.push(`/detail/${props.dsrSeq}`)
     }else{
       console.log("viewResult call failed")
